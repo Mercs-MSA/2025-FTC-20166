@@ -10,10 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemGrabber;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemIntakeArm;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemIntakeSlide;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 
 @Config
 @TeleOp

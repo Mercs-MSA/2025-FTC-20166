@@ -6,12 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemClimb;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemGrabber;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemIntakeArm;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemIntakeSlide;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
-
 
 @TeleOp
 //@Disabled

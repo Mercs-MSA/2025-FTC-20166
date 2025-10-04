@@ -102,14 +102,7 @@ public class DriveTest extends LinearOpMode {
         imu.resetYaw();
     }
     public void initializeHardware() {
-        limitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
-        limitSwitch.setMode(DigitalChannel.Mode.INPUT);
-        if (limitSwitch.getState() == false) {
-            robotID = 0;
-        } else
-        {
-            robotID = 1;
-        }
+
         initializeMotors();
         initializeIMU();
     }
