@@ -15,7 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
-
+//Fl Motor - Motor 0
+//FR Motor - Motor 1
+//BL Motor - Motor 2
+//BR Motor - Motor 3
+//Otos sensor - I2C 1
+//Pinpoint - I2C 2
+//Shooter Tilt Left Servo
+//Shooter Tilt Right Servo
+//Shooter Fly Wheel Motor
 
 @TeleOp
 //@Disabled
@@ -35,8 +43,7 @@ public class DriveTestFaceGoal extends LinearOpMode
     private DcMotorEx m1 = null;
     private DcMotorEx m2 = null;
     private DcMotorEx m3 = null;
-    private Servo servo1;
-    private Servo servo2;
+
 //    private DcMotorEx m4 = null;
 //    private DcMotorEx m5 = null;
 //    private DcMotorEx m6 = null;
@@ -88,10 +95,9 @@ public class DriveTestFaceGoal extends LinearOpMode
 
         robotIMUSubSystem = new SubSystemRobotIMU(hardwareMap, robotID);
 
-        //servo1 = hardwareMap.get(Servo.class, "servo1");
-        //servo2 = hardwareMap.get(Servo.class, "servo2");
 
-        //pinpoint = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
+
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
         myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
         myOtos.setPosition(startPointMiddleBottom);
