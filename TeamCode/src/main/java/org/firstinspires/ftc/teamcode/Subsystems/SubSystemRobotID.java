@@ -13,7 +13,7 @@ public class SubSystemRobotID {
     }
     public int getRobotID()
     {
-        if (limitSwitch.getState() == false) {
+        if (limitSwitch.getState()) {
             return 0;
         } else
         {

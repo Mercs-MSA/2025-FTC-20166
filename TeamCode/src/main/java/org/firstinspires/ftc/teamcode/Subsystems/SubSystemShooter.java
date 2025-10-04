@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
+
+import org.firstinspires.ftc.teamcode.RobotConstants;
 
 public class SubSystemShooter {
 
@@ -26,4 +29,8 @@ public class SubSystemShooter {
 
     }
 
+    public void shooterSetAngle(double tiltAngle)
+    {
+
+    }
     }

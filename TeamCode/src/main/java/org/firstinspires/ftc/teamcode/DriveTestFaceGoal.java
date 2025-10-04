@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -76,9 +77,7 @@ public class DriveTestFaceGoal extends LinearOpMode
     GoBildaPinpointDriver pinpoint;
 
 
-    public static SparkFunOTOS.Pose2D startPointMiddleBottom = new SparkFunOTOS.Pose2D(0, -60, Math.toRadians(0));
-
-
+    Servo servo1;
 
 
     //public Point startPose
@@ -94,13 +93,13 @@ public class DriveTestFaceGoal extends LinearOpMode
         Waypoints.setRobotID(robotID);
 
         robotIMUSubSystem = new SubSystemRobotIMU(hardwareMap, robotID);
-
+        servo1 = hardwareMap.get(Servo.class, "servo1");
 
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
         myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
-        myOtos.setPosition(startPointMiddleBottom);
+        myOtos.setPosition(Waypoints.startPointMiddleBottom);
         //SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 90);
         //myOtos.setOffset(offset);
 
@@ -121,6 +120,12 @@ public class DriveTestFaceGoal extends LinearOpMode
 //        m5.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        m6.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        m7.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        if (robotID == 1)
+        {
+            m1.setDirection(DcMotorSimple.Direction.REVERSE);
+            m3.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
 
         imu = hardwareMap.get(IMU.class, "imu");
         imu.resetYaw();
@@ -263,7 +268,7 @@ public class DriveTestFaceGoal extends LinearOpMode
             calculateDrivePower();
 
             setDriveMotors((FLXPower + FLYPower + FLRPower), (FRXPower + FRYPower + FRRPower), (BLXPower + BLYPower + BLRPower), (BRXPower + BRYPower + BRRPower));
-
+            servo1.setPosition(RobotConstants.servoAngle);
             updateTelemetryA();
         }
     }

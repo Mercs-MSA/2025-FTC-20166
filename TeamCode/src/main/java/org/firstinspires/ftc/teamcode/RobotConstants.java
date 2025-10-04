@@ -7,13 +7,22 @@ public class RobotConstants
 {
     public final static double errorDeadZone = 5.0;
     public static int robotId;
-    //public RobotConstants(int robotId)
-    //{
-//
-    //}
-
+    public static double servoAngle = 0;
+    public static double leftMaxAngleSetting = 0.9;
+    public static double rightMaxAngleSetting = 0.1;
+    public static double leftMinAngleSetting = 0.1;
+    public static double rightMinAngleSetting = 0.9;
+    public static double shooterMaxAngle = 85;
+    public static double shooterMinAngle = 30;
     public static void setRobotID(int robotID)
     {
-        robotId = robotID;
+        if (robotID == 0)
+        {
+
+        }
+        else if (robotID == 1)
+        {
+
+        }
     }
 }
