@@ -4,7 +4,7 @@ ShowRampPlate = true;
 ShowServos = true;
 ShowServoMounts = true;
 ShowGears = true;
-LimitBounds = [18, 18, 18];
+LimitBounds = [15, 15, 15];
 ShooterAngle = 0;
 TurretAngle  = 0.1;
 ShooterWallHeight = 5.5;
@@ -93,7 +93,8 @@ module RotateObject(Radius, Angle, Axis, ShowLever = true)
 
 module Ball()
 {
-  sphere(d = 5);
+  color("Purple", 0.5)
+    sphere(d = 5);
 }
 
 module LazySusan()
@@ -150,11 +151,24 @@ module Shooter()
 module TurretServoGear()
 {
   color("plum", 0.5)
-    translate([-4.999, 0, 0])
+  difference()
+  {
+    union()
+    {
+    translate([-4.9985, 0, 0])
       rotate(180, [1, 0, 0])
       rotate(90, [1, 0, 0])
         scale(1/25.4)
           import("servo gear - Spur gear (36 teeth).stl", 4);
+    cylinder(d = 1, h = .3);
+    }
+    cylinder(d = .2, h = 1, center = true);
+    rotate(45, [0, 0, 1])
+      QuadHoles(d = .275 * 2, hole = 3.2/25.4);
+    rotate(45, [0, 0, 1])
+      QuadHoles(d = .275 * 2, hole = 6/25.4, h = .3);
+
+  }
 }
 
 module TurretSensorGear()
@@ -180,7 +194,7 @@ module TurretSensorGear()
       }
       //Grub screw captive bolt
       translate([.2, 0, 0.5])
-        cube([1.8/25.4, 5.4/25.4, 1], center = true);
+#        cube([1.8/25.4, 6.0/25.4, 1], center = true);
       //Grub screw opening
       translate([0, 0, .2])
         rotate(90, [0, 1, 0])
@@ -195,12 +209,13 @@ module TurretServo()
   {
     //Drive servo
     translate(TurretServoLocation)
-      translate([0, 0, -.6])
+      translate([0, 0, -.52])
       TurretServoGear();
     //Position sensor
     translate(TurretSensorLocation)
     {
       //Sensor gear
+      translate([0, 0, -0.32])
       TurretSensorGear();
       //Sensor Body & shaft
       color("lightgreen", 0.5)
@@ -291,6 +306,12 @@ module RenderMotorBody()
         rotate(-45, [0, 0, 1])
           rotate(-90, [1, 0, 0])
             translate([0, 0, -1.5 / 2])
+                MotorBody();
+    else if (ShowShooterMotor == 4)
+      translate([0, 0, - (1.5/2)])
+        rotate(-45, [0, 0, 1])
+          rotate(-90, [1, 0, 0])
+            translate([0, ShooterPlateT, -(1.5 / 2)])
                 MotorBody();
   }
 }
@@ -447,7 +468,7 @@ module ServoBlock(BlockDepth = .3, BlockWidth = 1.0, BlockLength = ServoBlockLen
   }
   
   //Alignment test
-  if (AddAttachHoles && ShowGears)
+  if (AddAttachHoles && ShowGears && false)
   {
 #  translate([0, (ServoBlockLength / 2) - .15, 0])
     cylinder(d = 2.9/25.4, h = 2, center = true);
@@ -479,21 +500,21 @@ module RampPivotBlock()
     cube([RampSupportT + .3, 1.0, .5]);
 }
 
-module QuadHoles(d, hole)
+module QuadHoles(d, hole, h = 1)
 {
     //Lazy Susan mounting holes
     rotate(45, [0, 0, 1])
       translate([d / 2, 0, 0])
-        cylinder(d = hole, h = 1, center = true);
+        cylinder(d = hole, h , center = true);
     rotate(135, [0, 0, 1])
       translate([d / 2, 0, 0])
-        cylinder(d = hole, h = 1, center = true);
+        cylinder(d = hole, h , center = true);
     rotate(-45, [0, 0, 1])
       translate([d / 2, 0, 0])
-        cylinder(d = hole, h = 1, center = true);
+        cylinder(d = hole, h , center = true);
     rotate(-135, [0, 0, 1])
       translate([d / 2, 0, 0])
-        cylinder(d = hole, h = 1, center = true);
+        cylinder(d = hole, h , center = true);
 }
 
 module RampPlate()
@@ -555,11 +576,11 @@ module RampPlate()
   if (ShowServoMounts)
   {
     //Left
-    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset  + .15 + 0.025, ServoHOffset + .39 , -(ShooterPlateT + 1) / 2])
+    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset  + .15 + 0.025, ServoHOffset + .39 , (ShooterPlateT + 1) / 2])
       rotate(180, [0, 1, 0])
         ServoBlock();
     //Right
-    translate([BallExitOffset - RampXOffset + FlywheelClearance -.15 - 0.025, ServoHOffset + .39 , -(ShooterPlateT + 1) / 2])
+    translate([BallExitOffset - RampXOffset + FlywheelClearance -.15 - 0.025, ServoHOffset + .39 , (ShooterPlateT + 1) / 2])
       rotate(180, [0, 1, 0])
         ServoBlock();
   }
@@ -635,11 +656,11 @@ module Everything()
     if (ShowServos)
       translate([0, ServoHOffset, -ServoVOffset])
       {
-        translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset, 0, 0])
+        translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset, 0, ShooterPlateT + 1])
           rotate(90, [0, 0, 1])
             rotate(-90, [1, 0, 0])
               Servo();
-        translate([BallExitOffset - RampXOffset + FlywheelClearance, 0, 0])
+        translate([BallExitOffset - RampXOffset + FlywheelClearance, 0, ShooterPlateT + 1])
           rotate(90, [0, 0, 1])
             rotate(90, [1, 0, 0])            
                 Servo();
@@ -662,7 +683,29 @@ module SensorTest()
   }
 }
 
-//Everything();
+  BallStoreSpacingAngle = 120;
+  BallStoreRadius = 3.2;
+  BallStoreAngle = 30;
+
+module BallStore()
+{  
+  rotate(BallStoreAngle, [0, 0, 1])
+  {
+    translate([0, 0, -5.2 / 2])
+      rotate(-30, [0, 0, 1])
+        cylinder(d = 2.8, h = 5.2, $fn = 3);
+    translate([0, -BallStoreRadius, 0])
+      Ball();
+    rotate(BallStoreSpacingAngle, [0, 0, 1])
+      translate([0, -BallStoreRadius, 0])
+        Ball();
+    rotate(-BallStoreSpacingAngle, [0, 0, 1])
+      translate([0, -BallStoreRadius, 0])
+        Ball();
+  }
+}
+
+Everything();
 
 //ServoBlock();
 
@@ -672,11 +715,21 @@ module SensorTest()
 //LazySusanInnerSpacer();
 //LazySusanOuterSpacer();
 
-if (ShowLimits)
-  Limits();
 
 //SensorTest();
 
+//intersection()
+//{
+//  TurretSensorGear();
+//  cube([.6, .6, 2], center = true);
+//}
 
-TurretSensorGear();
 
+//TurretServoGear();
+
+translate([3, 0, -3])
+  BallStore();
+
+if (ShowLimits)
+  translate([1, 0, -6])
+  Limits();
