@@ -1,0 +1,40 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "New set 1": {
+            "BallClearance": "0.25",
+            "BallCompression": "0.20000000000000001",
+            "BallDiameter": "5",
+            "BallExitOffset": "2.7000000000000002",
+            "FlywheelDiameter": "3.75",
+            "LazySusanT": "0.20000000000000001",
+            "LimitBounds": "[15, 15, 15]",
+            "MotorMountD": "2.5",
+            "RampLowerCutoff": "0.40000000000000002",
+            "RampSupportT": "0.5",
+            "RampTiltHOffset": "-1.8",
+            "RampXOffset": "1.2",
+            "RampYOffset": "1.8",
+            "RampZOffset": "-0.5",
+            "ServoBlockLength": "2.7000000000000002",
+            "ShooterAngle": "-45",
+            "ShooterCurveAngle": "52",
+            "ShooterPlateHeight": "2",
+            "ShooterPlateT": "0.20000000000000001",
+            "ShooterPlateWidth": "10",
+            "ShooterVersion": "2",
+            "ShooterWallT": "0.20000000000000001",
+            "ShowBallStore": "true",
+            "ShowGears": "true",
+            "ShowLimits": "false",
+            "ShowRampPlate": "true",
+            "ShowServoMounts": "true",
+            "ShowServos": "true",
+            "ShowShooter": "true",
+            "ShowShooterMotor": "5",
+            "TurretAngle": "0.10000000000000001",
+            "TurretSensorLocation": "[0, 5, -0.2]",
+            "TurretServoLocation": "[-4.51, -2.15, 0]"
+        }
+    }
+}
