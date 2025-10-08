@@ -12,7 +12,7 @@ public class RobotConstants
     public static double rightMaxAngleSetting = 0.1;
     public static double leftMinAngleSetting = 0.1;
     public static double rightMinAngleSetting = 0.9;
-    public static double shooterMaxAngle = 85;
+    public static double shooterMaxAngle = 90;
     public static double shooterMinAngle = 30;
     public static void setRobotID(int robotID)
     {

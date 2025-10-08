@@ -16,21 +16,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
+import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 //Fl Motor - Motor 0
 //FR Motor - Motor 1
 //BL Motor - Motor 2
 //BR Motor - Motor 3
 //Otos sensor - I2C 1
 //Pinpoint - I2C 2
-//Shooter Tilt Left Servo
-//Shooter Tilt Right Servo
-//Shooter Fly Wheel Motor
+//Shooter Tilt Left Servo - Servo 0
+//Shooter Tilt Right Servo - Servo 1
+//Shooter Fly Wheel Motor - Motor 0 Expansion Hub
+//Shooter Turret Rotation - Servo 2
+//Turret Position Sensor - Analog Input 0
 
 @TeleOp
 //@Disabled
 public class DriveTestFaceGoal extends LinearOpMode
 {
     private Telemetry telemetryA;
+    private SubSystemShooter subSystemShooter;
     private SubSystemRobotID robotIDSubSystem;
     private int robotID = 0;
     private SubSystemRobotIMU robotIMUSubSystem;
@@ -77,9 +81,6 @@ public class DriveTestFaceGoal extends LinearOpMode
     GoBildaPinpointDriver pinpoint;
 
 
-    Servo servo1;
-
-
     //public Point startPose
 
     public void initializeHardware() throws InterruptedException {
@@ -89,11 +90,12 @@ public class DriveTestFaceGoal extends LinearOpMode
         robotIDSubSystem = new SubSystemRobotID(hardwareMap);
         robotID = robotIDSubSystem.getRobotID();
 
+        subSystemShooter = new SubSystemShooter(hardwareMap);
+
         RobotConstants.setRobotID(robotID);
         Waypoints.setRobotID(robotID);
 
         robotIMUSubSystem = new SubSystemRobotIMU(hardwareMap, robotID);
-        servo1 = hardwareMap.get(Servo.class, "servo1");
 
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
@@ -256,6 +258,17 @@ public class DriveTestFaceGoal extends LinearOpMode
         BLRPower = driveRotate; //gamepad1.right_stick_x;
         BRRPower = -driveRotate; //-gamepad1.right_stick_x;
     }
+    public void test()
+    {
+        if(gamepad2.y)
+        {
+            subSystemShooter.shooterSetAngle(RobotConstants.shooterMaxAngle);
+        }
+        else if(gamepad2.a)
+        {
+            subSystemShooter.shooterSetAngle(RobotConstants.shooterMinAngle);
+        }
+    }
 
     public void runOpMode() throws InterruptedException
     {
@@ -268,8 +281,8 @@ public class DriveTestFaceGoal extends LinearOpMode
             calculateDrivePower();
 
             setDriveMotors((FLXPower + FLYPower + FLRPower), (FRXPower + FRYPower + FRRPower), (BLXPower + BLYPower + BLRPower), (BRXPower + BRYPower + BRRPower));
-            servo1.setPosition(RobotConstants.servoAngle);
             updateTelemetryA();
+            test();
         }
     }
 
