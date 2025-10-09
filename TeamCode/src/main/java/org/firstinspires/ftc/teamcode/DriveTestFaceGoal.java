@@ -8,12 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
@@ -39,8 +35,8 @@ public class DriveTestFaceGoal extends LinearOpMode
     private int robotID = 0;
     private SubSystemRobotIMU robotIMUSubSystem;
 
-    private double driveX;
-    private double driveY;
+    private double driveTranslateX;
+    private double driveTranslateY;
     SparkFunOTOS myOtos;
 
     //Motor demo variables
@@ -164,7 +160,7 @@ public class DriveTestFaceGoal extends LinearOpMode
         return -1 * calculatedAngleDegs;
     }
 
-    public double headingError(double actualHeading, double desiredHeading)
+    public double calculateHeadingError(double actualHeading, double desiredHeading)
     {
         error = actualHeading - desiredHeading;
         if (error > 180)
@@ -179,84 +175,84 @@ public class DriveTestFaceGoal extends LinearOpMode
 
     private void updateDriveControls() 
     {
-        double angleInRadians;
-        double oldDriveX = gamepad1.left_stick_x;
-        double oldDriveY = gamepad1.left_stick_y;
-        double headingPFactor = (1.0 / 90.0);
+        double translateAdjustAngleRadians;
+        double joystickX;
+        double joystickY;
+        double joystickRotation;
+        double currentRobotHeadingRadians;
+        boolean forceRobotCentric = false;
+        boolean faceGoal = false;
+        double headingError = 0.0;
 
+        //Capture some information we will need later
+        joystickX = gamepad1.left_stick_x;
+        joystickY = gamepad1.left_stick_y;
+        joystickRotation = gamepad1.right_stick_x;
+        currentRobotHeadingRadians = robotIMUSubSystem.getHeadingRadians();
+        forceRobotCentric = gamepad1.right_bumper;
+        faceGoal = gamepad1.left_bumper;
 
-        //Robot Centric or Field Centric switching
-        if(gamepad1.right_bumper)
-        {
-            angleInRadians = 0;
-        }
+        //Adjust translation factors if not robot centric
+        if(forceRobotCentric)
+            translateAdjustAngleRadians = 0;
         else
-        {
-            angleInRadians = robotIMUSubSystem.getHeadingRadians();
-        }
+            translateAdjustAngleRadians = currentRobotHeadingRadians;
 
         // Applying Trig for field centric driving
-        driveX = oldDriveX * Math.cos(angleInRadians) - oldDriveY * Math.sin(angleInRadians);
-        driveY = oldDriveX * Math.sin(angleInRadians) + oldDriveY * Math.cos(angleInRadians);
-        driveRotate = gamepad1.right_stick_x;
+        driveTranslateX = joystickX * Math.cos(translateAdjustAngleRadians) - joystickY * Math.sin(translateAdjustAngleRadians);
+        driveTranslateY = joystickX * Math.sin(translateAdjustAngleRadians) + joystickY * Math.cos(translateAdjustAngleRadians);
 
-        //setting josytick heading if rotating
-        if (currentlyTurning)
+        //Calculate desired rotation power, using a dead zone
+        if (Math.abs(joystickRotation) < RobotConstants.joystickRotateDeadband)
         {
-            joystickHeading = robotIMUSubSystem.getHeadingDegrees();
-        }
-
-        //Setting dead zone
-        if (Math.abs(driveRotate) < .1)
-        {
-            driveRotate = 0;
+            if (currentlyTurning)//If we WERE turning (but not anymore), then capture our current heading so we can hold it
+                joystickHeading = Math.toDegrees(currentRobotHeadingRadians);
+            //Stop actually turning
+            driveRotate = 0.0;
             currentlyTurning = false;
         }
         else
         {
+            driveRotate = joystickRotation;
             currentlyTurning = true;
         }
 
-        //setting heading to goal heading or regular heading
+        //Setting heading to goal heading or regular heading
         goalHeading = getPointsHeading(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.x, robotPose.y);
-        if (gamepad1.left_bumper)
-        {
+        if (faceGoal)
             desiredHeading = goalHeading;
-        } else
-        {
+        else
             desiredHeading = joystickHeading;
+
+        //Calculating and apply heading error, but only if we are not actively turning
+        //Otherwise continue to use the driveRotate decided by the joystick above
+        if (!currentlyTurning) {
+            headingError = calculateHeadingError(Math.toDegrees(currentRobotHeadingRadians), desiredHeading);
+            if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone) {
+                driveRotate = headingError * RobotConstants.headingPFactor;
+            }
         }
-
-        //Calculating and applying heading error
-        double error = headingError(robotIMUSubSystem.getHeadingDegrees(), desiredHeading);
-        if (Math.abs(error) > RobotConstants.errorDeadZone)
-        {
-            driveRotate = error * headingPFactor;
-        }
-        //displaying telemetry on the driver hub
-
-
     }
 
     private void calculateDrivePower()
     {
         // Setting the power for forwards and backwards
-        FLYPower = -driveY;
-        FRYPower = -driveY;
-        BLYPower = -driveY;
-        BRYPower = -driveY;
+        FLYPower = -driveTranslateY;
+        FRYPower = -driveTranslateY;
+        BLYPower = -driveTranslateY;
+        BRYPower = -driveTranslateY;
 
         //Setting power for strafing
-        FLXPower = driveX;
-        FRXPower = -driveX;
-        BLXPower = -driveX;
-        BRXPower = driveX;
+        FLXPower = driveTranslateX;
+        FRXPower = -driveTranslateX;
+        BLXPower = -driveTranslateX;
+        BRXPower = driveTranslateX;
 
         //Setting rotational power
-        FLRPower = driveRotate; //gamepad1.right_stick_x;
-        FRRPower = -driveRotate; //-gamepad1.right_stick_x;
-        BLRPower = driveRotate; //gamepad1.right_stick_x;
-        BRRPower = -driveRotate; //-gamepad1.right_stick_x;
+        FLRPower = driveRotate;
+        FRRPower = -driveRotate;
+        BLRPower = driveRotate;
+        BRRPower = -driveRotate;
     }
     public void test()
     {

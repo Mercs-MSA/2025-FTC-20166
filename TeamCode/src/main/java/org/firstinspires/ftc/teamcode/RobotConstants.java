@@ -5,7 +5,10 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class RobotConstants
 {
-    public final static double errorDeadZone = 5.0;
+    public final static double headingErrorDeadZone = 5.0;
+    public final static double headingPFactor = (1.0 / 90.0);
+    public final static double joystickRotateDeadband = 0.1;
+
     public static int robotId;
     public static double servoAngle = 0;
     public static double leftMaxAngleSetting = 0.9;
