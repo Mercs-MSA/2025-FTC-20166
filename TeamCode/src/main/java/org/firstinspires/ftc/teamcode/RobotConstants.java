@@ -8,6 +8,10 @@ public class RobotConstants
     public final static double headingErrorDeadZone = 5.0;
     public final static double headingPFactor = (1.0 / 90.0);
     public final static double joystickRotateDeadband = 0.1;
+    public final static double robotAPodYOffset = 15.5;
+    public final static double robotAPodXOffset = -16.5;
+    public final static double robotBPodYOffset = -19.5;
+    public final static double robotBPodXOffset = 7.5;
 
     public static int robotId;
     public static double servoAngle = 0;
