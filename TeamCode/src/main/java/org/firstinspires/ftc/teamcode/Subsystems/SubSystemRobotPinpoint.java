@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
@@ -33,13 +34,13 @@ public class SubSystemRobotPinpoint
          *  The Y pod offset refers to how far forwards from the tracking point the Y (strafe) odometry pod is.
          *  Forward of center is a positive number, backwards is a negative number.
          */
-        if (robotID == 0)
+        if (robotID == 0) //robot A
         {
-            pinpoint.setOffsets(RobotConstants.robotAPodYOffset, RobotConstants.robotAPodXOffset, DistanceUnit.CM);
+            pinpoint.setOffsets(RobotConstants.robotAPodYOffset, RobotConstants.robotAPodXOffset, DistanceUnit.INCH);
         }
-        else
+        else //robotB has robotID = 1
         {
-            pinpoint.setOffsets(RobotConstants.robotBPodYOffset, RobotConstants.robotBPodXOffset, DistanceUnit.CM);
+            pinpoint.setOffsets(RobotConstants.robotBPodYOffset, RobotConstants.robotBPodXOffset, DistanceUnit.INCH);
         }
 
         /*
@@ -76,6 +77,8 @@ public class SubSystemRobotPinpoint
 
     public Pose2D getPinpointPos()
     {
-        return pinpoint.getPosition();
+        Pose2D remuxPosition = pinpoint.getPosition();
+
+        return new Pose2D(DistanceUnit.INCH,remuxPosition.getY(DistanceUnit.INCH),remuxPosition.getX(DistanceUnit.INCH), AngleUnit.DEGREES,remuxPosition.getHeading(AngleUnit.DEGREES));
     }
 }

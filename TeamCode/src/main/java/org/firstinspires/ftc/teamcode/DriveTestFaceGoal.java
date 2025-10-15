@@ -121,7 +121,7 @@ public class DriveTestFaceGoal extends LinearOpMode
 //        m6.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        m7.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        if (robotID == 1)
+        if (robotID == 0) //robot A
         {
             m1.setDirection(DcMotorSimple.Direction.REVERSE);
             m3.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -293,7 +293,7 @@ public class DriveTestFaceGoal extends LinearOpMode
         telemetryA.addData("X coordinate", robotPose.x);
         telemetryA.addData("Y coordinate", robotPose.y);
         telemetryA.addData("Heading angle", robotIMUSubSystem.getHeadingDegrees());
-        telemetryA.addData("Robot ID: ", RobotConstants.robotId);
+        telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());
 
         //Heading Correction
         telemetryA.addData("error", error);

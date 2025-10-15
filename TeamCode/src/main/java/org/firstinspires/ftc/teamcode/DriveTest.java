@@ -75,7 +75,7 @@ public class DriveTest extends LinearOpMode {
 //        m6.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        m7.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        if (robotID == 0)
+        if (robotID == 1)
         {
             m1.setDirection(DcMotorSimple.Direction.REVERSE);
             m3.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -87,7 +87,7 @@ public class DriveTest extends LinearOpMode {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection;
 
-        if (robotID == 0) {
+        if (robotID == 1) {
             logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
             usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
         }
