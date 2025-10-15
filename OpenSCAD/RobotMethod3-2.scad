@@ -110,6 +110,28 @@ module Ball()
     sphere(d = 5);
 }
 
+TurretGear();
+
+module TurretGear()
+{
+  TurretGearT = .5;
+  ZScale = TurretGearT / .2;
+  difference()
+  {
+    translate([0, 0, -TurretGearT / 2])
+      rotate(90, [1, 0, 0])
+      scale([1.0, ZScale, 1.0])
+        scale(1/25.4)
+          import("Big gear.stl", 4);
+    translate([0, 0, -LazySusanT / 2])
+      cylinder(d = LazySusanOuterD + .1, h = LazySusanT);
+    for (i = [0:3])
+      rotate(45 + (i * 90), [0, 0, 1])
+        translate([0, 3.671, 0])
+          cylinder(d = 3.9 / 25.4, h = 2, center = true);
+  }
+}
+
 module LazySusan()
 {
   color("LightSteelBlue", 0.5)
@@ -119,10 +141,8 @@ module LazySusan()
     cylinder(d = LazySusanInnerD, h = LazySusanT + .1, center = true);
   }
   color("plum", 0.5)
-  translate([0, 0, -LazySusanT])
-    rotate(90, [1, 0, 0])
-      scale(1/25.4)
-        import("Big gear.stl", 4);
+    translate([0, 0, 0])
+      TurretGear();
 }
 
 module Shooter()
@@ -919,7 +939,7 @@ module Everything()
     TurretServo();
   }
   if (ShowGears)
-    translate([0, 0, -.2])
+    translate([0, 0, -ShooterPlateT / 1])
       LazySusan();
 
 }
