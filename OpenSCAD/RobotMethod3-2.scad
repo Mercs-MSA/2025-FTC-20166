@@ -5,6 +5,7 @@ ShowBallStore = true;
 ShowServos = true;
 ShowServoMounts = true;
 ShowGears = true;
+ShowAlignMarkers = true;
 LimitBounds = [15, 15, 15];
 ShooterVersion = 2;
 ShooterAngle = -90;
@@ -59,11 +60,15 @@ CurveBallProfileInnerR = 6.5;
 CurveBallPathSegmentAngle = 50;
 ShooterInnerCurveBackT = .2;
 RampRotationSupportT = 0.2;
+UpperBallTractionGap = 1.0;
+UpperBallTractionLocation = [-.4, -3.3, .70];
 
 module Servo()
 {
   color("DarkOrchid", 0.5) 
-    translate([ServoRotateOffset, 0, 0])
+  rotate(90, [0, 0, 1])
+  rotate(90, [1, 0, 0])
+    translate([0, 0, 0])
       scale (1/25.4)
         import("GoBildaServoLoRes.stl");
 }
@@ -110,28 +115,6 @@ module Ball()
     sphere(d = 5);
 }
 
-TurretGear();
-
-module TurretGear()
-{
-  TurretGearT = .5;
-  ZScale = TurretGearT / .2;
-  difference()
-  {
-    translate([0, 0, -TurretGearT / 2])
-      rotate(90, [1, 0, 0])
-      scale([1.0, ZScale, 1.0])
-        scale(1/25.4)
-          import("Big gear.stl", 4);
-    translate([0, 0, -LazySusanT / 2])
-      cylinder(d = LazySusanOuterD + .1, h = LazySusanT);
-    for (i = [0:3])
-      rotate(45 + (i * 90), [0, 0, 1])
-        translate([0, 3.671, 0])
-          cylinder(d = 3.9 / 25.4, h = 2, center = true);
-  }
-}
-
 module LazySusan()
 {
   color("LightSteelBlue", 0.5)
@@ -141,8 +124,10 @@ module LazySusan()
     cylinder(d = LazySusanInnerD, h = LazySusanT + .1, center = true);
   }
   color("plum", 0.5)
-    translate([0, 0, 0])
-      TurretGear();
+  translate([0, 0, -LazySusanT])
+    rotate(90, [1, 0, 0])
+      scale(1/25.4)
+        import("Big gear.stl", 4);
 }
 
 module Shooter()
@@ -291,6 +276,7 @@ module TurretServo()
       }
     }
   }
+  /*
   if (ShowServos)
   {
     translate(TurretServoLocation)
@@ -299,6 +285,7 @@ module TurretServo()
           rotate(180, [1, 0, 0])
             Servo();
   }
+  */
 }
 
 module frame(thickness) 
@@ -359,12 +346,78 @@ module pie_slice(r=3.0,a=30) {
   } 
 }
 
+module UpperBallTraction()
+{
+  {
+    rotate(180, [0, 0, 1])
+      ServoBlock(BlockWidthOffset = 0);
+    translate([-UpperBallTractionGap - UpperBallTractionLocation[0] - .9 - .3, -.1, -0.5])
+    difference()
+    {
+      translate([0, -.2, 0])
+        cube([.3, 1.4, 1]);
+      translate([-0.1, .487, .498])
+        rotate(90, [0, 1, 0])
+          cylinder(d = BearingD, h = 1.2);
+      translate([.3/2, 0, 0])
+        cylinder(d = 3/25.4, h = 3, center = true);
+      translate([.3/2, 1, 0])
+        cylinder(d = 3/25.4, h = 3, center = true);
+      if (ShowAlignMarkers)
+      {
+#        translate([.3/2, 0, 0])
+          cylinder(d = 3/25.4, h = 3, center = true);
+#        translate([.3/2, 1, 0])
+          cylinder(d = 3/25.4, h = 3, center = true);
+      }
+    }
+  }
+}
+
+module Roller(L, D, CF)
+{
+  rotate_extrude(angle = 360)
+  intersection()
+  {
+    scale([1.0, CF])
+      circle(d = D);
+    translate([0, -L/2])
+      square([D, L]);
+  }
+}
+
+module UpperBallTractionPulley()
+{
+  RollerL = (UpperBallTractionGap - .1) / 3;
+    rotate(-90, [0, 1, 0])
+    {
+    difference()
+    {
+      union()
+      {
+        Roller(L = RollerL, D = 1, CF = 1.0);
+        translate([0, 0, RollerL])
+          Roller(L = RollerL, D = 1, CF = 1.0);
+        translate([0, 0, RollerL + RollerL])
+          Roller(L = RollerL, D = 1, CF = 1.0);
+      }
+      cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true);
+    }
+//      color("silver")
+//      translate([0, 0, -.25])
+//      cylinder(d = .3, h = 1.2);
+  }
+}
+
 module ShooterBasePlate2TopAssembly()
 {
   ShooterBasePlate2Top();
-  translate([-0.5, -3.3, .70])
-    ServoBlock(BlockWidthOffset = 0);
-
+  translate(UpperBallTractionLocation)
+  {
+    UpperBallTraction();
+    translate([-.7, ServoRotateOffset, 0])
+      UpperBallTractionPulley();
+  }
 }
 
 
@@ -373,10 +426,11 @@ module ShooterBasePlate2Top()
   difference()
   {
     ShooterBasePlate2Core();
-    translate([-2, -5, -0.5])
-      cube([1, 3, 1]);
+    translate([-.9-UpperBallTractionGap, -5, -0.5])
+      cube([UpperBallTractionGap, 3, 1]);
   }
 }
+
 
 module ShooterBasePlate2Core()
 {
@@ -737,9 +791,12 @@ module ServoBlock(BlockDepth = .3, BlockWidth = 1.0, BlockLength = ServoBlockLen
         cylinder(d = 2.9/25.4, h = 2, center = true);
     }
   }
+    if (ShowServos)
+      translate([.5 - BlockDepth, 0, 0])
+        Servo();
   
   //Alignment test
-  if (AddAttachHoles && ShowGears && false)
+  if (AddAttachHoles && ShowAlignMarkers)
   {
 #  translate([0, (ServoBlockLength / 2) - .15, 0])
     cylinder(d = 2.9/25.4, h = 2, center = true);
@@ -924,6 +981,7 @@ module Everything()
       Shooter();
     if (ShowRampPlate)
       RampPlate();
+    /*
     if (ShowServos)
       translate([0, ServoHOffset, -ServoVOffset])
       {
@@ -936,10 +994,11 @@ module Everything()
             rotate(90, [1, 0, 0])            
                 Servo();
       }
+    */
     TurretServo();
   }
   if (ShowGears)
-    translate([0, 0, -ShooterPlateT / 1])
+    translate([0, 0, -.2])
       LazySusan();
 
 }
