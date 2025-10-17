@@ -33,16 +33,23 @@ public class SubSystemRobotPinpoint
          *
          *  The Y pod offset refers to how far forwards from the tracking point the Y (strafe) odometry pod is.
          *  Forward of center is a positive number, backwards is a negative number.
+         * Set the direction that each of the two odometry pods count. The X (forward) pod should
+         * increase when you move the robot forward. And the Y (strafe) pod should increase when
+         * you move the robot to the left.
          */
         if (robotID == 0) //robot A
         {
-            pinpoint.setOffsets(RobotConstants.robotAPodYOffset, RobotConstants.robotAPodXOffset, DistanceUnit.INCH);
+            pinpoint.setOffsets(RobotConstants.robotAPodXOffset, RobotConstants.robotAPodYOffset, DistanceUnit.MM);
+            pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         }
         else //robotB has robotID = 1
         {
-            pinpoint.setOffsets(RobotConstants.robotBPodYOffset, RobotConstants.robotBPodXOffset, DistanceUnit.INCH);
+            pinpoint.setOffsets(RobotConstants.robotBPodXOffset, RobotConstants.robotBPodYOffset, DistanceUnit.MM);
+            pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         }
-
+        //Test only
+        pinpoint.setOffsets(-220, 90, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         /*
          * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
          * the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
@@ -52,12 +59,6 @@ public class SubSystemRobotPinpoint
          */
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
-        /*
-         * Set the direction that each of the two odometry pods count. The X (forward) pod should
-         * increase when you move the robot forward. And the Y (strafe) pod should increase when
-         * you move the robot to the left.
-         */
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         /*
          * Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary

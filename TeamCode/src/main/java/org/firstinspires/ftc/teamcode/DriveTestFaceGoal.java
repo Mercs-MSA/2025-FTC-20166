@@ -290,22 +290,23 @@ public class DriveTestFaceGoal extends LinearOpMode
     private void updateTelemetryA()
     {
         //Robot status
-        telemetryA.addData("X coordinate", robotPose.x);
-        telemetryA.addData("Y coordinate", robotPose.y);
-        telemetryA.addData("Heading angle", robotIMUSubSystem.getHeadingDegrees());
         telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());
+        telemetryA.addData("IMU Heading angle", robotIMUSubSystem.getHeadingDegrees());
+        telemetryA.addData("OTOS X coordinate", robotPose.x);
+        telemetryA.addData("OTOS Y coordinate", robotPose.y);
+        telemetryA.addData("OTOS heading", robotPose.h);
+        //Pinpoint
+        telemetryA.addData("Pinpoint X coordinate", robotPos.getX(DistanceUnit.INCH));
+        telemetryA.addData("Pinpoint Y coordinate", robotPos.getY(DistanceUnit.INCH));
+        telemetryA.addData("Pinpoint heading", robotPos.getHeading(AngleUnit.DEGREES));
 
         //Heading Correction
-        telemetryA.addData("error", error);
         telemetryA.addData("Desired Heading", desiredHeading);
+        telemetryA.addData("error", error);
         telemetryA.addData("Joystick Heading", joystickHeading);
         telemetryA.addData("Goal Heading", goalHeading);
 
 
-        //Pinpoint
-        telemetryA.addData("X coordinate (pinpoint)", robotPos.getX(DistanceUnit.INCH));
-        telemetryA.addData("Y coordinate (pinpoint)", robotPos.getY(DistanceUnit.INCH));
-        telemetryA.addData("heading (pinpoint)", robotPos.getHeading(AngleUnit.DEGREES));
 
         updateTelemetry(telemetryA);
 
