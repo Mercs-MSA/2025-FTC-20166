@@ -71,9 +71,10 @@ public class DriveTestFaceGoal extends LinearOpMode
     private double BRRPower = 0.0;
 
     private double driveRotate;
+    private double headingError = 0.0;
+
     private double desiredHeading;
     private double goalHeading;
-    private double error;
     private boolean currentlyTurning = false;
     private double joystickHeading;
 
@@ -98,6 +99,9 @@ public class DriveTestFaceGoal extends LinearOpMode
 
         myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
         myOtos.setPosition(Waypoints.startPointMiddleBottom);
+        myOtos.calibrateImu();
+        myOtos.resetTracking();
+        robotPose = myOtos.getPosition();
         //SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 90);
         //myOtos.setOffset(offset);
 
@@ -164,7 +168,7 @@ public class DriveTestFaceGoal extends LinearOpMode
 
     public double calculateHeadingError(double actualHeading, double desiredHeading)
     {
-        error = actualHeading - desiredHeading;
+        double  error = actualHeading - desiredHeading;
         if (error > 180)
         {
             error -= 360;
@@ -184,13 +188,12 @@ public class DriveTestFaceGoal extends LinearOpMode
         double currentRobotHeadingRadians;
         boolean forceRobotCentric = false;
         boolean faceGoal = false;
-        double headingError = 0.0;
 
         //Capture some information we will need later
         joystickX = gamepad1.left_stick_x;
         joystickY = gamepad1.left_stick_y;
         joystickRotation = gamepad1.right_stick_x;
-        currentRobotHeadingRadians = robotIMUSubSystem.getHeadingRadians();
+        currentRobotHeadingRadians = Math.toRadians(robotPose.h);//robotIMUSubSystem.getHeadingRadians();
         forceRobotCentric = gamepad1.right_bumper;
         faceGoal = gamepad1.left_bumper;
 
@@ -204,6 +207,12 @@ public class DriveTestFaceGoal extends LinearOpMode
         driveTranslateX = joystickX * Math.cos(translateAdjustAngleRadians) - joystickY * Math.sin(translateAdjustAngleRadians);
         driveTranslateY = joystickX * Math.sin(translateAdjustAngleRadians) + joystickY * Math.cos(translateAdjustAngleRadians);
 
+        if (!currentlyTurning)
+        {
+            headingError = calculateHeadingError(Math.toDegrees(currentRobotHeadingRadians), desiredHeading);
+            if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone)
+                driveRotate = headingError * RobotConstants.headingPFactor;
+        }
         //Calculate desired rotation power, using a dead zone
         if (Math.abs(joystickRotation) < RobotConstants.joystickRotateDeadband)
         {
@@ -228,12 +237,6 @@ public class DriveTestFaceGoal extends LinearOpMode
 
         //Calculating and apply heading error, but only if we are not actively turning
         //Otherwise continue to use the driveRotate decided by the joystick above
-        if (!currentlyTurning) {
-            headingError = calculateHeadingError(Math.toDegrees(currentRobotHeadingRadians), desiredHeading);
-            if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone) {
-                driveRotate = headingError * RobotConstants.headingPFactor;
-            }
-        }
     }
 
     private void calculateDrivePower()
@@ -302,7 +305,7 @@ public class DriveTestFaceGoal extends LinearOpMode
 
         //Heading Correction
         telemetryA.addData("Desired Heading", desiredHeading);
-        telemetryA.addData("error", error);
+        telemetryA.addData("Heading Error", headingError);
         telemetryA.addData("Joystick Heading", joystickHeading);
         telemetryA.addData("Goal Heading", goalHeading);
 
