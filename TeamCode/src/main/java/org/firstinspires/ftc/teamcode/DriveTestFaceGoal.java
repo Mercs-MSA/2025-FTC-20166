@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
+import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 //Fl Motor - Motor 0
 //FR Motor - Motor 1
 //BL Motor - Motor 2
@@ -72,13 +73,13 @@ public class DriveTestFaceGoal extends LinearOpMode
 
     private double driveRotate;
     private double headingError = 0.0;
-
+    boolean faceGoal = false;
     private double desiredHeading;
     private double goalHeading;
     private boolean currentlyTurning = false;
     private double joystickHeading;
 
-    SparkFunOTOS.Pose2D robotPose;
+    RobotStatus robotPose;
 
 
     //public Point startPose
@@ -101,11 +102,15 @@ public class DriveTestFaceGoal extends LinearOpMode
         myOtos.setPosition(Waypoints.startPointMiddleBottom);
         myOtos.calibrateImu();
         myOtos.resetTracking();
-        robotPose = myOtos.getPosition();
+
+        robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
+
+        Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
+        robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
         //SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 90);
         //myOtos.setOffset(offset);
 
-        robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
+
 
         m0 = hardwareMap.get(DcMotorEx.class, "FL");
         m1 = hardwareMap.get(DcMotorEx.class, "FR");
@@ -137,7 +142,8 @@ public class DriveTestFaceGoal extends LinearOpMode
 
     public void updateRobotPose()
     {
-        robotPose = myOtos.getPosition();
+        Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
+        robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
     }
 
 
@@ -187,13 +193,12 @@ public class DriveTestFaceGoal extends LinearOpMode
         double joystickRotation;
         double currentRobotHeadingRadians;
         boolean forceRobotCentric = false;
-        boolean faceGoal = false;
 
         //Capture some information we will need later
         joystickX = gamepad1.left_stick_x;
         joystickY = gamepad1.left_stick_y;
         joystickRotation = gamepad1.right_stick_x;
-        currentRobotHeadingRadians = Math.toRadians(robotPose.h);//robotIMUSubSystem.getHeadingRadians();
+        currentRobotHeadingRadians = robotPose.getThetaRadians();//robotIMUSubSystem.getHeadingRadians();
         forceRobotCentric = gamepad1.right_bumper;
         faceGoal = gamepad1.left_bumper;
 
@@ -207,12 +212,6 @@ public class DriveTestFaceGoal extends LinearOpMode
         driveTranslateX = joystickX * Math.cos(translateAdjustAngleRadians) - joystickY * Math.sin(translateAdjustAngleRadians);
         driveTranslateY = joystickX * Math.sin(translateAdjustAngleRadians) + joystickY * Math.cos(translateAdjustAngleRadians);
 
-        if (!currentlyTurning)
-        {
-            headingError = calculateHeadingError(Math.toDegrees(currentRobotHeadingRadians), desiredHeading);
-            if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone)
-                driveRotate = headingError * RobotConstants.headingPFactor;
-        }
         //Calculate desired rotation power, using a dead zone
         if (Math.abs(joystickRotation) < RobotConstants.joystickRotateDeadband)
         {
@@ -229,7 +228,7 @@ public class DriveTestFaceGoal extends LinearOpMode
         }
 
         //Setting heading to goal heading or regular heading
-        goalHeading = getPointsHeading(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.x, robotPose.y);
+        goalHeading = getPointsHeading(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.getX(), robotPose.getY());
         if (faceGoal)
             desiredHeading = goalHeading;
         else
@@ -237,6 +236,13 @@ public class DriveTestFaceGoal extends LinearOpMode
 
         //Calculating and apply heading error, but only if we are not actively turning
         //Otherwise continue to use the driveRotate decided by the joystick above
+        if (!currentlyTurning)
+        {
+            headingError = calculateHeadingError(Math.toDegrees(currentRobotHeadingRadians), desiredHeading);
+            if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone)
+                driveRotate = headingError * RobotConstants.headingPFactor;
+        }
+
     }
 
     private void calculateDrivePower()
@@ -293,24 +299,20 @@ public class DriveTestFaceGoal extends LinearOpMode
     private void updateTelemetryA()
     {
         //Robot status
-        telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());
-        telemetryA.addData("IMU Heading angle", robotIMUSubSystem.getHeadingDegrees());
-        telemetryA.addData("OTOS X coordinate", robotPose.x);
-        telemetryA.addData("OTOS Y coordinate", robotPose.y);
-        telemetryA.addData("OTOS heading", robotPose.h);
-        //Pinpoint
-        telemetryA.addData("Pinpoint X coordinate", robotPos.getX(DistanceUnit.INCH));
-        telemetryA.addData("Pinpoint Y coordinate", robotPos.getY(DistanceUnit.INCH));
-        telemetryA.addData("Pinpoint heading", robotPos.getHeading(AngleUnit.DEGREES));
+        telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());//Pinpoint
+        telemetryA.addData("Pinpoint X coordinate", robotPose.getX());
+        telemetryA.addData("Pinpoint Y coordinate", robotPose.getY());
+        telemetryA.addData("Pinpoint heading", robotPose.getThetaDegrees());
+        telemetryA.addData("OTOS Heading", myOtos.getPosition().h);
+        telemetryA.addData("IMU heading", robotIMUSubSystem.getHeadingDegrees());
 
         //Heading Correction
         telemetryA.addData("Desired Heading", desiredHeading);
         telemetryA.addData("Heading Error", headingError);
         telemetryA.addData("Joystick Heading", joystickHeading);
         telemetryA.addData("Goal Heading", goalHeading);
-
-
-
+        telemetryA.addData("Should Face Goal:", faceGoal);
+        telemetryA.addData("Currently Turning: ", currentlyTurning);
         updateTelemetry(telemetryA);
 
     }
