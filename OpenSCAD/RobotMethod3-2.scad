@@ -146,6 +146,23 @@ module Ball()
     sphere(d = 5);
 }
 
+module TurretGear()
+{
+  difference()
+  {
+    translate([0, 0, .0])
+      scale([1.0, 1.0, 2.0])
+        rotate(90, [1, 0, 0])
+          scale(1/25.4)
+            import("Components/Big gear.stl", 4);
+    cylinder(d = LazySusanOuterD + 0.03, h = 1, center = false);
+    for (i = [0:3])
+      rotate((90 * i) + 45, [0, 0, 1])
+        translate([3.671, 0, 0])
+          cylinder(d = 4.8 / 25.4, h = 1, center = true);
+  }
+}
+
 module LazySusan()
 {
   color("LightSteelBlue", 0.5)
@@ -156,9 +173,7 @@ module LazySusan()
   }
   color("plum", 0.5)
   translate([0, 0, -LazySusanT])
-    rotate(90, [1, 0, 0])
-      scale(1/25.4)
-        import("Components/Big gear.stl", 4);
+  TurretGear();
 }
 
 module Shooter()
