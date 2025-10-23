@@ -7,6 +7,7 @@ ShowServos = true;
 ShowServoMounts = true;
 ShowGears = true;
 ShowAlignMarkers = true;
+ShowBallLifter = true;
 ShooterAngle = -90;
 TurretAngle  = 0.0;
 ShooterWallT = 0.2;
@@ -15,6 +16,7 @@ ShowShooterMotor = 5;
 BallStoreSpacingAngle = 120;
 BallStoreRadius = 3.2;
 BallStoreAngle = -30;
+BallLifterAngle = 110;
 
 module Stop(){}
 BallDiameter = 5.0;
@@ -53,6 +55,7 @@ TurretServoLocation = [-2.39, 4.2, 0];//[-4.51, -2.15, 0]
 TurretSensorLocation = [-4.1, 2.85, -0.2];//[0, 5.0, -0.2]
 TurretSensorMountD = 9.3/25.4;
 ShooterVersion = 2;
+BallLifterOffset = [2.6, .18, 4.11];//[3, .18, 4.11]
 
 $fn = 150;
 ShooterInnerCurveRadius = (FlywheelDiameter / 2) + BallDiameter - BallCompression;
@@ -429,6 +432,15 @@ module Roller(L, D, CF)
   }
 }
 
+module ServoShaft()
+{
+  color("silver")
+  {
+    cylinder(d = .3, h = 1.25 + 0.1653, $fn = 6);
+    cylinder(d = .394, h = 0.1653);
+  }
+}
+
 module UpperBallTractionPulley()
 {
   RollerL = (UpperBallTractionGap - .1) / 3;
@@ -446,9 +458,9 @@ module UpperBallTractionPulley()
       }
       cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true);
     }
-//      color("silver")
-//      translate([0, 0, -.25])
-//      cylinder(d = .3, h = 1.2);
+    if (ShowAlignMarkers)
+      translate([0, 0, -.39])
+        ServoShaft();
   }
 }
 
@@ -1242,73 +1254,124 @@ module BallStore1()
 
 module BallStore2()
 {
-  translate([0, 0, -4])
-    Ball();
+  if (ShowAlignMarkers)
+    translate([0, 0, -4])
+      Ball();
   translate([0, 0, -6.5])
   {
     //Main ball ramp
-    hull()
+/*    hull()
     {
       translate([0, -1, 0.1])
         cube([5, .1, .1], center = true);
       translate([0, -7, 1])
         cube([15, .1, .1], center = true);
     }
-    //Ball cylinder channel
+    */
+    //Ball cylinder channel and servo support
     difference()
     {
-      cylinder(d = 5.5, h = 6);
-      translate([0, 0, -0.1])
-        cylinder(d = 5.3, h = 6.2);
-      translate([-3, -7.5, -.1])
-        cube([6, 6, 6.2]);
-      translate([0, -4.5, -.1])
-        cube([6, 6, 6.2]);
-    }
-    //Servo support
-    translate([2, 1.5, 0])
-    {
-      difference()
+      union()
       {
-        cube([3.7, .5, 5.5]);
-        translate([3, .18, 4.11])
-        rotate(-90, [0, 0, 1])
-        rotate(-90, [1, 0, 0])
+        //Outer ball storage
+        cylinder(d = 5.5, h = 6);
+        //Servo support
+        translate([1.9, 1.5, 0])
         {
-        ServoBlockOpenings(BlockDepth = .3, OpeningWidth = 21/25.4, OpeningLength = ServoBlockLengthOpening);
-#          Servo();
+          difference()
+          {
+            cube([3.7, .5, 5.5]);
+            translate(BallLifterOffset)
+              rotate(-90, [0, 0, 1])
+                rotate(-90, [1, 0, 0])
+                {
+                  ServoBlockOpenings(BlockDepth = .3, OpeningWidth = 21/25.4, OpeningLength = ServoBlockLengthOpening);
+                  if (ShowServos)
+                  {
+#                    Servo();
+                    translate([0, -ServoRotateOffset, 0])
+                    rotate(90, [0, 1, 0])
+#                    ServoShaft();
+                  }
+                }
+          }
         }
-
+        //Bottom plate
+        translate([-3, -2, -0.1])
+          cube([8.6, 5, .1]);
       }
+      //Bottom plate mount holes
+      translate([5, 2.5, 0])
+        cylinder(d = 4.1 / 25.4, h = 1, center = true);
+      translate([5, -1.5, 0])
+        cylinder(d = 4.1 / 25.4, h = 1, center = true);
+      translate([-2.7, 2.5, 0])
+        cylinder(d = 4.1 / 25.4, h = 1, center = true);
+      translate([-2.7, -1.5, 0])
+        cylinder(d = 4.1 / 25.4, h = 1, center = true);
+      //Inner ball storage
+      translate([0, 0, 0])
+        cylinder(d = 5.3, h = 6.2);
+      //Cut off front opening
+      translate([-3, -7.5, 0])
+        cube([6, 6, 6.2]);
+      //Cut off pusher opening
+      translate([0, -4.5, 0])
+        cube([6, 6, 6.2]);
     }
   }
 }
 
 module BallLifter()
 {
- BallLifterArmLength = 4.8;
+ BallLifterArmLength = 4.5;//4.8
   
-  translate([5, 0, -2])
+  translate([1.9, 0, -6.5 + ServoRotateOffset])
   {
-    rotate(90 + 30, [0, 1, 0])
-    difference()
+    translate(BallLifterOffset)
     {
-      hull()
+      rotate(90 + BallLifterAngle, [0, 1, 0])
       {
-        translate([0, 1, 0])
-          rotate(90, [1, 0, 0])
-          cylinder(d = 1.5, h = .3, center = true);
-        translate([BallLifterArmLength, 0, 0])
-          cylinder(d = 2, h = .5, center = true);
+        difference()
+        {
+          hull()
+          {
+            translate([0, 0.7, 0])
+              rotate(90, [1, 0, 0])
+              cylinder(d = 1.5, h = .5, center = true);
+            translate([BallLifterArmLength, 0, 0])
+              cylinder(d = 2, h = .5, center = true);
+          }
+          translate([BallLifterArmLength, 0, -2.5])
+            sphere(d = 5.2);
+          translate([5.8, 0, 0])
+            rotate(-30, [0, 1, 0])
+              cube([1, 3, 3], center = true);
+          
+          rotate(-90, [1, 0, 0])
+          {
+            cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true); //Servo hex shaft
+            //cylinder(d = 5/25.4, h = 3, $fn = 6); //Servo screw access
+            //Servo hub flattener
+            translate([0, 0, -0.55])
+              cylinder(d = 1.5, h = 1);
+            //Servo hub mount holes
+            translate([0, 0, 0.6])
+            {
+              //GoBilda
+              QuadHoles(d = .891, hole = 4.2/25.4, h = 1.5);
+              //Amazon
+              rotate(45, [0, 0, 1])
+              QuadHoles(d = .275 * 2, hole = 3.2/25.4);
+            }
+          }
+          //Band attach hole
+          translate([BallLifterArmLength + .4, -.7, 0])
+            cylinder(d = .2, h = 1, center = true);
+        }
+
       }
-      translate([BallLifterArmLength, 0, -2.5])
-        sphere(d = 5.2);
-      translate([5.8, 0, 0])
-        rotate(-30, [0, 1, 0])
-          cube([1, 3, 3], center = true);
     }
-    rotate(-90, [1, 0, 0])
-#      cylinder(d = 5/25.4, h = 3);
   }
 }
 
@@ -1346,7 +1409,8 @@ Everything();
 
 //TurretServoGear();
 
-BallLifter();
+if (ShowBallLifter)
+  BallLifter();
 
 
 if (ShowBallStore == 1)
