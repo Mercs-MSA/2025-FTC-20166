@@ -13,6 +13,11 @@ public class SubSystemRobotPinpoint
 {
     private GoBildaPinpointDriver pinpoint;
     private int robotID;
+    private double startPositionX;
+    private double startPositionY;
+    private double startPositionT;
+    private double podOffsetX;
+    private double podOffsetY;
 
     public SubSystemRobotPinpoint(HardwareMap hardwareMap, int robotID) throws InterruptedException
     {
@@ -22,6 +27,9 @@ public class SubSystemRobotPinpoint
         configurePinpoint();
 
         pinpoint.setPosition(Waypoints.startPointMiddleBottomPinpoint);
+        startPositionX = Waypoints.startPointMiddleBottomPinpoint.getX(DistanceUnit.INCH);
+        startPositionY = Waypoints.startPointMiddleBottomPinpoint.getY(DistanceUnit.INCH);
+        startPositionT = Waypoints.startPointMiddleBottomPinpoint.getHeading(AngleUnit.DEGREES);
     }
 
     public void configurePinpoint(){
@@ -48,7 +56,9 @@ public class SubSystemRobotPinpoint
             pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         }
         //Test only
-        pinpoint.setOffsets(-220, 90, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+        pinpoint.setOffsets(-220, 90, DistanceUnit.MM);
+        podOffsetX = 220.0/25.4;
+        podOffsetY = 90.0/25.4;
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         /*
          * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -76,10 +86,22 @@ public class SubSystemRobotPinpoint
         pinpoint.update();
     }
 
+    public Pose2D getStartPose()
+    {
+
+        return new Pose2D(DistanceUnit.INCH,startPositionX,startPositionY, AngleUnit.DEGREES,startPositionT);
+    }
+
+    public Pose2D getPodOffsets()
+    {
+        return new Pose2D(DistanceUnit.INCH,podOffsetX,podOffsetY, AngleUnit.DEGREES,0);
+    }
+
     public Pose2D getPinpointPos()
     {
         Pose2D remuxPosition = pinpoint.getPosition();
-
-        return new Pose2D(DistanceUnit.INCH,remuxPosition.getY(DistanceUnit.INCH),remuxPosition.getX(DistanceUnit.INCH), AngleUnit.DEGREES,remuxPosition.getHeading(AngleUnit.DEGREES));
+//        This should be x, y, t !!! We have y, x, t !!! Could be the cause of a lot of our issues???
+//        return new Pose2D(DistanceUnit.INCH,remuxPosition.getY(DistanceUnit.INCH),remuxPosition.getX(DistanceUnit.INCH), AngleUnit.DEGREES,remuxPosition.getHeading(AngleUnit.DEGREES));
+        return new Pose2D(DistanceUnit.INCH,remuxPosition.getX(DistanceUnit.INCH),remuxPosition.getY(DistanceUnit.INCH), AngleUnit.DEGREES,remuxPosition.getHeading(AngleUnit.DEGREES));
     }
 }

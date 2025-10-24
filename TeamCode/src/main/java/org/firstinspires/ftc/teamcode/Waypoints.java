@@ -14,8 +14,10 @@ public class Waypoints
     public static double redGoalPointx = 72;
     public static double redGoalPointy = 72;
 
-    public static double blueGoalPointx = 41;
-    public static double blueGoalPointy = 106;
+//    public static double blueGoalPointx = 41;//??? Seems wrong? diagonal from the center should be more like +-72
+    public static double blueGoalPointx = -70;
+//    public static double blueGoalPointy = 106;//??? This can't be correct. +- 72 is the max/min distance from the center
+    public static double blueGoalPointy = 70;
     public static SparkFunOTOS.Pose2D startPointMiddleBottom = new SparkFunOTOS.Pose2D(0, -63, Math.toRadians(0));
     public static Pose2D startPointMiddleBottomPinpoint = new Pose2D(DistanceUnit.INCH,0, -63, AngleUnit.RADIANS, Math.toRadians(90));
     public static void setRobotID(int robotID)

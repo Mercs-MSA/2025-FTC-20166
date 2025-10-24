@@ -50,6 +50,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private SubSystemRobotPinpoint robotPinpointSubSystem;
     private double driveTranslateX;
     private double driveTranslateY;
+    private double forceJoystickRotation = 0.0;
     SparkFunOTOS myOtos;
 
     //Motor demo variables
@@ -80,9 +81,6 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private boolean currentlyTurning = false;
 
     RobotStatus robotPose;
-
-
-    //public Point startPose
 
     public void initializeHardware() throws InterruptedException {
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -179,21 +177,6 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
             number += (range * 2);
         return number;
     }
-    public double calculateHeadingError(double actualHeading, double desiredHeading)
-    {
-        /*
-        double  error = actualHeading - desiredHeading;
-        if (error > 180)
-        {
-            error -= 360;
-        } else if (error < -180)
-        {
-            error += 360;
-        }
-        return error;
-         */
-        return wrapRange(actualHeading - desiredHeading, 180.0);
-    }
 
     private void updateDesiredHeading()
     {
@@ -204,25 +187,29 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
         if (faceGoal)
         {
+            currentlyTurning = false;
             desiredHeading = getPointsHeading(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.getX(), robotPose.getY());
+            forceJoystickRotation = 0.0;
         }
         else if (Math.abs(joystickRotation) >= RobotConstants.joystickRotateDeadband)
         {
             //Note that we are turning
             currentlyTurning = true;
             //Set the desired heading to be a factor of the joystick position
-            //This will infer an error that then gets scaled and used as a turning 'power'
-            desiredHeading = wrapRange(robotPose.getThetaDegrees() + (joystickRotation * 90), 180);
+//            //This will infer an error that then gets scaled and used as a turning 'power'
+//            desiredHeading = wrapRange(robotPose.getThetaDegrees() + (joystickRotation * 90), 180);
+            forceJoystickRotation = joystickRotation;
         }
         else
         {
             //Have we JUST stopped turning?
             if (currentlyTurning)
             {
-                //Yes, note where we are now and make that our desired heading
+                //Yes, note where we are now no longer turning and make that our desired heading
                 currentlyTurning = false;
                 desiredHeading = robotPose.getThetaDegrees();
             }
+            forceJoystickRotation = 0.0;
         }
     }
     private void updateDriveControls()
@@ -230,7 +217,6 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         double joystickX;
         double joystickY;
         double translateAdjustAngleRadians;
-        double currentRobotHeadingRadians;
         boolean forceRobotCentric;
 
         //Capture some information we will need later
@@ -248,11 +234,16 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         driveTranslateX = joystickX * Math.cos(translateAdjustAngleRadians) - joystickY * Math.sin(translateAdjustAngleRadians);
         driveTranslateY = joystickX * Math.sin(translateAdjustAngleRadians) + joystickY * Math.cos(translateAdjustAngleRadians);
 
-        headingError = wrapRange(robotPose.getThetaDegrees() -  desiredHeading, 180);
-        if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone)
-            driveRotate = headingError * RobotConstants.headingPFactor;
+        if (forceJoystickRotation != 0.0)
+            driveRotate = forceJoystickRotation;
         else
-            driveRotate = 0.0;
+        {
+            headingError = wrapRange(robotPose.getThetaDegrees() - desiredHeading, 180);
+            if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone)
+                driveRotate = headingError * RobotConstants.headingPFactor;
+            else
+                driveRotate = 0.0;
+        }
     }
 
     private void calculateDrivePower()
@@ -277,8 +268,16 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     }
     private void updateTelemetryA()
     {
+        Pose2D pinpointStart = robotPinpointSubSystem.getStartPose();
+
         //Robot status
-        telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());//Pinpoint
+        telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());
+        telemetryA.addLine();
+
+        telemetryA.addData("Pinpoint start X", pinpointStart.getX(DistanceUnit.INCH));
+        telemetryA.addData("Pinpoint start Y", pinpointStart.getY(DistanceUnit.INCH));
+        telemetryA.addData("Pinpoint start T", pinpointStart.getHeading(AngleUnit.DEGREES));
+
         telemetryA.addData("Pinpoint X coordinate", robotPose.getX());
         telemetryA.addData("Pinpoint Y coordinate", robotPose.getY());
         telemetryA.addLine();
@@ -327,6 +326,7 @@ public void test()
         {
             clearHubCache();
             updateRobotPose();
+            updateDesiredHeading();
             updateDriveControls();
             calculateDrivePower();
             setDriveMotors((FLXPower + FLYPower + FLRPower), (FRXPower + FRYPower + FRRPower), (BLXPower + BLYPower + BLRPower), (BRXPower + BRYPower + BRRPower));
