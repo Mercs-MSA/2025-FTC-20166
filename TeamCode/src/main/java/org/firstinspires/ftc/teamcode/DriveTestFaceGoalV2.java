@@ -103,6 +103,8 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
         robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
 
+        sleep(500);
+
         Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
         robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
         //SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 90);
@@ -118,7 +120,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         m2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         m3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        if (robotID == 0) //robot A
+        if (robotID == 1) //robot B
         {
             m1.setDirection(DcMotorSimple.Direction.REVERSE);
             m3.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -129,11 +131,11 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
         //Change the way hardware is read so that we only read things once per loop
         //Need to make sure we actually DO reset the cached values though !!!
-        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        //List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
+        //for (LynxModule hub : allHubs) {
+        //    hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        //}
     }
 
     public void updateRobotPose()
@@ -163,7 +165,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
     public static double getPointsHeading(double x, double y, double xr, double yr)
     {
-        double calculatedAngleRads = Math.atan2(x - xr, y - yr);
+        double calculatedAngleRads = Math.atan2(y - yr, x - xr);
         double calculatedAngleDegs = Math.toDegrees(calculatedAngleRads);
         //double correctedAngle = calculatedAngleDegs - 90.0;
         return -1 * calculatedAngleDegs;
@@ -277,6 +279,11 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         telemetryA.addData("Pinpoint start X", pinpointStart.getX(DistanceUnit.INCH));
         telemetryA.addData("Pinpoint start Y", pinpointStart.getY(DistanceUnit.INCH));
         telemetryA.addData("Pinpoint start T", pinpointStart.getHeading(AngleUnit.DEGREES));
+        telemetryA.addLine();
+
+        telemetryA.addData("Pinpoint pod offset X", robotPinpointSubSystem.getPodOffsets().getX(DistanceUnit.MM));
+        telemetryA.addData("Pinpoint pod offset Y", robotPinpointSubSystem.getPodOffsets().getY(DistanceUnit.MM));
+        telemetryA.addLine();
 
         telemetryA.addData("Pinpoint X coordinate", robotPose.getX());
         telemetryA.addData("Pinpoint Y coordinate", robotPose.getY());
@@ -320,11 +327,11 @@ public void test()
     public void runOpMode() throws InterruptedException
     {
         initializeHardware();
-        clearHubCache();
+        // clearHubCache();
         waitForStart();
         while (opModeIsActive())
         {
-            clearHubCache();
+            // clearHubCache();
             updateRobotPose();
             updateDesiredHeading();
             updateDriveControls();

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -25,14 +27,13 @@ public class SubSystemRobotPinpoint
         this.robotID = robotID;
 
         configurePinpoint();
-
         pinpoint.setPosition(Waypoints.startPointMiddleBottomPinpoint);
         startPositionX = Waypoints.startPointMiddleBottomPinpoint.getX(DistanceUnit.INCH);
         startPositionY = Waypoints.startPointMiddleBottomPinpoint.getY(DistanceUnit.INCH);
         startPositionT = Waypoints.startPointMiddleBottomPinpoint.getHeading(AngleUnit.DEGREES);
     }
 
-    public void configurePinpoint(){
+    public void configurePinpoint() throws InterruptedException {
         /*
          *  Set the odometry pod positions relative to the point that you want the position to be measured from.
          *
@@ -45,21 +46,28 @@ public class SubSystemRobotPinpoint
          * increase when you move the robot forward. And the Y (strafe) pod should increase when
          * you move the robot to the left.
          */
+        podOffsetX = 0;
+        podOffsetY = 0;
         if (robotID == 0) //robot A
         {
             pinpoint.setOffsets(RobotConstants.robotAPodXOffset, RobotConstants.robotAPodYOffset, DistanceUnit.MM);
+            podOffsetX = 1;
+            podOffsetY = 1;
             pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         }
         else //robotB has robotID = 1
         {
             pinpoint.setOffsets(RobotConstants.robotBPodXOffset, RobotConstants.robotBPodYOffset, DistanceUnit.MM);
+            podOffsetX = RobotConstants.robotBPodXOffset;
+            podOffsetY = RobotConstants.robotBPodYOffset;
             pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
         }
         //Test only
-        pinpoint.setOffsets(-220, 90, DistanceUnit.MM);
-        podOffsetX = 220.0/25.4;
-        podOffsetY = 90.0/25.4;
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+//        pinpoint.setOffsets(RobotConstants.robotBPodXOffset, RobotConstants.robotBPodYOffset, DistanceUnit.MM);
+//        podOffsetX = RobotConstants.robotBPodXOffset;
+//        podOffsetY = RobotConstants.robotBPodYOffset;
+//        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         /*
          * Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
          * the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
@@ -79,6 +87,8 @@ public class SubSystemRobotPinpoint
          * an incorrect starting value for x, y, and heading.
          */
         pinpoint.resetPosAndIMU();
+        sleep(1000);
+
     }
 
     public void updatePinpoint()
@@ -94,7 +104,7 @@ public class SubSystemRobotPinpoint
 
     public Pose2D getPodOffsets()
     {
-        return new Pose2D(DistanceUnit.INCH,podOffsetX,podOffsetY, AngleUnit.DEGREES,0);
+        return new Pose2D(DistanceUnit.MM, podOffsetX, podOffsetY, AngleUnit.DEGREES,0);
     }
 
     public Pose2D getPinpointPos()
