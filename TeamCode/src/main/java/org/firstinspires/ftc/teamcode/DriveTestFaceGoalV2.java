@@ -165,10 +165,10 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
     public static double getPointsHeading(double x, double y, double xr, double yr)
     {
-        double calculatedAngleRads = Math.atan2(y - yr, x - xr);
+        double calculatedAngleRads = Math.atan2(y-yr, x-xr);
         double calculatedAngleDegs = Math.toDegrees(calculatedAngleRads);
         //double correctedAngle = calculatedAngleDegs - 90.0;
-        return -1 * calculatedAngleDegs;
+        return calculatedAngleDegs;
     }
 
     public double wrapRange(double number, double range)

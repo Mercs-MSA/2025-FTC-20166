@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class RobotConstants
 {
     public final static double headingErrorDeadZone = 5.0;
-    public final static double headingPFactor = (1.0 / 90.0);
+    public static double headingPFactor = (2.0 / 90.0);
     public final static double joystickRotateDeadband = 0.05;
     public final static double robotAPodYOffset = 0;
     public final static double robotAPodXOffset = 0;
