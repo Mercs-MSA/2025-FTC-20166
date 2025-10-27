@@ -51,8 +51,8 @@ LazySusanAccessHoleD = 10.5/25.4;
 LazySusanT = .2;
 ServoBlockLength = 2.7;
 ServoBlockLengthOpening = 41/25.4;
-TurretServoLocation = [-2.39, 4.2, 0];//[-4.51, -2.15, 0]
-TurretSensorLocation = [-4.1, 2.85, -0.2];//[0, 5.0, -0.2]
+TurretServoLocation = [-2.5, 3.70, 0]; //[-2.39, 4.2, 0];//[-4.51, -2.15, 0]
+TurretSensorLocation = [-4.1, 12.85, -0.2]; //[-4.1, 2.85, -0.2];//[0, 5.0, -0.2]
 TurretSensorMountD = 9.3/25.4;
 ShooterVersion = 2;
 BallLifterOffset = [2.6, .18, 4.11];//[3, .18, 4.11]
@@ -248,6 +248,7 @@ module TurretServoGear()
   color("plum", 0.5)
   difference()
   {
+    rotate(0.0, [0, 0, 1])
     union()
     {
     translate([-4.9985, 0, 0])
@@ -304,7 +305,7 @@ module TurretServo()
   {
     //Drive servo
     translate(TurretServoLocation)
-      translate([ServoRotateOffset, ServoRotateOffset, -.52])
+      translate([-ServoRotateOffset, ServoRotateOffset, -.52])
         rotate(-5, [0, 0, 1])
           TurretServoGear();
     //Position sensor
@@ -872,8 +873,16 @@ module ShooterBody2SidePlateScoopAssembly()
 //  translate([-RampRotationSupportT - (ShooterPlateT / 2), -ShooterInnerCurveRadius - RampTiltHOffset + (11 / 2.54),0])
 //    rotate(90, [0, 1, 0])
 //      cylinder(d = 1, h = RampRotationSupportT);
-  
+}
 
+module ShooterBasePlate2BottomAssembly()
+{
+  difference()
+  {
+    ShooterBasePlate2Core();
+    
+#    cube([2, 2, .5]);
+  }
 }
 
 module ShooterBody2()
@@ -886,7 +895,7 @@ module ShooterBody2()
     RenderMotorBody();
     //Lower base plate
     translate([0, 0, -ShooterPlateT])
-      ShooterBasePlate2Core();
+      ShooterBasePlate2BottomAssembly();      
 
     //Upper base plate
     translate([0, 0, ShooterWallHeight])
@@ -931,7 +940,7 @@ module ServoBlockOpenings(BlockDepth, OpeningLength, OpeningWidth)
   cube([1, 54/25.4, 3/25.4], center = true);
 }
 
-module ServoBlock(BlockDepth = .3, BlockWidth = 1.0, BlockLength = ServoBlockLength, OpeningWidth = 21/25.4, OpeningLength = ServoBlockLengthOpening, BlockWidthOffset = -0.05, AddAttachHoles = true)
+module ServoBlock(BlockDepth = .3, BlockWidth = 1.0, BlockLength = ServoBlockLength, OpeningWidth = 21/25.4, OpeningLength = ServoBlockLengthOpening, BlockWidthOffset = -0.05, AddAttachHoles = true, ServoOrientation = 0)
 {  
   difference()
   {
@@ -951,8 +960,9 @@ module ServoBlock(BlockDepth = .3, BlockWidth = 1.0, BlockLength = ServoBlockLen
     }
   }
     if (ShowServos)
-      translate([.5 - BlockDepth, 0, 0])
-        Servo();
+      translate([.5 - BlockDepth, 0, BlockWidthOffset])
+        rotate(ServoOrientation, [1, 0, 0])
+          Servo();
   
   //Alignment test
   if (AddAttachHoles && ShowAlignMarkers)
@@ -977,7 +987,11 @@ module RampPivotPlate()
     translate([0, -0.55, RampTiltVOffset - RampZOffset + (ShooterPlateT / 2) + (4 / 25.4)])
       rotate(90, [1, 0, 0])
         rotate(90, [0, 1, 0])
-#          HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+        {
+          HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+          if (ShowAlignMarkers)
+            HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+        }
     //Shooter pivot hole
     rotate(90, [0, 1, 0])
       cylinder(d = M4FreeHoleD, h = 1, center = true);
@@ -1057,6 +1071,82 @@ module RampPlate()
   {
     //Main plate
     translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset + ((ShooterOuterCurveRadius + FlywheelClearance) / 2) - (ShooterPlateT / 4), 1.756 + .7, 0])
+    {
+//        translate([0, 1.8, 0])
+//        cube([ShooterOuterCurveRadius + FlywheelClearance + (ShooterPlateT / 2) - ShooterPlateT - ShooterPlateT, 3, ShooterPlateT], center = true);
+      hull()
+      {
+        translate([0.01, -0.69, 0])
+          cube([ShooterOuterCurveRadius + FlywheelClearance + (ShooterPlateT / 2) - 0.02, 5.6, ShooterPlateT], center = true);
+        translate([0.8, -5.2, 0])
+          scale([1, .5, 1.0])
+            cylinder(d = 6, h = ShooterPlateT, center = true);
+        translate([0.8, 1.6, 0])
+          scale([1, .5, 1.0])
+            cylinder(d = 6, h = ShooterPlateT, center = true);
+      }
+    }
+    //Ball opening
+    cylinder(d = LazySusanInnerD + .05, h = 1, center = true);
+    //Lazy Susan inner ring attach holes
+    QuadHoles(d = LazySusanInnderMountD, hole = LazySusanMountHoleD);
+    //Lazy Susan outer access holes
+    QuadHoles(d = LazySusanOuterMountD, hole = LazySusanAccessHoleD);
+    //Shooter servo block mount holes
+    //Left
+    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset + .08, ServoHOffset - 0.8, -ShooterPlateT / 2])
+    {
+      //Printed block
+      PrintedServoBlockMountHoles(d = 3.5/25.4);
+      //GoBilda block    
+      GoBildaServoBlockMountHoles(d = 4.0/25.4);
+    }
+    //Right
+    translate([BallExitOffset - RampXOffset + FlywheelClearance - .51 + ShooterPlateT + ShooterPlateT, ServoHOffset - 0.8, -ShooterPlateT / 2])    
+    {
+      //Printed block
+      PrintedServoBlockMountHoles(d = 3.5/25.4);
+      //GoBilda block    
+      GoBildaServoBlockMountHoles(d = 4.0/25.4);
+    }    
+    
+    //Turret servo opening
+    translate([0, ServoRotateOffset, .1])
+      translate(TurretServoLocation)
+      {
+        rotate(90, [0, 0, 1])
+        {
+          cube([.85, ServoBlockLengthOpening, .8], center = true);
+          rotate(90, [0, 1, 0])
+            ServoBlockHoles();
+        }
+      }
+    //Turret sensor opening
+    translate(TurretSensorLocation)
+      intersection()
+      {
+        cylinder(d = TurretSensorMountD, h = 1.5, center = true);
+        cube([8.5 / 25.4, TurretSensorMountD, 1.5], center = true);
+      }
+    translate([UpperBallTractionLocation[0], -3.0, ShooterPlateT / 2])
+      LowerBallTractionMountHoles();
+    //Side support mount holes
+    translate([BallExitOffset - RampXOffset + FlywheelClearance - (4 / 25.4) - ShooterPlateT - ShooterPlateT, -(3 * 12/25.4) + 0.86733, 0])
+      rotate(90, [0, 0, 1])
+        HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset - (ShooterPlateT / 2) + (4/25.4)  + ShooterPlateT + ShooterPlateT + 0.02, -(3 * 12/25.4) + 0.86733, 0])//No idea why 0.86733 is needed !!
+      rotate(90, [0, 0, 1])
+        HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+  }
+}
+
+module RampPlate_old()
+{
+  //Main plate with ball entry opening
+  difference()
+  {
+    //Main plate
+    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset + ((ShooterOuterCurveRadius + FlywheelClearance) / 2) - (ShooterPlateT / 4), 1.756 + .7, 0])
       hull()
       {
         cube([ShooterOuterCurveRadius + FlywheelClearance + (ShooterPlateT / 2), 6.6, ShooterPlateT], center = true);
@@ -1119,6 +1209,49 @@ module RampPlate()
 }
 
 module RampPlateAssembly()
+{
+  RampPlate();
+  //Ramp servo support blocks
+  if (ShowServoMounts)
+  {
+    //Left
+//    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset  + .15 + 0.025, ServoHOffset + .39 , (ShooterPlateT + 1) / 2])
+    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset  + .26 - ShooterPlateT, ServoHOffset -.8 , (ShooterPlateT + 1) / 2])
+      rotate(180, [0, 1, 0])
+        ServoBlock(BlockWidthOffset = 0.05, ServoOrientation = 0);
+    //Right
+    translate([BallExitOffset - RampXOffset + FlywheelClearance -0.33 + ShooterPlateT, ServoHOffset -0.8, (ShooterPlateT + 1) / 2])
+      rotate(180, [0, 1, 0])
+        mirror([1, 0, 0])
+          ServoBlock(BlockWidthOffset = 0.05, ServoOrientation = 0);
+  }
+  //Ramp pivot blocks
+  //Left
+  translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset - ShooterPlateT - (ShooterPlateT / 2) + 0.015, 0, -RampTiltVOffset + RampZOffset])
+    //RampPivotBlock();
+    RampPivotPlate();
+  //Right
+  translate([BallExitOffset - RampXOffset + FlywheelClearance + ShooterPlateT, 0,  -RampTiltVOffset + RampZOffset])
+    mirror([1, 0, 0])
+      //RampPivotBlock();
+      RampPivotPlate();
+  if (ShowServoMounts)
+  {
+    //Turret servo mount
+    translate([0, ServoRotateOffset, .1 + (.31 / 2)])
+      translate(TurretServoLocation)
+        rotate(90, [0, 0, 1])
+          rotate(90, [0, 1, 0])
+            ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
+  }
+  //Traction blocks
+  translate([UpperBallTractionLocation[0], -3.0, ShooterPlateT / 2])
+    {
+      LowerBallTraction();
+    }
+}
+
+module RampPlateAssembly_old()
 {
   RampPlate();
   //Ramp servo support blocks
@@ -1437,7 +1570,7 @@ else if (ShowBallStore == 2)
   BallStore2();
 
 if (ShowLimits)
-  translate([-1, 0, -6.5])
+  translate([-0, 0, -6.5])
     Limits();
 
 
