@@ -2,18 +2,18 @@ ShowLimits = false;
 LimitBounds = [15, 15, 15];
 ShowShooter = true;
 ShowRampPlate = true;
-ShowBallStore = 1;
+ShowBallStore = 2;
+ShowDriveBase = true;
 ShowServos = true;
 ShowServoMounts = true;
 ShowGears = true;
 ShowAlignMarkers = true;
 ShowBallLifter = true;
 ShowTurretMountPlate = true;
-NarrowTurretMountPlate = true;
 ShooterAngle = -90;
 TurretAngle  = 0.0;
 ShooterWallT = 0.2;
-ShooterPlateT = 0.18;
+ShooterPlateT = 0.125;
 ShowShooterMotor = 5;
 BallStoreSpacingAngle = 120;
 BallStoreRadius = 3.2;
@@ -23,6 +23,11 @@ SensorGear36 = false;//Select 36 tooth vs 22 for servo gear
 FreeHoleOversize = 0.00001;
 
 module Stop(){}
+RobotOuterWidth = 15;
+RobotOuterLength = 15;
+DriveBaseVOffset = -5.3;
+WheelSpacingOffset = (RobotOuterLength / 2) - 2;
+
 BallDiameter = 5.0;
 BallClearance = .25;
 ShooterWallHeight = BallClearance + BallDiameter;
@@ -1340,19 +1345,12 @@ module LazySusanInnerSpacer()
 
 module TurretMountPlate()
 {
-  RobotOuterWidth = 15;
-  
-  WidthModifier = NarrowTurretMountPlate ? 32/25.4 : 0;
-  
   difference()
   {
     hull()
     {
       cylinder(d = LazySusanOuterD + 1, h = ShooterPlateT, center = true);
-      translate([-(RobotOuterWidth / 2) + WidthModifier, 0, 0])
-        cube([.001, 3, ShooterPlateT], center = true);
-      translate([(RobotOuterWidth / 2) - WidthModifier, 0, 0])
-        cube([.001, 3, ShooterPlateT], center = true);
+      cube([RobotOuterWidth + ShooterPlateT + ShooterPlateT, 3, ShooterPlateT], center = true);
     }
     //Shooter ball opening
     cylinder(d = LazySusanInnerD, h = ShooterPlateT + 0.1, center = true);
@@ -1385,16 +1383,25 @@ module LazySusanOuterSpacer()
   }
 }
 
+module DriveBase()
+{
+  SwyftSet();
+
+}
+
 module Everything()
 {
   rotate(TurretAngle, [0, 0, 1])
   {
     if (ShowShooter)
       Shooter();
+    
     if (ShowRampPlate)
       RampPlateAssembly();
+    
     TurretServo();
   }
+  
   if (ShowGears)
     translate([0, 0, -.2])
       LazySusan();
@@ -1402,6 +1409,9 @@ module Everything()
   if (ShowTurretMountPlate)
     translate([0, 0, -.6])
     TurretMountPlate();
+  
+  if (ShowDriveBase)
+    DriveBase();
 }
 
 module SensorTest()
@@ -1466,7 +1476,7 @@ module BallStore2()
         {
           difference()
           {
-            cube([3.7, .5, 5.5]);
+            cube([3.5, .5, 5.5]);
             translate(BallLifterOffset)
               rotate(-90, [0, 0, 1])
                 rotate(-90, [1, 0, 0])
@@ -1484,7 +1494,7 @@ module BallStore2()
         }
         //Bottom plate
         translate([-3, -2, -0.1])
-          cube([8.6, 5, .1]);
+          cube([8.4, 5, .1]);
       }
       //Bottom plate mount holes
       translate([5, 2.5, 0])
@@ -1568,6 +1578,177 @@ module IntakeSpinner()
   translate([0, -9, -2])
     rotate(90, [0, 1, 0])
       cylinder(d = 1, h = 10, center = true);
+}
+
+module SwyftSet()
+{  
+  translate([-RobotOuterWidth / 2, WheelSpacingOffset, DriveBaseVOffset])
+    Swyft();
+  translate([RobotOuterWidth / 2, WheelSpacingOffset, DriveBaseVOffset])
+    rotate(180, [0, 1, 0])
+      Swyft();
+  translate([-RobotOuterWidth / 2, -WheelSpacingOffset, DriveBaseVOffset])
+    Swyft();
+  translate([RobotOuterWidth / 2, -WheelSpacingOffset, DriveBaseVOffset])
+    rotate(180, [0, 1, 0])
+      Swyft();
+
+}
+
+module Swyft()
+{
+  rotate(90, [0, 1, 0])
+  {
+    cylinder(d = 86/25.4, h = 48/25.4);
+    cylinder(d = 38/25.4, h = 88/25.4);
+  }
+}
+
+module SwyftHolesInner(MotorSlide = true)
+{
+  InnerD = 39;
+  rotate(-90, [0, 0, 1])
+  {
+    for (i = [0:3])
+      rotate((i * 90), [0, 0, 1])
+        translate([22/25.4, 0, 0])
+          cylinder(d = M3FreeHoleD, h = 1, center = true);
+    cylinder(d = InnerD/25.4, h = 1, center = true);
+    if (MotorSlide)
+      translate([0, -(InnerD/2)/25.4, 0])
+      cube([InnerD/25.4, InnerD/25.4, 1], center = true);
+  }
+}
+
+module SwyftHolesOuter(DoFull = false)
+{
+  rotate(-90, [0, 0, 1])
+  {
+    if (DoFull)
+      for (i = [-3:2])
+        translate([(i * (8/25.4)) + (4/25.4), 12/25.4, 0])
+          cylinder(d = M4FreeHoleD, h = 1, center = true);
+    else
+    {
+      translate([(-3 * (8/25.4)) + (4/25.4), 12/25.4, 0])
+        cylinder(d = M4FreeHoleD, h = 1, center = true);
+      translate([(2 * (8/25.4)) + (4/25.4), 12/25.4, 0])
+        cylinder(d = M4FreeHoleD, h = 1, center = true);
+    }
+    //4 lower holes
+    if (DoFull)
+    {
+      translate([(2 * (8/25.4)) + (4/25.4), -4/25.4, 0])
+        cylinder(d = M4FreeHoleD, h = 1, center = true);
+      translate([(-3 * (8/25.4)) + (4/25.4), -4/25.4, 0])
+        cylinder(d = M4FreeHoleD, h = 1, center = true);
+      //2 upper holes
+      translate([(1 * (8/25.4)) + (4/25.4), 20/25.4, 0])
+        cylinder(d = M4FreeHoleD, h = 1, center = true);
+      translate([(-2 * (8/25.4)) + (4/25.4), 20/25.4, 0])
+        cylinder(d = M4FreeHoleD, h = 1, center = true);
+    }
+    translate([(2 * (8/25.4)) + (4/25.4), -12/25.4, 0])
+      cylinder(d = M4FreeHoleD, h = 1, center = true);
+    translate([(-3 * (8/25.4)) + (4/25.4), -12/25.4, 0])
+      cylinder(d = M4FreeHoleD, h = 1, center = true);
+  }
+}
+
+LeftSideAssembly();
+
+module LeftSideAssembly()
+{
+
+  translate([RobotOuterWidth / 2, 0, DriveBaseVOffset - 1.2])
+  {
+    //Outer plate
+    translate([ShooterPlateT / 2, 0, 0])
+      rotate(-90, [0, 1, 0])
+        SidePlateOuter();
+    //Inner plate
+    translate([-(ShooterPlateT / 2) - (48 / 25.4), 0, 0])
+      rotate(-90, [0, 1, 0])
+        SidePlateInner();
+    color("Orange")
+      translate([-5, 3, 2.7])
+        RevHub();
+  }
+}
+
+module RevHub()
+{
+  rotate(90, [0, 1, 0])
+    translate([0, (30 / 2)/25.4, 0])
+      cube([143 / 25.4, 30/25.4, 103/25.4], center = true);
+}
+
+module SidePlateOuter()
+{
+  difference()
+  {
+    SidePlateCore();
+    //Drive wheel mounts
+    translate([1.2, WheelSpacingOffset, 0])
+      SwyftHolesOuter(MotorSlide = true);
+    translate([1.2, -WheelSpacingOffset, 0])
+      SwyftHolesOuter(MotorSlide = true);
+  }
+}
+
+module SidePlateInner()
+{
+  difference()
+  {
+    SidePlateCore();
+    translate([1.2, WheelSpacingOffset, 0])
+      SwyftHolesInner(MotorSlide = true);
+    translate([1.2, -WheelSpacingOffset, 0])
+      SwyftHolesInner(MotorSlide = true);
+    //Back plate mount holes
+    translate([0.065, (8 * 10) / 25.4, 0])
+      HoleSet(M4FreeHoleD, 9, (16 / 25.4));
+  }
+}
+
+module SidePlateCore()
+{
+//RobotOuterWidth = 15;
+//RobotOuterLength = 15;
+//DriveBaseVOffset = -5.3;
+//SwyftHolesOuter();
+//SwyftHolesInner();
+  difference()
+  {
+    hull()
+    {
+      //Ground level
+      translate([0, -(RobotOuterLength  - 0.5)/ 2, 0])
+        cylinder(d = .5, h = ShooterPlateT, center = true);
+      translate([0, (RobotOuterLength  - 0.5)/ 2, 0])
+        cylinder(d = .5, h = ShooterPlateT, center = true);
+      //Upper
+      translate([2.5, -(RobotOuterLength  - 5)/ 2, 0])
+        cylinder(d = 5, h = ShooterPlateT, center = true);
+      translate([2.5, (RobotOuterLength  - 5)/ 2, 0])
+        cylinder(d = 5, h = ShooterPlateT, center = true);
+      //Top
+      translate([5.31, 0, 0])
+        cube([1, 3, ShooterPlateT], center = true);
+    }
+    //Upper channel mount holes
+    for (i = [-4:4])
+      translate([5.81 - (8 / 25.4), (8 / 25.4) * i, 0])
+        cylinder(d = M4FreeHoleD, h = .5, center = true);
+    //Bottom channel mount holes
+    for (i = [-6:6])
+      translate([-.25 + (8 / 25.4), (16 / 25.4) * i, 0])
+        cylinder(d = M4FreeHoleD, h = .5, center = true);
+    //Mid channel mount holes
+    for (i = [-7:7])
+      translate([3.4, (24 / 25.4) * i, 0])
+        cylinder(d = M4FreeHoleD, h = 2.5, center = true);
+  }  
 }
 
 module DXF()
