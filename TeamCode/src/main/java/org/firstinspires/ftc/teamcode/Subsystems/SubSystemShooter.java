@@ -35,6 +35,11 @@ public class SubSystemShooter {
 
     }
 
+    public void setTurretRotationSpeed(double power)
+    {
+        turretRotation.setPower(power);
+    }
+
     public void shooterSetAngle(double tiltAngle)
     {
         shooterTiltLeft.setPosition(shooterTiltLeftLERP.interpolated(tiltAngle));

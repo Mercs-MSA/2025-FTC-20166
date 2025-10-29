@@ -329,6 +329,9 @@ public void test()
         initializeHardware();
         // clearHubCache();
         waitForStart();
+
+
+
         while (opModeIsActive())
         {
             // clearHubCache();
@@ -336,6 +339,13 @@ public void test()
             updateDesiredHeading();
             updateDriveControls();
             calculateDrivePower();
+            if (gamepad1.x)
+            {
+                subSystemShooter.setTurretRotationSpeed(1);
+            } else
+            {
+                subSystemShooter.setTurretRotationSpeed(0);
+            }
             setDriveMotors((FLXPower + FLYPower + FLRPower), (FRXPower + FRYPower + FRRPower), (BLXPower + BLYPower + BLRPower), (BRXPower + BRYPower + BRRPower));
             updateTelemetryA();
             //test();
