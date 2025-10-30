@@ -270,11 +270,11 @@ public class DriveTestFaceGoal extends LinearOpMode
     {
         if(gamepad2.y)
         {
-            subSystemShooter.shooterSetAngle(RobotConstants.shooterMaxAngle);
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMaxAngle);
         }
         else if(gamepad2.a)
         {
-            subSystemShooter.shooterSetAngle(RobotConstants.shooterMinAngle);
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
         }
     }
 

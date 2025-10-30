@@ -34,7 +34,7 @@ import java.util.List;
 //Shooter Tilt Left Servo - Servo 0
 //Shooter Tilt Right Servo - Servo 1
 //Shooter Fly Wheel Motor - Motor 0 Expansion Hub
-//Shooter Turret Rotation - Servo 2
+//Shooter Turret Rotation - Servo 3
 //Turret Position Sensor - Analog Input 0
 
 @TeleOp
@@ -302,6 +302,11 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         telemetryA.addLine();
         telemetryA.addData("Should Face Goal:", faceGoal);
         telemetryA.addData("Currently Turning: ", currentlyTurning);
+        telemetryA.addLine();
+
+        //Shooter
+        telemetryA.addData("Current Shooter Velocity", subSystemShooter.getShooterSpeed());
+
         updateTelemetry(telemetryA);
 
     }
@@ -310,46 +315,45 @@ public void test()
     {
         if(gamepad2.y)
         {
-            subSystemShooter.shooterSetAngle(RobotConstants.shooterMaxAngle);
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMaxAngle);
+            subSystemShooter.setTurretRotationSpeed(-1);
         }
         else if(gamepad2.a)
         {
-            subSystemShooter.shooterSetAngle(RobotConstants.shooterMinAngle);
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
+            subSystemShooter.setTurretRotationSpeed(1);
         }
     }
-
+    private void updateShooter()
+    {
+        subSystemShooter.setShooterSpeed(RobotConstants.shooterVelocity);
+        subSystemShooter.setShooterAngle(RobotConstants.shooterAngle);
+    }
     private void clearHubCache()
     {
         for (LynxModule hub : allHubs) 
             hub.clearBulkCache();
     }
-
     public void runOpMode() throws InterruptedException
     {
         initializeHardware();
         // clearHubCache();
         waitForStart();
 
-
-
         while (opModeIsActive())
         {
+            test();
             // clearHubCache();
             updateRobotPose();
             updateDesiredHeading();
             updateDriveControls();
             calculateDrivePower();
-            if (gamepad1.x)
-            {
-                subSystemShooter.setTurretRotationSpeed(1);
-            } else
-            {
-                subSystemShooter.setTurretRotationSpeed(0);
-            }
+            updateShooter();
             setDriveMotors((FLXPower + FLYPower + FLRPower), (FRXPower + FRYPower + FRRPower), (BLXPower + BLYPower + BLRPower), (BRXPower + BRYPower + BRRPower));
             updateTelemetryA();
             //test();
         }
     }
+
 
 }

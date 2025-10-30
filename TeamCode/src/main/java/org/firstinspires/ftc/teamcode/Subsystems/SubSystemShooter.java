@@ -3,10 +3,8 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.Utilities.LERP;
@@ -40,9 +38,19 @@ public class SubSystemShooter {
         turretRotation.setPower(power);
     }
 
-    public void shooterSetAngle(double tiltAngle)
+    public void setShooterAngle(double tiltAngle)
     {
         shooterTiltLeft.setPosition(shooterTiltLeftLERP.interpolated(tiltAngle));
         shooterTiltRight.setPosition(shooterTiltRightLERP.interpolated(tiltAngle));
     }
+
+    public void setShooterSpeed(double velocity)
+    {
+        shooterFlyWheel.setVelocity(velocity);
+    }
+    public double getShooterSpeed()
+    {
+        return shooterFlyWheel.getVelocity();
+    }
+
 }
