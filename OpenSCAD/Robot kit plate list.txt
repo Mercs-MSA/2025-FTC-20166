@@ -1,0 +1,28 @@
+Turret mount plate
+1x TurretMountPlate
+
+Drive train assemblies
+2x SidePlateOuter
+2x SidePlateInner
+
+Ramp plate
+2x RampPivotPlate
+1x RampPlate
+
+Belly pan
+1x BellyPan
+
+Rev plate
+1x RevMountPlate
+
+Shooter
+1x ShooterBasePlate2BottomPlate
+1x ShooterBasePlate2TopPlate
+1x ShooterBody2SidePlateScoop
+1x ShooterBody2SidePlateFlywheel
+
+Intake roller plate
+2x IntakePlate
+
+Linkages
+2x Linkage

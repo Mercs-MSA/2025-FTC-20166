@@ -13,6 +13,8 @@ ShowTurretMountPlate = true;
 ShowLeftSideAssembly = true;
 ShowRightSideAssembly = true;
 ShowIntake = true;
+ShowBellypan = false;
+ShowRevMountPlate = true;
 ShooterAngle = -90;
 TurretAngle  = 0.0;
 ShooterWallT = 0.2;
@@ -508,7 +510,7 @@ module UpperBallTractionPulley()
 
 module ShooterBasePlate2TopAssembly()
 {
-  ShooterBasePlate2Top();
+  ShooterBasePlate2TopPlate();
   translate(UpperBallTractionLocation)
   {
     UpperBallTraction();
@@ -517,7 +519,7 @@ module ShooterBasePlate2TopAssembly()
   }
 }
 
-module ShooterBasePlate2Top()
+module ShooterBasePlate2TopPlate()
 {
   difference()
   {
@@ -580,7 +582,7 @@ module ShooterBasePlate2Core()
     //Side support
     translate([FlywheelClearance - ShooterPlateT - (4 / 25.4), 0, 0])
       rotate(-90, [0, 0, 1])
-        HoleSet(D = M4FreeHoleD, C = 6, S = (12 / 25.4));
+        HoleSet(D = M4FreeHoleD, C = 5, S = (16 / 25.4));
   }
 }
 
@@ -863,14 +865,14 @@ module ShooterBody2SidePlateFlywheel()
           cylinder(d = 1, h = ShooterPlateT, center = true);
     }
     //Upper/lower plate attach holes
-    translate([0, 0, ((BallDiameter + BallClearance) / 2) - (4 / 25.4)])
+    translate([0, -(8 / 25.4), ((BallDiameter + BallClearance) / 2) - (4 / 25.4)])
       rotate(90, [0, 1, 0])
         rotate(-90, [0, 0, 1])
-          HoleSet(D = M4FreeHoleD, C = 6, S = (12 / 25.4));
-    translate([0, 0, -((BallDiameter + BallClearance) / 2) + (4 / 25.4)])
+          HoleSet(D = M4FreeHoleD, C = 4, S = (16 / 25.4));
+    translate([0, -(8 / 25.4), -((BallDiameter + BallClearance) / 2) + (4 / 25.4)])
       rotate(90, [0, 1, 0])
         rotate(-90, [0, 0, 1])
-          HoleSet(D = M4FreeHoleD, C = 6, S = (12 / 25.4));
+          HoleSet(D = M4FreeHoleD, C = 4, S = (16 / 25.4));
     //
     //Ramp pivot holes
     translate([0, -ShooterInnerCurveRadius - RampTiltHOffset, 0])
@@ -930,7 +932,7 @@ module ShooterBody2()
     RenderMotorBody();
     //Lower base plate
     translate([0, 0, -ShooterPlateT])
-      ShooterBasePlate2BottomPlate();      
+      ShooterBasePlate2BottomPlate();
 
     //Upper base plate
     translate([0, 0, ShooterWallHeight])
@@ -1019,13 +1021,13 @@ module RampPivotPlate()
         cube([ShooterPlateT, 3, 0.001]);
     }
     //Base plate mount holes
-    translate([0, -0.55, RampTiltVOffset - RampZOffset + (ShooterPlateT / 2) + (4 / 25.4)])
+    translate([0, -0.55 + (8 / 25.4), RampTiltVOffset - RampZOffset + (ShooterPlateT / 2) + (4 / 25.4)])
       rotate(90, [1, 0, 0])
         rotate(90, [0, 1, 0])
         {
-          HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+          HoleSet(D = M4FreeHoleD, C = 5, S = (16 / 25.4));
           if (ShowAlignMarkers)
-            HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+            HoleSet(D = M4FreeHoleD, C = 5, S = (16 / 25.4));
         }
     //Shooter pivot hole
     rotate(90, [0, 1, 0])
@@ -1168,78 +1170,10 @@ module RampPlate()
     //Side support mount holes
     translate([BallExitOffset - RampXOffset + FlywheelClearance - (4 / 25.4), -(3 * 12/25.4) + 0.86733, 0])
       rotate(90, [0, 0, 1])
-        HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+        HoleSet(D = M4FreeHoleD, C = 4, S = (16 / 25.4));
     translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset - (ShooterPlateT / 2) + (4/25.4) + 0.02, -(3 * 12/25.4) + 0.86733, 0])//No idea why 0.86733 is needed !!
       rotate(90, [0, 0, 1])
-        HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
-  }
-}
-
-module RampPlate_old()
-{
-  //Main plate with ball entry opening
-  difference()
-  {
-    //Main plate
-    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset + ((ShooterOuterCurveRadius + FlywheelClearance) / 2) - (ShooterPlateT / 4), 1.756 + .7, 0])
-      hull()
-      {
-        cube([ShooterOuterCurveRadius + FlywheelClearance + (ShooterPlateT / 2), 6.6, ShooterPlateT], center = true);
-        translate([0.8, -5.2, 0])
-          scale([1, .5, 1.0])
-            cylinder(d = 6, h = ShooterPlateT, center = true);
-      }
-    //Ball opening
-    cylinder(d = LazySusanInnerD + .05, h = 1, center = true);
-    //Lazy Susan inner ring attach holes
-    QuadHoles(d = LazySusanInnderMountD, hole = LazySusanMountHoleD);
-    //Lazy Susan outer access holes
-    QuadHoles(d = LazySusanOuterMountD, hole = LazySusanAccessHoleD);
-    //Shooter servo block mount holes
-    //Left
-    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset + .3 + 0.025 - (.3/2), ServoHOffset + .39, -ShooterPlateT / 2])
-    {
-      //Printed block
-      PrintedServoBlockMountHoles(d = 3.5/25.4);
-      //GoBilda block    
-      GoBildaServoBlockMountHoles(d = 4.0/25.4);
-    }
-    //Right
-    translate([BallExitOffset - RampXOffset + FlywheelClearance - 0.025 - (0.3 / 2), ServoHOffset + .39, -ShooterPlateT / 2])    
-    {
-      //Printed block
-      PrintedServoBlockMountHoles(d = 3.5/25.4);
-      //GoBilda block    
-      GoBildaServoBlockMountHoles(d = 4.0/25.4);
-    }    
-    
-    //Turret servo opening
-    translate([0, ServoRotateOffset, .1])
-      translate(TurretServoLocation)
-      {
-        rotate(90, [0, 0, 1])
-        {
-          cube([.85, ServoBlockLengthOpening, .8], center = true);
-          rotate(90, [0, 1, 0])
-            ServoBlockHoles();
-        }
-      }
-    //Turret sensor opening
-    translate(TurretSensorLocation)
-      intersection()
-      {
-        cylinder(d = TurretSensorMountD, h = 1.5, center = true);
-        cube([8.5 / 25.4, TurretSensorMountD, 1.5], center = true);
-      }
-    translate([UpperBallTractionLocation[0], -3.0, ShooterPlateT / 2])
-      LowerBallTractionMountHoles();
-    //Side support mount holes
-    translate([BallExitOffset - RampXOffset + FlywheelClearance - (4 / 25.4), -(3 * 12/25.4) +  + 0.86733, 0])
-      rotate(90, [0, 0, 1])
-        HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
-    translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset - (ShooterPlateT / 2) + (4/25.4), -(3 * 12/25.4) + 0.86733, 0])//No idea why 0.86733 is needed !!
-      rotate(90, [0, 0, 1])
-        HoleSet(D = M4FreeHoleD, C = 5, S = (12 / 25.4));
+        HoleSet(D = M4FreeHoleD, C = 4, S = (16 / 25.4));
   }
 }
 
@@ -1425,6 +1359,9 @@ module IntakePlate()
     translate([(16 / 25.4), 0, 0])
       rotate(90, [0, 0, 1])
         DualHoles(32/25.4, M4FreeHoleD, 1);
+    //Rotation mount
+    translate([0, IntakeArmLength - 1 - (4 / 25.4), 0])
+      HoleSet(D = M4FreeHoleD, C = 5, S = (8 / 25.4), Center = true);
   }
 }
 
@@ -1495,6 +1432,23 @@ module BallStore1()
   }
 }
 
+module StoreBottomPlateMountHoles()
+{
+  translate([5.1, 2.4, 0])
+    cylinder(d = 4.1 / 25.4, h = 1, center = true);
+  translate([5.1, -1.5, 0])
+    cylinder(d = 4.1 / 25.4, h = 1, center = true);
+  translate([-2.7, 2.4, 0])
+    cylinder(d = 4.1 / 25.4, h = 1, center = true);
+  translate([-2.7, -1.5, 0])
+    cylinder(d = 4.1 / 25.4, h = 1, center = true);
+  translate([5.1, -1.0, 0])
+    cylinder(d = 4.1 / 25.4, h = 1, center = true);
+  translate([-2.7, -1.0, 0])
+    cylinder(d = 4.1 / 25.4, h = 1, center = true);
+
+}
+
 module BallStore2()
 {
   translate([0, 0, .15])
@@ -1528,9 +1482,9 @@ module BallStore2()
         union()
         {
           //Outer ball storage
-          cylinder(d = 5.5, h = 6);
+          cylinder(d = 5.5, h = 5.5);
           //Servo support
-          translate([1.9, 1.5, 0])
+          translate([1.9, 1.1, 0])
           {
             difference()
             {
@@ -1552,17 +1506,9 @@ module BallStore2()
           }
           //Bottom plate
           translate([-3, -2, -0.1])
-            cube([8.4, 5, .1]);
+            cube([8.4, 4.75, .1]);
         }
-        //Bottom plate mount holes
-        translate([5, 2.5, 0])
-          cylinder(d = 4.1 / 25.4, h = 1, center = true);
-        translate([5, -1.5, 0])
-          cylinder(d = 4.1 / 25.4, h = 1, center = true);
-        translate([-2.7, 2.5, 0])
-          cylinder(d = 4.1 / 25.4, h = 1, center = true);
-        translate([-2.7, -1.5, 0])
-          cylinder(d = 4.1 / 25.4, h = 1, center = true);
+        StoreBottomPlateMountHoles();
         //Inner ball storage
         translate([0, 0, 0])
           cylinder(d = 5.3, h = 6.2);
@@ -1570,7 +1516,7 @@ module BallStore2()
         translate([-3, -7.5, 0])
           cube([6, 6, 6.2]);
         //Cut off pusher opening
-        translate([0, -4.5, 0])
+        translate([0, -4.8, 0])
           cube([6, 6, 6.2]);
       }
     }
@@ -1726,10 +1672,53 @@ module LeftSideAssembly()
     translate([-(ShooterPlateT / 2) - (48 / 25.4), 0, 0])
       rotate(-90, [0, 1, 0])
         SidePlateInner();
+    if (ShowAlignMarkers)
     color("Orange")
-      translate([-5.8, 3, 2.9])
+      translate([-5.1, 3.1, 3.3])
+      rotate(90, [0, 1, 0])
+      {
         RevHub();
+#        RevHubHoles();
+      }
   }
+}
+
+module RevMountPlate()
+{
+  translate([0, 2.7, .45])
+  {
+  difference()
+  {
+    hull()
+    {
+      cube([RobotOuterWidth - (96 / 25.4) - ShooterPlateT - ShooterPlateT, ShooterPlateT, 5], center = true);
+      translate([0, 0, 3.2])
+        cube([10, ShooterPlateT, .1], center = true);
+    }
+    //Bellypan attach holes
+    translate([0.1575 - (8 / 25.4), 0, -(5/2) + (4 / 25.4)])
+      rotate(90, [1, 0, 0])
+        HoleSet(D = M4FreeHoleD, C = 19, S = (16 / 25.4), Center = true);
+    //Rev hub mount options
+    //Vertical
+    translate([-2.5, 0, 0.35])
+      RevHubHoles();
+    translate([2.5, 0, 0.35])
+      RevHubHoles();
+    //Horizontal
+    translate([2.932, 0, 0.725])
+      rotate(90, [0, 1, 0])
+        RevHubHoles();
+    translate([-2.932, 0, 0.725])
+      rotate(90, [0, 1, 0])
+        RevHubHoles();
+    //Side assembly attach holes
+    translate([(RobotOuterWidth / 2) - (48 / 25.4) - ShooterPlateT - (4 / 25.4), 0, -1.945 + (8 / 25.4)])
+      rotate(-90, [0, 1, 0])
+        rotate(90, [1, 0, 0])
+          HoleSet(D = M4FreeHoleD, C = 7, S = (16 / 25.4));
+  }
+}
 }
 
 module RightSideAssembly()
@@ -1745,9 +1734,28 @@ module RightSideAssembly()
     translate([-(ShooterPlateT / 2) - (48 / 25.4), 0, 0])
       rotate(-90, [0, 1, 0])
         SidePlateInner();
+    if (ShowAlignMarkers)
     color("Orange")
-      translate([-5.8, 3, 2.9])
+      translate([-5.53, 3, 2.925])
+      {
         RevHub();
+#          RevHubHoles();
+      }
+  }
+}
+
+module RevHubHoles()
+{
+  rotate(-90, [1, 0, 0])
+  {
+    translate([(44 / 25.4), (64 / 25.4), 0])
+      cylinder(d = (3.5 / 25.4), h = 3, center = true);
+    translate([-(44 / 25.4), (64 / 25.4), 0])
+      cylinder(d = (3.5 / 25.4), h = 3, center = true);
+    translate([(44 / 25.4), -(64 / 25.4), 0])
+      cylinder(d = (3.5 / 25.4), h = 3, center = true);
+    translate([-(44 / 25.4), -(64 / 25.4), 0])
+      cylinder(d = (3.5 / 25.4), h = 3, center = true);
   }
 }
 
@@ -1755,7 +1763,11 @@ module RevHub()
 {
   rotate(90, [0, 1, 0])
     translate([0, (30 / 2)/25.4, 0])
-      cube([143 / 25.4, 30/25.4, 103/25.4], center = true);
+      difference()
+      {
+        cube([143 / 25.4, 30/25.4, 103/25.4], center = true);
+        RevHubHoles();
+      }
 }
 
 module SidePlateOuter()
@@ -1781,10 +1793,10 @@ module SidePlateInner()
     translate([1.2, -WheelSpacingOffset, 0])
       SwyftHolesInner(MotorSlide = true);
     //Back plate mount holes
-    translate([0.315, (8 * 10) / 25.4, 0])
+    translate([0.315 + (8 / 25.4), 2.834, 0])
       HoleSet(M4FreeHoleD, 8, (16 / 25.4));
     //Elevator support mount holes
-    translate([3.1, 5.2, 0])
+    translate([3.9, 5.8, 0])
       rotate(90, [0, 0, 1])
         HoleSet(M4FreeHoleD, 5, (8 / 25.4), Center = true);
     
@@ -1830,9 +1842,9 @@ module SidePlateCore()
     translate([.5, -(RobotOuterLength  - (9/25.4))/ 2, 0])
       HoleSet(D = M4FreeHoleD, C = 4, S = (16 / 25.4));
     //Odometry pod mounts
-    translate([-0.5 + (35/25.4), (20/25.4), 0])
+    translate([-0.5 + (35/25.4), (10/25.4), 0])
       HoleSet(D = M4FreeHoleD, C = 2, S = (32 / 25.4));
-    translate([-0.5 + (35/25.4), (70/25.4), 0])
+    translate([-0.5 + (35/25.4), (60/25.4), 0])
       HoleSet(D = M4FreeHoleD, C = 2, S = (32 / 25.4));
     //Intake pivot options
     translate([3.75, -1.1, 0])
@@ -1844,15 +1856,17 @@ module SidePlateCore()
   }  
 }
 
-//RobotOuterWidth = 16;
-//RobotOuterLength = 15;
-//DriveBaseVOffset = -5.3;
-
 module BellyPan()
 {
+  RampExtension = 1.7;
   difference()
   {
-    cube([RobotOuterWidth, RobotOuterLength - 3.5, ShooterPlateT], center = true);
+    translate([0, -RampExtension / 2, 0])
+      cube([RobotOuterWidth, RobotOuterLength - 3.5 + RampExtension, ShooterPlateT], center = true);
+    //Ramp slots
+    for (i = [-2:2])
+      translate([(i * 1.5), -(RobotOuterLength - 3.5) / 2, 0])
+        cube([.8, 0.05, 1], center = true);
     //Wheel cutouts
     translate([(RobotOuterWidth / 2) - (24 / 25.4), WheelSpacingOffset + .3, 0])
     {
@@ -1884,6 +1898,11 @@ module BellyPan()
           cube([6, 2, 1], center = true);
       }
     }
+    //Odometry pod cutouts
+    translate([(RobotOuterWidth / 2) - (21.5 / 25.4), -0.4, 0])
+      cube([54/25.4, 45/25.4, 1], center = true);
+    translate([-((RobotOuterWidth / 2) - (21.5 / 25.4)), -0.4, 0])
+      cube([54/25.4, 45/25.4, 1], center = true);
     //Outer attach holes
     translate([(RobotOuterWidth / 2) - (8 / 25.4), -((8 * 11) / 25.4), 0])
       rotate(90, [0, 0, 1])
@@ -1902,7 +1921,7 @@ module BellyPan()
           HoleSet(D = M4FreeHoleD, C = 12, S = (16 / 25.4));
     }
     //Rev mount plate lower mount holes
-    translate([(4 / 25.4), 0.316 + ((9 * 8) / 25.4), 0])
+    translate([(4 / 25.4), ((9 * 8) / 25.4), 0])
       HoleSet(D = M4FreeHoleD, C = 21, S = (16/ 25.4), Center = true);
     
   }
@@ -1927,7 +1946,7 @@ module Everything()
 
   if (ShowTurretMountPlate)
     translate([0, 0, -.6])
-    TurretMountPlate();
+      TurretMountPlate();
   
   if (ShowDriveBase)
     DriveBase();
@@ -1959,26 +1978,44 @@ module Everything()
   if (ShowRightSideAssembly)
     RightSideAssembly();
 
+  if (ShowBellypan)
+    translate([0, 0, -6.5])
+      BellyPan();
+
+  if (ShowRevMountPlate)
+    translate([0, 0.33, -4.375])
+      RevMountPlate();
+
+
   if (ShowLimits)
     translate([0, -(LimitBounds[1] / 2) + 7.5, (LimitBounds[2] / 2) - 14.5])
       Limits();
-  translate([0, 0, -6.5])
-    BellyPan();
+  
 }
 
 module DXF()
 {
-//  projection(cut = false)
-//    TurretMountPlate();
-//    RampPivotPlate()
-//    Linkage();
-    RampPlate();
+  projection(cut = false)
+  //ShooterBasePlate2BottomPlate();
+  //ShooterBasePlate2TopPlate();
+  //rotate(90, [0, 1, 0]) ShooterBody2SidePlateScoop();
+  //rotate(90, [0, 1, 0]) ShooterBody2SidePlateFlywheel();
+  //rotate(90, [0, 1, 0]) RampPivotPlate();
+  //RampPlate();
+  //TurretMountPlate();
+  //SidePlateOuter();
+  //SidePlateInner();
+  //IntakePlate();
+  //BellyPan();
+  //rotate(90, [1, 0, 0]) RevMountPlate();
+  Linkage();
+  
 }
 
-translate([0, 0, 7])
-  Everything();
-
-//DXF();
+//translate([0, 0, 7])
+//  Everything();
+scale(25.4)
+  DXF();
 
 //IntakeSpinner();
 
