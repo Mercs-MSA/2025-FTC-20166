@@ -25,6 +25,7 @@ BallStoreRadius = 3.2;
 BallStoreAngle = -30;
 BallLifterAngle = 110;
 FreeHoleOversize = 0.00001;
+IntakeD = 3;
 
 module Stop(){}
 RobotOuterWidth = 16.063;//This puts the outer side channels on an 8mm grid
@@ -1391,7 +1392,7 @@ module IntakeAssembly()
     rotate(90, [0, 1, 0])
     {
       color("Gray", 0.5)
-        cylinder(d = 3, h = RobotOuterWidth - 4.2, center = true);
+        cylinder(d = IntakeD, h = RobotOuterWidth - 4.2, center = true);
       color("DarkGray", 0.5)
         cylinder(d = 8/25.4, h = RobotOuterWidth, center = true, $fn = 6);
     }
@@ -1523,6 +1524,16 @@ module BallStore2()
   }
 }
 
+module SonicHubHoles()
+{
+  translate([0, 0, 0.6])
+  {
+    cylinder(d = 8.4 / 25.5, h = 3, $fn = 6, center = true); //Servo hex shaft
+    //GoBilda
+    QuadHoles(d = .891, hole = 4.2/25.4, h = 1.5);
+  }
+}
+
 module BallLifter()
 {
  BallLifterArmLength = 4.5;//4.8
@@ -1551,20 +1562,17 @@ module BallLifter()
           
           rotate(-90, [1, 0, 0])
           {
-            cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true); //Servo hex shaft
             //cylinder(d = 5/25.4, h = 3, $fn = 6); //Servo screw access
             //Servo hub flattener
             translate([0, 0, -0.55])
               cylinder(d = 1.5, h = 1);
             //Servo hub mount holes
+            //Amazon
             translate([0, 0, 0.6])
-            {
-              //GoBilda
-              QuadHoles(d = .891, hole = 4.2/25.4, h = 1.5);
-              //Amazon
               rotate(45, [0, 0, 1])
-              QuadHoles(d = .275 * 2, hole = 3.2/25.4);
-            }
+                QuadHoles(d = .275 * 2, hole = 3.2/25.4);
+            //GoBilda Sonic Hub
+            SonicHubHoles();
           }
           //Band attach hole
           translate([BallLifterArmLength + .4, -.7, 0])
@@ -1927,6 +1935,25 @@ module BellyPan()
   }
 }
 
+module IntakeWheel()
+{
+  difference()
+  {
+    cylinder(d = IntakeD + .25, h = .3, center = true);
+    translate([0, 0, -0.5])
+      SonicHubHoles();
+
+    for (i = [0:10])
+      rotate((360/11) * i, [0, 0, 1])
+        translate([0, IntakeD / 2, 0])
+        {
+          cube([.4, .1, .5], center = true);
+          translate([0, .2, 0])
+            cube([.07, .5, .5], center = true);
+        }
+  }
+}
+
 module Everything()
 {
   rotate(TurretAngle, [0, 0, 1])
@@ -2012,10 +2039,10 @@ module DXF()
   
 }
 
-//translate([0, 0, 7])
-//  Everything();
-scale(25.4)
-  DXF();
+translate([0, 0, 7])
+  Everything();
+//scale(25.4)
+//  DXF();
 
 //IntakeSpinner();
 
@@ -2041,3 +2068,4 @@ scale(25.4)
 //TurretServoGear();
 
 
+IntakeWheel();
