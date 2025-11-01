@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Utilities.LERP;
 public class SubSystemShooter {
     private LERP shooterTiltLeftLERP;
     private LERP shooterTiltRightLERP;
+    private LERP turretInterpolator;
     private Servo shooterTiltLeft;
     private Servo shooterTiltRight;
     private DcMotorEx shooterFlyWheel;
@@ -21,6 +22,7 @@ public class SubSystemShooter {
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
+        turretInterpolator = new LERP(RobotConstants.potVoltageMin,RobotConstants.turretAngleMin,RobotConstants.potVoltageMax,RobotConstants.turretAngleMax,true);
 
         shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");
         shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");
@@ -36,6 +38,12 @@ public class SubSystemShooter {
     public void setTurretRotationSpeed(double power)
     {
         turretRotation.setPower(power);
+    }
+
+    public double getTurretAngle()
+    {
+        RobotConstants.potVoltage = turretPositionSensor.getVoltage();
+        return turretInterpolator.interpolated(RobotConstants.potVoltage);
     }
 
     public void setShooterAngle(double tiltAngle)

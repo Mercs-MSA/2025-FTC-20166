@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
+import org.firstinspires.ftc.teamcode.Utilities.LERP;
 import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 
 import java.util.List;
@@ -45,11 +47,15 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private List<LynxModule> allHubs;
     private Telemetry telemetryA;
     private SubSystemShooter subSystemShooter;
+    private LERP velocityLERP = new LERP(RobotConstants.nearDistance,RobotConstants.nearVelocity,RobotConstants.farDistance,RobotConstants.farVelocity,true);
+    private LERP angleLERP = new LERP(RobotConstants.nearDistance,RobotConstants.nearShooterAngle,RobotConstants.farDistance,RobotConstants.farShooterAngle,true);
     private SubSystemRobotID robotIDSubSystem;
     private int robotID = 0;
     private SubSystemRobotIMU robotIMUSubSystem;
     private SubSystemRobotPinpoint robotPinpointSubSystem;
     private double driveTranslateX;
+    private double turretDelta = 0;
+    private double goalHeading = 0;
     private double driveTranslateY;
     private double forceJoystickRotation = 0.0;
     SparkFunOTOS myOtos;
@@ -173,6 +179,11 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         return calculatedAngleDegs;
     }
 
+    public static double getPointsDistance(double x, double y, double xr, double yr)
+    {
+        return Math.hypot(xr-x,yr-y);
+    }
+
     public double wrapRange(double number, double range)
     {
         while(number >= range)
@@ -186,13 +197,15 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     {
         double joystickRotation;
 
+        goalHeading = getPointsHeading(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.getX(), robotPose.getY());
+
         joystickRotation = gamepad1.right_stick_x;
         faceGoal = gamepad1.left_bumper;
 
         if (faceGoal)
         {
             currentlyTurning = false;
-            desiredHeading = getPointsHeading(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.getX(), robotPose.getY());
+            desiredHeading = goalHeading;
             forceJoystickRotation = 0.0;
         }
         else if (Math.abs(joystickRotation) >= RobotConstants.joystickRotateDeadband)
@@ -215,6 +228,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
             }
             forceJoystickRotation = 0.0;
         }
+        turretDelta = goalHeading - robotPose.getThetaDegrees();
     }
     private void updateDriveControls()
     {
@@ -307,14 +321,26 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         telemetryA.addLine();
 
         //Shooter
-        telemetryA.addData("Current Shooter Velocity", subSystemShooter.getShooterSpeed());
+        telemetryA.addData("Current Shooter Velocity", RobotConstants.shooterVelocity);
+        telemetryA.addData("Current Shooter Angle", RobotConstants.shooterAngle);
+        telemetryA.addData("Distance",RobotConstants.distanceFromGoal);
+        telemetryA.addLine();
+
+        telemetryA.addData("Pot Voltage", RobotConstants.potVoltage);
 
         TelemetryPacket fieldPayload = new TelemetryPacket(true);
 
         fieldPayload.fieldOverlay()
                 .setTranslation(-robotPose.getX(),-robotPose.getY())
+                .setRotation(robotPose.getThetaRadians())
                 .strokeRect(-5,-5,10,10)
-                .strokeLine(0,0,10,0);
+                .strokeLine(0,0,-5,0)
+                .setStroke("red")
+                .setRotation(Math.toRadians(robotPose.getThetaDegrees() + subSystemShooter.getTurretAngle()))
+                .strokeLine(0,0,-10,0)
+                .setStroke("blue")
+                .setRotation(Math.toRadians(turretDelta + robotPose.getThetaDegrees()))
+                .strokeLine(0,0,-15,0);
 
         FtcDashboard.getInstance().sendTelemetryPacket(fieldPayload);
 
@@ -337,6 +363,9 @@ public void test()
     }
     private void updateShooter()
     {
+        RobotConstants.distanceFromGoal = getPointsDistance(Waypoints.blueGoalPointx, Waypoints.blueGoalPointy, robotPose.getX(), robotPose.getY());
+        RobotConstants.shooterAngle = angleLERP.interpolated(RobotConstants.distanceFromGoal);
+        RobotConstants.shooterVelocity = velocityLERP.interpolated(RobotConstants.distanceFromGoal);
         subSystemShooter.setShooterSpeed(RobotConstants.shooterVelocity);
         subSystemShooter.setShooterAngle(RobotConstants.shooterAngle);
     }
@@ -353,7 +382,6 @@ public void test()
 
         while (opModeIsActive())
         {
-            test();
             // clearHubCache();
             updateRobotPose();
             updateDesiredHeading();

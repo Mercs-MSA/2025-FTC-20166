@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.firstinspires.ftc.teamcode.Utilities.LERP;
+
 @Config
 public class RobotConstants
 {
@@ -16,6 +18,12 @@ public class RobotConstants
     public final static double robotBPodXOffset = -185;//220mm to the right of the center
 
     public static int robotId;
+    public static double distanceFromGoal = 0;
+    public static double potVoltage = .5;
+    public static double potVoltageMin = .5;
+    public static double potVoltageMax = 3;
+    public static double turretAngleMin = -180;
+    public static double turretAngleMax = 180;
     public static double servoAngle = 0;
     public static double leftMaxAngleSetting = 0.9;
     public static double rightMaxAngleSetting = 0.1;
