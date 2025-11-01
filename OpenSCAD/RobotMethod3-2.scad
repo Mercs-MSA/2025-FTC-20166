@@ -1528,7 +1528,7 @@ module SonicHubHoles()
 {
   translate([0, 0, 0.6])
   {
-    cylinder(d = 8.4 / 25.5, h = 3, $fn = 6, center = true); //Servo hex shaft
+    cylinder(d = 8.3 / 25.5, h = 3, $fn = 6, center = true); //Servo hex shaft
     //GoBilda
     QuadHoles(d = .891, hole = 4.2/25.4, h = 1.5);
   }
@@ -2039,10 +2039,29 @@ module DXF()
   
 }
 
+module Print3D()
+{
+//  BearingBlock(L = 1.4, H = 1, T = 0.3, VO = 0.52, MS = 1.0, MD = 0.118);
+//  ServoBlock(BlockWidthOffset = 0);
+//  UpperBallTractionPulley();
+//  BallScoop();
+//  BearingBlock(L = LTBlockL, H = LTBlockH, T = LTBlockT, VO = LTVO, MS = LTMountSpacing, MD = 0.118);
+//  BearingBlock(L = LTBlockL, H = LTBlockH, T = LTBlockT, VO = LTVO, MS = LTMountSpacing, MD = 0.118);
+//  ServoBlock(BlockDepth = .21, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
+//ToDo :  BallStore2(); 
+//  TurretServoGear();
+  //BallLifter();
+//  TurretSensorGear();
+  IntakeWheel();
+}
+
+
 translate([0, 0, 7])
   Everything();
+
 //scale(25.4)
 //  DXF();
+//Print3D();
 
 //IntakeSpinner();
 
