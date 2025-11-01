@@ -5,6 +5,7 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -81,6 +82,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private boolean currentlyTurning = false;
 
     RobotStatus robotPose;
+    private Telemetry telemetryA1;
 
     public void initializeHardware() throws InterruptedException {
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -306,6 +308,15 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
         //Shooter
         telemetryA.addData("Current Shooter Velocity", subSystemShooter.getShooterSpeed());
+
+        TelemetryPacket fieldPayload = new TelemetryPacket(true);
+
+        fieldPayload.fieldOverlay()
+                .setTranslation(-robotPose.getX(),-robotPose.getY())
+                .strokeRect(-5,-5,10,10)
+                .strokeLine(0,0,10,0);
+
+        FtcDashboard.getInstance().sendTelemetryPacket(fieldPayload);
 
         updateTelemetry(telemetryA);
 
