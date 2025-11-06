@@ -1,3 +1,4 @@
+DoPrint = false;
 ShowLimits = false;
 LimitBounds = [15, 15, 15];
 ShowShooter = true;
@@ -26,6 +27,8 @@ BallStoreAngle = -30;
 BallLifterAngle = 110;
 FreeHoleOversize = 0.00001;
 IntakeD = 3;
+PulleyRoller = 2;
+TractionPulleyLip = .2;
 
 module Stop(){}
 RobotOuterWidth = 16.063;//This puts the outer side channels on an 8mm grid
@@ -467,13 +470,24 @@ module LowerBallTraction()
 
 module Roller(L, D, CF)
 {
-  rotate_extrude(angle = 360)
-  intersection()
+  if (PulleyRoller == 1)
   {
-    scale([1.0, CF])
-      circle(d = D);
-    translate([0, -L/2])
-      square([D, L]);
+    rotate_extrude(angle = 360)
+    intersection()
+    {
+      scale([1.0, CF])
+        circle(d = D);
+      translate([0, -L/2])
+        square([D, L]);
+    }
+  }
+  else if (PulleyRoller == 2)
+  {
+    translate([0, 0, L / 2])
+      cylinder(d = D + TractionPulleyLip, h = 0.03, center = true);
+    cylinder(d = D, h = L, center = true);
+    translate([0, 0, -L / 2])
+      cylinder(d = D + TractionPulleyLip, h = 0.03, center = true);
   }
 }
 
@@ -488,9 +502,9 @@ module ServoShaft()
 
 module UpperBallTractionPulley()
 {
-  RollerL = (UpperBallTractionGap - .1) / 3;
-    rotate(-90, [0, 1, 0])
-    {
+  RollerL = (UpperBallTractionGap - .08) / 3;
+  rotate(-90, [0, 1, 0])
+  {
     difference()
     {
       union()
@@ -501,7 +515,11 @@ module UpperBallTractionPulley()
         translate([0, 0, RollerL + RollerL])
           Roller(L = RollerL, D = 1, CF = 1.0);
       }
+      //Shaft
       cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true);
+      //Grub screw
+      rotate(90, [1, 0, 0])
+        cylinder(d = M3TapHoleD, h = 1);
     }
     if (ShowAlignMarkers)
       translate([0, 0, -.39])
@@ -2052,17 +2070,21 @@ module Print3D()
 //  TurretServoGear();
   //BallLifter();
 //  TurretSensorGear();
-  IntakeWheel();
+//  IntakeWheel();
+  UpperBallTractionPulley();
 }
 
-
-translate([0, 0, 7])
-  Everything();
-
-//scale(25.4)
-//  DXF();
-//Print3D();
-
+if (!DoPrint)
+{
+  translate([0, 0, 7])
+    Everything();
+}
+else
+{
+  scale(25.4)
+  //  DXF();
+  Print3D();
+}
 //IntakeSpinner();
 
 
@@ -2087,4 +2109,3 @@ translate([0, 0, 7])
 //TurretServoGear();
 
 
-IntakeWheel();
