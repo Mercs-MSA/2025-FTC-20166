@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -10,6 +11,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 @Config
 public class Waypoints
 {
+    //PedroPoints
+    public static final Pose blueStartPoseWall = new Pose(84, 0, Math.toRadians(90));
+    public static final Pose redStartPoseWall = new Pose(60, 0, Math.toRadians(90));
+    public static final Pose redGoal = new Pose(144, 144, Math.toRadians(45));
+    public static final Pose blueGoal = new Pose(0, 144, Math.toRadians(135));
 
     public static double redGoalPointx = 72;
     public static double redGoalPointy = 72;
