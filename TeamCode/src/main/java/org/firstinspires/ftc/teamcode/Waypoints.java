@@ -16,6 +16,8 @@ public class Waypoints
     public static final Pose redStartPoseWall = new Pose(60, 0, Math.toRadians(90));
     public static final Pose redGoal = new Pose(144, 144, Math.toRadians(45));
     public static final Pose blueGoal = new Pose(0, 144, Math.toRadians(135));
+    public static Pose startPoseBlueAudience = new Pose(72,0,Math.toRadians(90)); //See ExampleAuto to understand how to use this
+
 
     public static double redGoalPointx = 72;
     public static double redGoalPointy = 72;
