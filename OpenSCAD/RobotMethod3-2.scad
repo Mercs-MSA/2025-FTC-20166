@@ -27,8 +27,6 @@ BallStoreAngle = -30;
 BallLifterAngle = 110;
 FreeHoleOversize = 0.00001;
 IntakeD = 3;
-PulleyRoller = 2;
-TractionPulleyLip = .2;
 
 module Stop(){}
 RobotOuterWidth = 16.063;//This puts the outer side channels on an 8mm grid
@@ -90,8 +88,15 @@ CurveBallProfileInnerR = 6.5;
 CurveBallPathSegmentAngle = 50;
 ShooterInnerCurveBackT = .2;
 RampRotationSupportT = 0.2;
-UpperBallTractionGap = 1.0;
-UpperBallTractionLocation = [-.4, -3.3, .70];
+UpperBallTractionGap = 1.5;
+UpperBallTractionGapNudge = .5;
+UpperBallTractionSpacing = 2.45;
+RollerBeltWidth = (8 / 25.4);
+PulleyRollerStyle = 2;
+TractionPulleyLip = .2;
+RollerSections = floor(UpperBallTractionGap / RollerBeltWidth);
+RollerD = 1.2;
+UpperBallTractionLocation = [0.3, -3.1, .620];
 LTBlockT = 0.3;//Lower traction pulley block thickness
 LTBlockL = 1.1;//Lower traction pulley block length
 LTBlockH = 1.2;//Lower traction pulley block height
@@ -99,6 +104,29 @@ LTMountSpacing = 0.8;//Lower traction pulley block mount hole spacing
 LTBlockSpacing = 3.5;//Lower traction pulley block spacing
 LTVO = 0.7;//Lower traction pulley block vertical offset
 LTMD = 2.9/25.4;//Lower traction pulley block mount hole diameter (M3 self tap)
+
+module RoundedBlock($XDim = 43, $YDim = 43, $ZDim = 9.6, $CurveD = 4)
+{
+  hull()
+  {
+    translate([-($XDim - $CurveD)/ 2, -($YDim  - $CurveD)/ 2, -($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([($XDim - $CurveD)/ 2, -($YDim  - $CurveD)/ 2, -($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([-($XDim - $CurveD)/ 2, ($YDim  - $CurveD)/ 2, -($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([($XDim - $CurveD)/ 2, ($YDim  - $CurveD)/ 2, -($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([-($XDim - $CurveD)/ 2, -($YDim  - $CurveD)/ 2, ($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([($XDim - $CurveD)/ 2, -($YDim  - $CurveD)/ 2, ($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([-($XDim - $CurveD)/ 2, ($YDim  - $CurveD)/ 2, ($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+    translate([($XDim - $CurveD)/ 2, ($YDim  - $CurveD)/ 2, ($ZDim - $CurveD) / 2])
+      sphere( d = $CurveD, $fn = 50);
+  }
+}
 
 module Servo()
 {
@@ -429,8 +457,31 @@ module UpperBallTraction()
 {
   {
     rotate(180, [0, 0, 1])
+    {
+      ServoBlock(BlockWidthOffset = -0.09);
+      if (ShowAlignMarkers)
+        translate([.28, -ServoRotateOffset, -0.09])
+          rotate(90, [0, 1, 0])
+            ServoShaft();
+    }
+    translate([-UpperBallTractionSpacing - 0.95, 0, 0])
+    {
+      rotate(180, [1, 0, 0])
+        ServoBlock(BlockWidthOffset = 0.09);
+        if (ShowAlignMarkers)
+          translate([.28, ServoRotateOffset, -0.09])
+            rotate(90, [0, 1, 0])
+              ServoShaft();
+    }
+  }
+}
+
+module UpperBallTraction_old()
+{
+  {
+    rotate(180, [0, 0, 1])
       ServoBlock(BlockWidthOffset = 0);
-    translate([-UpperBallTractionGap - 0.65, ServoRotateOffset, -0.52])
+    translate([-UpperBallTractionSpacing - 0.65, ServoRotateOffset, -0.52])
     {
       rotate(90, [0, 0, 1])
         BearingBlock(L = 1.4, H = 1, T = 0.3, VO = 0.52, MS = 1.0, MD = 0.118);
@@ -462,14 +513,14 @@ module LowerBallTraction()
     translate([LTBlockSpacing / 2, 0, 0])
       rotate(90, [0, 0, 1])
         BearingBlock(L = LTBlockL, H = LTBlockH, T = LTBlockT, VO = LTVO, MS = LTMountSpacing, MD = 0.118);
-    translate([(UpperBallTractionGap / 2) - .1, 0, LTVO])
-      UpperBallTractionPulley();
+    translate([(UpperBallTractionGap / 2) - .1 - UpperBallTractionGapNudge, 0, LTVO])
+      UpperBallTractionPulley(DoGuide = false);
   }
 }
 
-module Roller(L, D, CF)
+module Roller(L, D, CF, DoGuide)
 {
-  if (PulleyRoller == 1)
+  if (PulleyRollerStyle == 1)
   {
     rotate_extrude(angle = 360)
     intersection()
@@ -480,13 +531,16 @@ module Roller(L, D, CF)
         square([D, L]);
     }
   }
-  else if (PulleyRoller == 2)
+  else if (PulleyRollerStyle == 2)
   {
-    translate([0, 0, L / 2])
-      cylinder(d = D + TractionPulleyLip, h = 0.03, center = true);
     cylinder(d = D, h = L, center = true);
-    translate([0, 0, -L / 2])
-      cylinder(d = D + TractionPulleyLip, h = 0.03, center = true);
+    if (DoGuide)
+    {
+      translate([0, 0, L / 2])
+        cylinder(d = D + TractionPulleyLip, h = 0.03, center = true);
+      translate([0, 0, -L / 2])
+        cylinder(d = D + TractionPulleyLip, h = 0.03, center = true);
+    }
   }
 }
 
@@ -498,21 +552,17 @@ module ServoShaft()
     cylinder(d = .394, h = 0.1653);
   }
 }
-
-module UpperBallTractionPulley()
+module UpperBallTractionPulley(DoGuide = true)
 {
-  RollerL = (UpperBallTractionGap - .08) / 3;
   rotate(-90, [0, 1, 0])
   {
     difference()
     {
       union()
       {
-        Roller(L = RollerL, D = 1, CF = 1.0);
-        translate([0, 0, RollerL])
-          Roller(L = RollerL, D = 1, CF = 1.0);
-        translate([0, 0, RollerL + RollerL])
-          Roller(L = RollerL, D = 1, CF = 1.0);
+        for (i = [0:RollerSections - 1])
+          translate([0, 0, RollerBeltWidth * i])
+            Roller(L = RollerBeltWidth, D = RollerD, CF = 1.0, DoGuide = DoGuide);
       }
       //Shaft
       cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true);
@@ -520,9 +570,6 @@ module UpperBallTractionPulley()
       rotate(90, [1, 0, 0])
         cylinder(d = M3TapHoleD, h = 1);
     }
-    if (ShowAlignMarkers)
-      translate([0, 0, -.39])
-        ServoShaft();
   }
 }
 
@@ -532,29 +579,36 @@ module ShooterBasePlate2TopAssembly()
   translate(UpperBallTractionLocation)
   {
     UpperBallTraction();
-    translate([-.7, ServoRotateOffset, 0])
+    translate([-.78 - UpperBallTractionGapNudge, ServoRotateOffset, 0])
       UpperBallTractionPulley();
   }
 }
-
 module ShooterBasePlate2TopPlate()
 {
   difference()
   {
     ShooterBasePlate2Core();
     //Ball feeder belt opening
-    translate([UpperBallTractionLocation[0] - UpperBallTractionGap - 0.5, UpperBallTractionLocation[1] - 1.7, -0.5])
-      cube([UpperBallTractionGap , 3, 1]);
+    translate([UpperBallTractionLocation[0] - UpperBallTractionGap - 0.5 - UpperBallTractionGapNudge, UpperBallTractionLocation[1] - 2.3, -0.5])
+      cube([UpperBallTractionGap , 4, 1]);
     //Ball feeder servo and bearing support mount holes
-    translate([UpperBallTractionLocation[0], UpperBallTractionLocation[1], 0])
+    for (i = [-1:1])
     {
-      //Printed block
-      PrintedServoBlockMountHoles(d = M3FreeHoleD);
-      //GoBilda block    
-      GoBildaServoBlockMountHoles(d = M4FreeHoleD);
-      //Bearing support
-      translate([-UpperBallTractionGap - .8, -.1123, -0.5])
-        UpperBallTractionSupportMountHoles();
+      translate([UpperBallTractionLocation[0], UpperBallTractionLocation[1] + (i * 8 / 25.4), 0])
+      {
+        //Printed block
+        PrintedServoBlockMountHoles(d = M3FreeHoleD);
+        //GoBilda block    
+  //      GoBildaServoBlockMountHoles(d = M4FreeHoleD);
+        //Bearing support
+        translate([-UpperBallTractionSpacing - .95, 0, 0])
+        {
+          //Printed block
+          PrintedServoBlockMountHoles(d = M3FreeHoleD);
+          //GoBilda block    
+  //        GoBildaServoBlockMountHoles(d = M4FreeHoleD);
+        }
+      }
     }    
     
   }
@@ -937,6 +991,9 @@ module ShooterBasePlate2BottomPlate()
     translate([-2.9, 0, 0])
       rotate(90, [0, 0, 1])
         DualHoles(32 / 25.4, M4FreeHoleD, 1);
+    //Ball clearance
+    translate([-1.5, -6.4, 0])
+    cylinder(d = 5.5, h = 1, center = true);
   }
 }
 
@@ -1232,7 +1289,7 @@ module RampPlateAssembly()
             ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
   }
   //Traction blocks
-  translate([UpperBallTractionLocation[0], -3.0, ShooterPlateT / 2])
+  translate([-.4, -3.0, ShooterPlateT / 2])
     {
       LowerBallTraction();
     }
@@ -1971,6 +2028,19 @@ module IntakeWheel()
   }
 }
 
+module ChannelSpacer()
+{
+  difference()
+  {
+    translate([0, 0, 9.4/2])
+      RoundedBlock($XDim = 43, $YDim = 43, $ZDim = 9.4, $CurveD = 4);
+    for (i = [-2:2])
+      translate([i*8, 0, 8.1 - 2.5])
+        rotate(90, [1, 0, 0])
+          cylinder(d = 4.3, h = 50, center = true);
+  }
+}
+
 module Everything()
 {
   rotate(TurretAngle, [0, 0, 1])
@@ -2041,7 +2111,7 @@ module DXF()
 {
   projection(cut = false)
   //ShooterBasePlate2BottomPlate();
-  //ShooterBasePlate2TopPlate();
+  ShooterBasePlate2TopPlate();
   //rotate(90, [0, 1, 0]) ShooterBody2SidePlateScoop();
   //rotate(90, [0, 1, 0]) ShooterBody2SidePlateFlywheel();
   //rotate(90, [0, 1, 0]) RampPivotPlate();
@@ -2052,7 +2122,7 @@ module DXF()
   //IntakePlate();
   //BellyPan();
   //rotate(90, [1, 0, 0]) RevMountPlate();
-  Linkage();
+//  Linkage();
   
 }
 
@@ -2070,18 +2140,21 @@ module Print3D()
   //BallLifter();
 //  TurretSensorGear();
 //  IntakeWheel();
-  UpperBallTractionPulley();
+//  UpperBallTractionPulley(DoGuide = false);
+//  UpperBallTractionPulley(DoGuide = true);
+  ChannelSpacer();
 }
 
 if (!DoPrint)
 {
+  scale(25.4)
   translate([0, 0, 7])
     Everything();
 }
 else
 {
   scale(25.4)
-  //  DXF();
+//    DXF();
   Print3D();
 }
 //IntakeSpinner();
