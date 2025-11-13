@@ -1,0 +1,22 @@
+Pedro Pinpoint setup, tuning and testing.
+https://pedropathing.com/docs/pathing/tuning/localization/pinpoint
+https://pedropathing.com/docs/pathing/reference/coordinates
+
+NOTE : 
+I THINK OUR CONFUSION COMES FROM ROBOT COORDINATES VS FIELD COORDINATES!!!
+PUSHING THE BOT FORWARD SHOULD INCREMENT X< BOT LEFT INCREMENT Y
+BUT...
+FACING FROM RED TOWARDS BLUE IS ZERO ORIENTATION ACCORDING TO FIELD COORDINATE
+SYSTEM
+
+I TINK THIS EXPLAINS WHY X & Y ARE SWAPPED BETWEEN DRIVE FACE GOAL AND PEDRO
+TELEOP
+
+
+RobotConstants
+Should not have 2 different robot*Pod*Offset settings. Should have one of each that is set depending on constructor (robotID)
+distanceFromGoal, potVoltage, shooterVelocity, shooterAngle should not be here. They are local variables where used.
+
+Misc
+Remove redundant code, e.g. 2 wheel etc...
+Switch all units to inches to avoid confusion
