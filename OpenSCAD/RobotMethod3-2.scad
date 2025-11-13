@@ -2028,13 +2028,15 @@ module IntakeWheel()
   }
 }
 
-module ChannelSpacer()
+module ChannelSpacer(Length)
 {
+  HoleCount = floor(Length / 8) - 1;
+  scale(1/25.4)
   difference()
   {
     translate([0, 0, 9.4/2])
-      RoundedBlock($XDim = 43, $YDim = 43, $ZDim = 9.4, $CurveD = 4);
-    for (i = [-2:2])
+      RoundedBlock($XDim = Length, $YDim = 43, $ZDim = 9.4, $CurveD = 4);
+    for (i = [-(HoleCount / 2):(HoleCount / 2)])
       translate([i*8, 0, 8.1 - 2.5])
         rotate(90, [1, 0, 0])
           cylinder(d = 4.3, h = 50, center = true);
@@ -2132,7 +2134,7 @@ module Print3D()
 //  ServoBlock(BlockWidthOffset = 0);
 //  UpperBallTractionPulley();
 //  BallScoop();
-//  BearingBlock(L = LTBlockL, H = LTBlockH, T = LTBlockT, VO = LTVO, MS = LTMountSpacing, MD = 0.118);
+  //Lower ball traction bearing mounts
 //  BearingBlock(L = LTBlockL, H = LTBlockH, T = LTBlockT, VO = LTVO, MS = LTMountSpacing, MD = 0.118);
 //  ServoBlock(BlockDepth = .21, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
 //ToDo :  BallStore2(); 
@@ -2142,7 +2144,13 @@ module Print3D()
 //  IntakeWheel();
 //  UpperBallTractionPulley(DoGuide = false);
 //  UpperBallTractionPulley(DoGuide = true);
-  ChannelSpacer();
+//  ChannelSpacer(25);
+  //Upper ball traction servo mounts
+//  ServoBlock(BlockWidthOffset = -0.09);
+  //Turret tilt servo mounts
+//  ServoBlock(BlockWidthOffset = 0.05, ServoOrientation = 0);
+  //Turret drive servo mount spacers
+  ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
 }
 
 if (!DoPrint)
