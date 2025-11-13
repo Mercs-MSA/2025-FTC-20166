@@ -60,7 +60,7 @@ public class SubSystemRobotPinpoint
             pinpoint.setOffsets(RobotConstants.robotBPodXOffset, RobotConstants.robotBPodYOffset, DistanceUnit.MM);
             podOffsetX = RobotConstants.robotBPodXOffset;
             podOffsetY = RobotConstants.robotBPodYOffset;
-            pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+            pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         }
         //Test only

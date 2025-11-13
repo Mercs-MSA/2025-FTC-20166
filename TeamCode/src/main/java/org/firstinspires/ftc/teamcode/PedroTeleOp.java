@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -10,7 +11,9 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.Waypoints;
 
@@ -21,8 +24,8 @@ import java.util.function.Supplier;
 public class PedroTeleOp extends OpMode {
     private Follower follower;
     private boolean automatedDrive;
+    private Telemetry telemetryA;
     private Supplier<PathChain> pathChain;
-    private TelemetryManager telemetryM;
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
 
@@ -31,10 +34,10 @@ public class PedroTeleOp extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(Waypoints.startPoseBlueAudience);
         follower.update();
-        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        telemetryA = new MultipleTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(),this.telemetry);
 
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 0))))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 1))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(90), 0.8))
                 .build();
 
@@ -54,9 +57,9 @@ public class PedroTeleOp extends OpMode {
     public void loop() {
         //Call this once per loop
         follower.update();
-        telemetryM.update();
 
-        if (!automatedDrive) {
+        if (!automatedDrive)
+        {
             //Make the last parameter false for field-centric
             //In case the drivers want to use a "slowMode" you can scale the vectors
 
@@ -69,7 +72,8 @@ public class PedroTeleOp extends OpMode {
             );
 
                 //This is how it looks with slowMode on
-            else follower.setTeleOpDrive(
+            else follower.setTeleOpDrive
+                    (
                     gamepad1.left_stick_y * slowModeMultiplier,
                     gamepad1.left_stick_x * slowModeMultiplier,
                     gamepad1.right_stick_x * slowModeMultiplier,
@@ -105,8 +109,11 @@ public class PedroTeleOp extends OpMode {
             slowModeMultiplier -= 0.25;
         }
 
-        telemetryM.debug("position", follower.getPose());
-        telemetryM.debug("velocity", follower.getVelocity());
-        telemetryM.debug("automatedDrive", automatedDrive);
+        telemetryA.addData("position", follower.getPose());
+        telemetryA.addData("velocity", follower.getVelocity());
+        telemetryA.addData("automatedDrive", automatedDrive);
+
+        telemetryA.update();
+
     }
 }

@@ -88,7 +88,6 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private boolean currentlyTurning = false;
 
     RobotStatus robotPose;
-    private Telemetry telemetryA1;
 
     public void initializeHardware() throws InterruptedException {
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
