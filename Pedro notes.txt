@@ -6,11 +6,9 @@ NOTE :
 I THINK OUR CONFUSION COMES FROM ROBOT COORDINATES VS FIELD COORDINATES!!!
 PUSHING THE BOT FORWARD SHOULD INCREMENT X< BOT LEFT INCREMENT Y
 BUT...
-FACING FROM RED TOWARDS BLUE IS ZERO ORIENTATION ACCORDING TO FIELD COORDINATE
-SYSTEM
+FACING FROM RED TOWARDS BLUE IS ZERO ORIENTATION ACCORDING TO FIELD COORDINATE SYSTEM
 
-I TINK THIS EXPLAINS WHY X & Y ARE SWAPPED BETWEEN DRIVE FACE GOAL AND PEDRO
-TELEOP
+I THINK THIS EXPLAINS WHY X & Y ARE SWAPPED BETWEEN DRIVE FACE GOAL AND PEDRO TELEOP
 
 
 RobotConstants
@@ -20,3 +18,86 @@ distanceFromGoal, potVoltage, shooterVelocity, shooterAngle should not be here. 
 Misc
 Remove redundant code, e.g. 2 wheel etc...
 Switch all units to inches to avoid confusion
+
+
+
+It is VERY confusing that the pinpoint 'defaults' are declared in 2 different
+places and neither of them are necessary!!! The 'correct' place is really in
+the PinpointConstants constructor in PedroPathing/Constants.java
+
+
+=============================================
+Checkout procedure...
+1) Check that the odometry pods are correctly oriented
+  Put bot on blocks
+  Using the PedroTeleop to display the follower X and Y coordinates
+  Turn the 'X' pod as though the robot is moving forward and make sure the X position increments
+  Check backwards decrements X
+  Turn the 'Y' pod as though the robot is moving left and make sure the Y position increments
+  Check right decrements Y
+    If the X & Y seem to be swapped then check that the X pod wire is connected to the 
+    Pinpoint X input
+    If either direction counts in the wrong direction then change the encoder direction in the 
+    PinpointConstants constructor in PedroPathing/Constants.java
+
+2) Check the pod offsets
+  With the robot facing away from you measure the horizontal distance from the center of the 
+  robot to the X pod wheel center. This is the pod that tracks forwards/backwards movement. 
+  This distance is noted as 'forwardPodY' with right of center being negative.
+  Measure the vertical distance from the robot center to the Y pod wheel center. This is 
+  the pod that tracks left/right movement. This distance is noted as 'strafePodX with towards 
+  the front of the robot being positive.
+  Put bot on blocks
+  Using the PedroTeleop to display the follower X and Y coordinates
+  Rotate the robot around the center point and make sure that the X & Y
+  coordinates remain basically zero. Slight deviations are expected, but should
+  be less than about +-2"
+    If the variation is large then we need to review the X/Y,
+    horizontal/vertical and +- options. This also means my understanding of the
+    settings is wrong !!!
+  
+
+3) Check that the motors are configured correctly
+  Put bot on blocks
+  Make sure the start pose is configured to have a heading of 0 degrees for the moment since 
+  we don't want to consider any rotations.
+3a)
+  In 'PedroTeleOp.java' set the test pathChain new Pose() to be that start pose +1 in the X 
+  direction and ensure that the end heading is also zero degrees. This is asking the test 
+  pose to move the robot forward 1" (i.e. +1" in the X direction) from the start pose.  
+  Run PedroTeleOp and hold the button to tell Pedro to go to the test position. Since the robot 
+  is still up on blocks (I hope!!) then the drive motors should run in an attempt to move the 
+  robot forwards. Check that the motors move in the correct direction. 
+    If the motors do NOT turn as expected then change their directions in the MecanumConstants 
+    method of PedroPathing/Constants.java
+  Once the motors turn in the correct direction slowly turn the X pod (called
+  forward Y!!) as though the robot is slowly moving forward. The motors should
+  stop after "moving" an inch and the telemetry should also indicate the robot
+  "moved" forward.
+3b)
+  In 'PedroTeleOp.java' set the test pathChain new Pose() to be that start pose +1 in the Y 
+  direction and ensure that the end heading is also zero degrees. This is asking the test 
+  pose to move the robot left 1" (i.e. +1" in the Y direction) from the start pose.  
+  Run PedroTeleOp and hold the button to tell Pedro to go to the test position. Since the robot 
+  is still up on blocks (I hope!!) then the drive motors should run in an attempt to move the 
+  robot left. Check that the motors move in the correct direction. 
+    If the wheels DON'T turn as expected then we will need to think more since 3a) implies the
+    motors are configured correctly.
+
+4) Check the joysticks are configured correctly
+  The 'default' drive mode is set to robot centric. This is configured by calling
+  follower.setTeleOpDrive with 'true' as the last parameter. Check that pushing forward on the
+  joystick moves the robot forward, left moves the robot left etc...
+    If translation or rotation are swapped then change gamepad axis/polarity in the setTeleOpDrive
+    method call.
+
+5) Check the gyroscope
+  Note, the field 'orientation' is effectively defined in the start pose. Setting the start pose to
+  zero will correspond to the robot facing from the red side towards the blue side, with the driver
+  facing the same direction. Thus 'forward' should still move the robot away from you if the start
+  pose heading is zero degrees. Later we will need to ensure the start heading is set correctly
+  depending on where on the field we start. It also means we will need to 'rotate' the joystick by 
+  180 degrees when we are on the blue side of the field since our point of view will have rotated.
+  Note, this is a rotation, NOT a mirror/flip, even though the field looks mirrored)
+  Change the drive mode from true to false in the setTeleOpDrive call and ensure field centric works
+  as expected.
