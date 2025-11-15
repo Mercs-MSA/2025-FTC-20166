@@ -32,12 +32,15 @@ import java.util.List;
 //FR Motor - Motor 1
 //BL Motor - Motor 2
 //BR Motor - Motor 3
-//Otos sensor - I2C 1
-//Pinpoint - I2C 2
+//Shooter Fly Wheel Motor - Motor 0 Expansion Hub
 //Shooter Tilt Left Servo - Servo 0
 //Shooter Tilt Right Servo - Servo 1
-//Shooter Fly Wheel Motor - Motor 0 Expansion Hub
+//Servo port 2 is bad
 //Shooter Turret Rotation - Servo 3
+//Turret Belt Servo 1 - Servo 4
+//Turret Belt Servo 2 - Servo 5
+//Otos sensor - I2C 1
+//Pinpoint - I2C 2
 //Turret Position Sensor - Analog Input 0
 
 @TeleOp
