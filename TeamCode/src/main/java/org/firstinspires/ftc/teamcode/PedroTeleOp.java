@@ -37,12 +37,12 @@ public class PedroTeleOp extends OpMode {
         telemetryA = new MultipleTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(),this.telemetry);
 
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 10))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(0), 0.8))
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(38, 33))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(0), 0.8))
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(103, 72))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(0), 0.8))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(90, 84f))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 72))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(90), 0.8))
 
                 .build();
 
@@ -65,7 +65,7 @@ public class PedroTeleOp extends OpMode {
             Path2 = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(38.579, 33.196), new Pose(103.402, 72.224))
+                            new BezierLine(new Pose(38.579, 33.196), new Pose(103, 72.224))
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -92,18 +92,18 @@ public class PedroTeleOp extends OpMode {
 
             //This is the normal version to use in the TeleOp
             if (!slowMode) follower.setTeleOpDrive(
-                    gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
-                    gamepad1.right_stick_x,
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
                     true // Robot Centric
             );
 
                 //This is how it looks with slowMode on
             else follower.setTeleOpDrive
                     (
-                    gamepad1.left_stick_y * slowModeMultiplier,
-                    gamepad1.left_stick_x * slowModeMultiplier,
-                    gamepad1.right_stick_x * slowModeMultiplier,
+                    -gamepad1.left_stick_y * slowModeMultiplier,
+                    -gamepad1.left_stick_x * slowModeMultiplier,
+                    -gamepad1.right_stick_x * slowModeMultiplier,
                     true // Robot Centric
             );
         }
