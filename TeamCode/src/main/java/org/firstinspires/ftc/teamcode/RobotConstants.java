@@ -8,6 +8,10 @@ import org.firstinspires.ftc.teamcode.Utilities.LERP;
 public class RobotConstants
 {
     public final static double headingErrorDeadZone = 5.0;
+    public enum alliance {
+        BLUE,
+        RED
+    };
     public static double headingPFactor = (2.0 / 90.0);
     public final static double joystickRotateDeadband = 0.05;
     public final static double robotAPodYOffset = 0;

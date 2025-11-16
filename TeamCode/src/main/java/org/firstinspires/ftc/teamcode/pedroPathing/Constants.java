@@ -28,7 +28,8 @@ public class Constants {
             .leftFrontMotorDirection(DcMotorEx.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorEx.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorEx.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorEx.Direction.REVERSE);
+            .rightRearMotorDirection(DcMotorEx.Direction.REVERSE)
+            .useBrakeModeInTeleOp(false);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
@@ -36,8 +37,6 @@ public class Constants {
                 .mecanumDrivetrain(driveConstants)
                 .pathConstraints(pathConstraints)
                 .build();
-
-
     }
 
     public static PinpointConstants localizerConstants = new PinpointConstants()

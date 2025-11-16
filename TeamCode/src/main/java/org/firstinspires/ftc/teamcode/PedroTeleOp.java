@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -11,7 +10,6 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotConstants;
@@ -24,51 +22,79 @@ import java.util.function.Supplier;
 public class PedroTeleOp extends OpMode {
     private Follower follower;
     private boolean automatedDrive;
+    private boolean shouldDoPositionLoop = false;
     private Telemetry telemetryA;
+    private RobotConstants.alliance previousAlliance;
+    private Pose pose = null;
+    private Pose goalPose;
     private Supplier<PathChain> pathChain;
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
 
+    private void setStartPos() {
+        if (gamepad1.a)
+        {
+            pose = Waypoints.redStartPoseWall;
+            goalPose = Waypoints.redGoal;
+        }
+        else if (gamepad1.b)
+        {
+            pose = Waypoints.startPoseRedAudience;
+            goalPose = Waypoints.redGoal;
+        }
+        else if (gamepad1.x)
+        {
+            pose = Waypoints.blueStartPoseWall;
+            goalPose = Waypoints.blueGoal;
+        }
+        else if (gamepad1.y) {
+            pose = Waypoints.startPoseBlueAudience;
+            goalPose = Waypoints.blueGoal;
+        }
+    }
+
     @Override
     public void init() {
+        pose = (Pose) blackboard.get("Position");
+        previousAlliance = (RobotConstants.alliance) blackboard.get("Alliance");
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(Waypoints.startPoseBlueAudience);
+        if (pose != null)
+        {
+            follower.setStartingPose(pose);
+            blackboard.remove("Position");
+        } else
+        {
+            shouldDoPositionLoop = true;
+        }
+        if (previousAlliance != null)
+        {
+            blackboard.remove("Alliance");
+        }
         follower.update();
         telemetryA = new MultipleTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(),this.telemetry);
-
-        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(38, 33))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(90, 84f))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 72))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(90), 0.8))
-
-                .build();
+        pose = Waypoints.startPoseBlueAudience;
+//        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+//                .addPath(new Path(new BezierLine(follower::getPose, Waypoints.)))
+//                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
+//
+//                .build();
 
     }
 
-    public static class Paths {
+    @Override
+    public void init_loop() {
+        if (shouldDoPositionLoop)
+        {
+            Pose prevPose = pose;
+            setStartPos();
 
-        public PathChain Path1;
-        public PathChain Path2;
-
-        public Paths(Follower follower) {
-            Path1 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(72.000, 0.000), new Pose(38.579, 33.196))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-                    .build();
-
-            Path2 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(38.579, 33.196), new Pose(103, 72.224))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                    .build();
+            if (pose != prevPose)
+            {
+                follower.setStartingPose(pose);
+            }
+            telemetryA.addData("Starting Pose: ", pose);
+            telemetryA.addData("Doing loop? ",shouldDoPositionLoop);
+            telemetryA.update();
         }
     }
 
@@ -95,7 +121,7 @@ public class PedroTeleOp extends OpMode {
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
-                    true // Robot Centric
+                    false // Robot Centric
             );
 
                 //This is how it looks with slowMode on
@@ -104,13 +130,13 @@ public class PedroTeleOp extends OpMode {
                     -gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
                     -gamepad1.right_stick_x * slowModeMultiplier,
-                    true // Robot Centric
+                    false // Robot Centric
             );
         }
 
         //Automated PathFollowing
         if (gamepad1.aWasPressed()) {
-            follower.followPath(pathChain.get());
+            follower.holdPoint(Waypoints.redBox);
             automatedDrive = true;
         }
 

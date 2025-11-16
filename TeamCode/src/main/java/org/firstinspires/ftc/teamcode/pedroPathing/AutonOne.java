@@ -9,6 +9,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.Waypoints;
 
 @Autonomous
@@ -138,7 +139,7 @@ public class AutonOne extends OpMode {
         startingPose = Waypoints.blueStartPoseWall;
         goalPose = Waypoints.blueGoal;
 
-        pathState = state.START;
+        pathState = state.DO_NOTHING;
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -174,7 +175,14 @@ public class AutonOne extends OpMode {
     @Override
     public void stop()
     {
-
+        if (isRedTeam)
+        {
+            blackboard.put("Alliance",RobotConstants.alliance.RED);
+        } else
+        {
+            blackboard.put("Alliance",RobotConstants.alliance.BLUE);
+        }
+        blackboard.put("Position",follower.getPose());
     }
     public void setStartingPose()
     {
