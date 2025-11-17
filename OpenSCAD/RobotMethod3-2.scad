@@ -56,6 +56,7 @@ M3TapHoleD = 3.0 / 25.4;
 M4FreeHoleD = (4.1 + FreeHoleOversize) / 25.4;
 M4TapHoleD = 4.0 / 25.4;
 M5FreeHoleD = (5.1 + FreeHoleOversize) / 25.4;
+HexShaftHoleD = 8.3 / 25.4;
 RampXOffset = 1.2;
 RampYOffset = 1.8 ;
 RampZOffset = -0.5 ;
@@ -565,7 +566,7 @@ module UpperBallTractionPulley(DoGuide = true)
             Roller(L = RollerBeltWidth, D = RollerD, CF = 1.0, DoGuide = DoGuide);
       }
       //Shaft
-      cylinder(d = 8.1 / 25.5, h = 3, $fn = 6, center = true);
+      cylinder(d = HexShaftHoleD, h = 3, $fn = 6, center = true);
       //Grub screw
       rotate(90, [1, 0, 0])
         cylinder(d = M3TapHoleD, h = 1);
@@ -1356,11 +1357,11 @@ module Linkage()
   }
 }
 
-module LazySusanInnerSpacer()
+module LazySusanInnerSpacer(T = .1)
 {
   difference()
   {
-    cylinder(d = (LazySusanOuterD + LazySusanInnerD) / 2, h = .039, center = true);
+    cylinder(d = (LazySusanOuterD + LazySusanInnerD) / 2, h = T, center = true);
     cylinder(d = LazySusanInnerD, h = 1, center = true);
     echo (((LazySusanOuterD + LazySusanInnerD) / 2) - LazySusanInnerD);
 
@@ -1398,11 +1399,11 @@ module TurretMountPlate()
   }
 }
 
-module LazySusanOuterSpacer()
+module LazySusanOuterSpacer(T = .1)
 {
   difference()
   {
-    cylinder(d = LazySusanOuterD, h = .039, center = true);
+    cylinder(d = LazySusanOuterD, h = T, center = true);
     cylinder(d = (LazySusanOuterD + LazySusanInnerD) / 2, h = 1, center = true);
     QuadHoles(d = LazySusanOuterMountD, hole = LazySusanMountHoleD);
   }
@@ -1602,7 +1603,7 @@ module SonicHubHoles()
 {
   translate([0, 0, 0.6])
   {
-    cylinder(d = 8.3 / 25.5, h = 3, $fn = 6, center = true); //Servo hex shaft
+    cylinder(d = HexShaftHoleD, h = 3, $fn = 6, center = true); //Servo hex shaft
     //GoBilda
     QuadHoles(d = .891, hole = 4.2/25.4, h = 1.5);
   }
@@ -2030,12 +2031,12 @@ module IntakeWheel()
 
 module ChannelSpacer(Length)
 {
-  HoleCount = floor(Length / 8) - 1;
+  HoleCount = ceil((Length + 0.5) / 8);
   scale(1/25.4)
   difference()
   {
     translate([0, 0, 9.4/2])
-      RoundedBlock($XDim = Length, $YDim = 43, $ZDim = 9.4, $CurveD = 4);
+      RoundedBlock($XDim = Length, $YDim = 43.2, $ZDim = 9.4, $CurveD = 4);
     for (i = [-(HoleCount / 2):(HoleCount / 2)])
       translate([i*8, 0, 8.1 - 2.5])
         rotate(90, [1, 0, 0])
@@ -2142,15 +2143,17 @@ module Print3D()
   //BallLifter();
 //  TurretSensorGear();
 //  IntakeWheel();
-//  UpperBallTractionPulley(DoGuide = false);
+//  UpperBallTractionPulley(DoGuide = false, RollerSections = 7);
 //  UpperBallTractionPulley(DoGuide = true);
-//  ChannelSpacer(25);
+//  ChannelSpacer(23.7);
   //Upper ball traction servo mounts
 //  ServoBlock(BlockWidthOffset = -0.09);
   //Turret tilt servo mounts
 //  ServoBlock(BlockWidthOffset = 0.05, ServoOrientation = 0);
   //Turret drive servo mount spacers
-  ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
+//  ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
+  LazySusanInnerSpacer(T = 3 / 25.4);
+//LazySusanOuterSpacer();
 }
 
 if (!DoPrint)
@@ -2173,8 +2176,6 @@ else
 //TurretSensorGear();
 
 //Linkage();
-//LazySusanInnerSpacer();
-//LazySusanOuterSpacer();
 
 
 //SensorTest();
