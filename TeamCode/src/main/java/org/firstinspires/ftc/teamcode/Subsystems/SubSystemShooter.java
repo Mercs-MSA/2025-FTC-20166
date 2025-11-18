@@ -17,6 +17,8 @@ public class SubSystemShooter {
     private Servo shooterTiltRight;
     private DcMotorEx shooterFlyWheel;
     private CRServo turretRotation;
+    private CRServo transferServo1;
+    private CRServo transferServo2;
     private AnalogInput turretPositionSensor;
 
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
@@ -26,6 +28,9 @@ public class SubSystemShooter {
 
         shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");
         shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");
+
+        transferServo1 = hardwareMap.get(CRServo.class, "transfer1");
+        transferServo2 = hardwareMap.get(CRServo.class, "transfer2");
 
         turretRotation = hardwareMap.get(CRServo.class, "turretRotation");
 
@@ -55,6 +60,19 @@ public class SubSystemShooter {
     public void setShooterSpeed(double velocity)
     {
         shooterFlyWheel.setVelocity(velocity);
+    }
+    public void setTransfer(boolean enabled)
+    {
+        if (enabled)
+        {
+            transferServo1.setPower(-1);
+            transferServo2.setPower(1);
+        }
+        else
+        {
+            transferServo1.setPower(0);
+            transferServo2.setPower(0);
+        }
     }
     public double getShooterSpeed()
     {

@@ -105,7 +105,7 @@ public class AutonOne extends OpMode {
         pathState = state.SCORE_PRELOAD;
     }
     private void processStateWaitPathDone() {
-        while (!follower.isBusy())
+        if (!follower.isBusy())
         {
             pathState = nextPathState;
         }
@@ -137,9 +137,9 @@ public class AutonOne extends OpMode {
         opmodeTimer.resetTimer();
 
         startingPose = Waypoints.blueStartPoseWall;
-        goalPose = Waypoints.blueGoal;
+        goalPose = Waypoints.blueShooterPoint;
 
-        pathState = state.DO_NOTHING;
+        pathState = state.START;
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -189,24 +189,24 @@ public class AutonOne extends OpMode {
             if (gamepad1.a)
             {
                 startingPose = Waypoints.redStartPoseWall;
-                goalPose = Waypoints.redGoal;
+                goalPose = Waypoints.redShooterPark;
                 isRedTeam = true;
             }
             else if (gamepad1.b)
             {
                 startingPose = Waypoints.startPoseRedAudience;
-                goalPose = Waypoints.redGoal;
+                goalPose = Waypoints.redShooterPark;
                 isRedTeam = true;
             }
             else if (gamepad1.x)
             {
                 startingPose = Waypoints.blueStartPoseWall;
-                goalPose = Waypoints.blueGoal;
+                goalPose = Waypoints.blueShooterPoint;
                 isRedTeam = false;
             }
             else if (gamepad1.y) {
                 startingPose = Waypoints.startPoseBlueAudience;
-                goalPose = Waypoints.blueGoal;
+                goalPose = Waypoints.blueShooterPoint;
                 isRedTeam = false;
             }
     }
