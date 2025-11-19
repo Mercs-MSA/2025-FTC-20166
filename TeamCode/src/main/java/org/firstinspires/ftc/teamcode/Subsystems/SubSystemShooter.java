@@ -26,8 +26,8 @@ public class SubSystemShooter {
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
-        turretInterpolator1 = new LERP(2.512,-180,1.13,0,true);
-        turretInterpolator2 = new LERP(1.13,0,.327,180,true);
+        turretInterpolator1 = new LERP(1.13,0,2.512,-180,true);
+        turretInterpolator2 = new LERP(.327,180,1.13,0,true);
 
         shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");//shooterTiltLeft
         shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");//shooterTiltRight
