@@ -24,17 +24,19 @@ public class RobotConstants
     public static int robotId;
     public static double distanceFromGoal = 0;
     public static double potVoltage = .5;
-    public static double potVoltageMin = .5;
-    public static double potVoltageMax = 3;
+    public static double potVoltageMin = .352;
+    public static double potVoltageMax = 2.522;
     public static double turretAngleMin = -180;
     public static double turretAngleMax = 180;
+    public static double turretMaxPower = .1;
+    public static double turretRotationP = 0.1;
     public static double servoAngle = 0;
-    public static double leftMaxAngleSetting = 0.9;
-    public static double rightMaxAngleSetting = 0.1;
-    public static double leftMinAngleSetting = 0.1;
-    public static double rightMinAngleSetting = 0.9;
-    public static double shooterMaxAngle = 90;
-    public static double shooterMinAngle = 30;
+    public static double leftMaxAngleSetting = 0.2;
+    public static double rightMaxAngleSetting = 0.8;
+    public static double leftMinAngleSetting = 0.9;
+    public static double rightMinAngleSetting = 0.1;
+    public static double shooterMaxAngle = 84;
+    public static double shooterMinAngle = 41;
     public static double nearShooterAngle = 80;
     public static double nearVelocity = 1000;
     public static double nearDistance = 6; //In inches

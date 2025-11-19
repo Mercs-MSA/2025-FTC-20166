@@ -8,11 +8,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.Utilities.LERP;
+import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 
 public class SubSystemShooter {
     private LERP shooterTiltLeftLERP;
     private LERP shooterTiltRightLERP;
-    private LERP turretInterpolator;
+    private LERP turretInterpolator1;
+    private LERP turretInterpolator2;
     private Servo shooterTiltLeft;
     private Servo shooterTiltRight;
     private DcMotorEx shooterFlyWheel;
@@ -24,10 +26,11 @@ public class SubSystemShooter {
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
-        turretInterpolator = new LERP(RobotConstants.potVoltageMin,RobotConstants.turretAngleMin,RobotConstants.potVoltageMax,RobotConstants.turretAngleMax,true);
+        turretInterpolator1 = new LERP(2.512,-180,1.13,0,true);
+        turretInterpolator2 = new LERP(1.13,0,.327,180,true);
 
-        shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");
-        shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");
+        shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");//shooterTiltLeft
+        shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");//shooterTiltRight
 
         transferServo1 = hardwareMap.get(CRServo.class, "transfer1");
         transferServo2 = hardwareMap.get(CRServo.class, "transfer2");
@@ -47,10 +50,21 @@ public class SubSystemShooter {
 
     public double getTurretAngle()
     {
-        RobotConstants.potVoltage = turretPositionSensor.getVoltage();
-        return turretInterpolator.interpolated(RobotConstants.potVoltage);
+        double volt = turretPositionSensor.getVoltage();
+        double mid = 1.13; //(2.512 + .327) / 2;
+        double angle;
+        if (volt > mid)
+        {
+            return turretInterpolator1.interpolated(volt);
+        } else
+        {
+            return turretInterpolator2.interpolated(volt);
+        }
     }
-
+    public double getPotVoltage()
+    {
+        return turretPositionSensor.getVoltage();
+    }
     public void setShooterAngle(double tiltAngle)
     {
         shooterTiltLeft.setPosition(shooterTiltLeftLERP.interpolated(tiltAngle));
@@ -65,8 +79,8 @@ public class SubSystemShooter {
     {
         if (enabled)
         {
-            transferServo1.setPower(-1);
-            transferServo2.setPower(1);
+            transferServo1.setPower(-RobotConstants.turretMaxPower);
+            transferServo2.setPower(RobotConstants.turretMaxPower);
         }
         else
         {

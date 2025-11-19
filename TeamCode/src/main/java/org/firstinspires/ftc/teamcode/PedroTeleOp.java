@@ -1,21 +1,23 @@
 package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
-import com.bylazar.ftcontrol.panels.json.Canvas;
-import com.bylazar.ftcontrol.panels.json.Rectangle;
+//import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
+//import com.bylazar.ftcontrol.panels.json.Canvas;
+//import com.bylazar.ftcontrol.panels.json.Rectangle;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.robot.Robot;
 
-import com.bylazar.ftcontrol.panels.Panels;
-import com.bylazar.ftcontrol.panels.json.CanvasRotation;
-import com.bylazar.ftcontrol.panels.json.Circle;
-import com.bylazar.ftcontrol.panels.json.Look;
-import com.bylazar.ftcontrol.panels.json.Point;
+//import com.bylazar.ftcontrol.panels.Panels;
+//import com.bylazar.ftcontrol.panels.json.CanvasRotation;
+//import com.bylazar.ftcontrol.panels.json.Circle;
+//import com.bylazar.ftcontrol.panels.json.Look;
+//import com.bylazar.ftcontrol.panels.json.Point;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotConstants;
@@ -24,8 +26,28 @@ import org.firstinspires.ftc.teamcode.Waypoints;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
+//config name                hub                slot                    description
 
-@Configurable
+//motors
+//FL                         control              0                     front left motor
+//FR                         control              1                     front right motor
+//BL                         control              2                     back left motor
+//BR                         control              3                     back right motor
+//shooterFlyWheel            expansion            0                     shooter flywheel motor
+
+//servos
+//shooterTiltLeft            control              0                     shooterTiltLeft servo
+//shooterTiltRight           control              1                     shooterTiltRight servo
+//                                        PORT TWO SERVO IS BAD
+//turretRotation             control               3                    turretRotation servo
+//transfer1                  control               4                    transfer1 turret belt servo 1
+//transfer2                  control               5                    transfer2 turret belt servo 2
+
+//Sensors
+//sensor_otos               control                I2C 1                otos sensor //WE DO NOT USE THIS
+//pinpoint                  control                I2C 2                pinpoint sensor for odometry!
+//Turret Position Sensor -  control                Analog Input 0
+@Config
 @TeleOp
 public class PedroTeleOp extends OpMode {
     private Follower follower;
@@ -40,7 +62,9 @@ public class PedroTeleOp extends OpMode {
     private Supplier<PathChain> pathChain;
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
-    private TelemetryManager telemetryP = Panels.getTelemetry();
+    public static double turretTargetAngle = 0;
+    private double debugturretAngle = 0;
+    //private TelemetryManager telemetryP = Panels.getTelemetry();
 
     private void setStartPos()
     {
@@ -83,7 +107,40 @@ public class PedroTeleOp extends OpMode {
     private void draw()
     {
     }
+    public double wrapRange(double number, double range)
+    {
+        while(number >= range)
+            number -= (range * 2);
+        while(number <= -range)
+            number += (range * 2);
+        return number;
+    }
+    public double clampRange(double number, double range)
+    {
+        if (number > range)
+        {
+            return range;
+        } else if (number < -range)
+        {
+            return -range;
+        } else
+        {
+            return number;
+        }
+    }
+    public void updateTurret()
+    {
+        double turretRotatePower;
+        double currentTurretAngle;
+        double currentTurretAngleError;
 
+        //this is for turret rotation
+        currentTurretAngle = subSystemShooter.getTurretAngle();
+        debugturretAngle = currentTurretAngle;
+        currentTurretAngleError = currentTurretAngle - turretTargetAngle;
+        turretRotatePower = clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
+        subSystemShooter.setTurretRotationSpeed(turretRotatePower);
+    }
     @Override
     public void init()
     {
@@ -224,10 +281,13 @@ public class PedroTeleOp extends OpMode {
 //        if (gamepad2.yWasPressed()) {
 //            slowModeMultiplier -= 0.25;
 //        }
-
+        updateTurret();
         telemetryA.addData("position", follower.getPose());
         telemetryA.addData("velocity", follower.getVelocity());
         telemetryA.addData("automatedDrive", automatedDrive);
+        telemetryA.addData("turretTargetAngle", turretTargetAngle );
+        telemetryA.addData("turretAngle", debugturretAngle);
+        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
 //        telemetryP.debug(
 //                Rectangle(
 //                        Point()
@@ -235,6 +295,7 @@ public class PedroTeleOp extends OpMode {
 //        );
 
         telemetryA.update();
+
 
     }
 }

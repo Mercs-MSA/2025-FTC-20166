@@ -7,7 +7,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+//import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -28,20 +28,26 @@ import org.firstinspires.ftc.teamcode.Utilities.LERP;
 import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 
 import java.util.List;
-//Fl Motor - Motor 0
-//FR Motor - Motor 1
-//BL Motor - Motor 2
-//BR Motor - Motor 3
-//Shooter Fly Wheel Motor - Motor 0 Expansion Hub
-//Shooter Tilt Left Servo - Servo 0
-//Shooter Tilt Right Servo - Servo 1
-//Servo port 2 is bad
-//Shooter Turret Rotation - Servo 3
-//Turret Belt Servo 1 - Servo 4
-//Turret Belt Servo 2 - Servo 5
-//Otos sensor - I2C 1
-//Pinpoint - I2C 2
-//Turret Position Sensor - Analog Input 0
+//config name                hub                slot                    description
+
+//motors
+//FL                         control              0                     front left motor
+//FR                         control              1                     front right motor
+//BL                         control              2                     back left motor
+//BR                         control              3                     back right motor
+//shooterFlyWheel            expansion            0                     shooter flywheel motor
+
+//servos
+//shooterTiltLeft            control              0                     shooterTiltLeft servo
+//shooterTiltRight           control              1                     shooterTiltRight servo
+//                                        PORT TWO SERVO IS BAD
+//turretRotation             control               3                    turretRotation servo
+//transfer1                  control               4                    transfer1 turret belt servo 1
+//transfer2                  control               5                    transfer2 turret belt servo 2
+
+//Sensors
+//pinpoint                  control                I2C 2                pinpoint sensor for odometry!
+//turretPositionSensor      control                Analog Input 0
 
 @TeleOp
 //@Disabled
@@ -61,7 +67,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private double goalHeading = 0;
     private double driveTranslateY;
     private double forceJoystickRotation = 0.0;
-    SparkFunOTOS myOtos;
+    //SparkFunOTOS myOtos;
 
     //Motor demo variables
     private DcMotorEx m0 = null;
@@ -106,10 +112,10 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
         robotIMUSubSystem = new SubSystemRobotIMU(hardwareMap, robotID);
 
-        myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
-        myOtos.setPosition(Waypoints.startPointMiddleBottom);
-        myOtos.calibrateImu();
-        myOtos.resetTracking();
+//        myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
+//        myOtos.setPosition(Waypoints.startPointMiddleBottom);
+//        myOtos.calibrateImu();
+//        myOtos.resetTracking();
 
         robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
 
@@ -193,6 +199,20 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         while(number <= -range)
             number += (range * 2);
         return number;
+    }
+
+    public double clampRange(double number, double range)
+    {
+        if (number > range)
+        {
+            return range;
+        } else if (number < -range)
+        {
+            return -range;
+        } else
+        {
+            return number;
+        }
     }
 
     private void updateDesiredHeading()
@@ -308,7 +328,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         telemetryA.addLine();
 
         telemetryA.addData("Pinpoint heading", robotPose.getThetaDegrees());
-        telemetryA.addData("OTOS Heading", myOtos.getPosition().h);
+        //telemetryA.addData("OTOS Heading", myOtos.getPosition().h);
         telemetryA.addData("IMU heading", robotIMUSubSystem.getHeadingDegrees());
         telemetryA.addLine();
 
