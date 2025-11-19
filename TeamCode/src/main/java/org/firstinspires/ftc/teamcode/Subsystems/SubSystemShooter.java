@@ -52,7 +52,7 @@ public class SubSystemShooter {
     private double [][] turretSensorCorrectionTable =
             {
                     {-180,      -90,        0,       90,       180     }, //Turret angle
-                    { 2.512,     1.821,     1.13     0.7285,   0.327   }, //Measured voltage. MUST be ordered high to low. Need to update these to 'real life'
+                    { 2.512,     1.821,     1.13,    0.7285,   0.327   }, //Measured voltage. MUST be ordered high to low. Need to update these to 'real life'
             };//Should move to robot constants since may be different for each robot
 
     private double interpolateTurretAngle(double Voltage)
