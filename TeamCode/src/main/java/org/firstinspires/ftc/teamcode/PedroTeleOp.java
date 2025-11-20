@@ -81,6 +81,9 @@ public class PedroTeleOp extends OpMode {
     public static double turretTargetAngle = 0;
     private double desiredHeading = 0;
     private double debugturretAngle = 0;
+    double currentTurretAngleError;
+    double turretRotatePower;
+
 
     //private TelemetryManager telemetryP = Panels.getTelemetry();
 
@@ -170,7 +173,8 @@ public class PedroTeleOp extends OpMode {
         if (number > range)
         {
             return range;
-        } else if (number < -range)
+        }
+        else if (number < -range)
         {
             return -range;
         } else
@@ -180,14 +184,12 @@ public class PedroTeleOp extends OpMode {
     }
     public void updateTurret()
     {
-        double turretRotatePower;
         double currentTurretAngle;
-        double currentTurretAngleError;
 
         //this is for turret rotation
         currentTurretAngle = subSystemShooter.getTurretAngle();
         debugturretAngle = currentTurretAngle;
-        currentTurretAngleError = currentTurretAngle - turretTargetAngle;
+        currentTurretAngleError =  turretTargetAngle - currentTurretAngle;
         turretRotatePower = clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
         subSystemShooter.setTurretRotationSpeed(turretRotatePower);
     }
@@ -320,6 +322,10 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("turretTargetAngle", turretTargetAngle );
         telemetryA.addData("turretAngle", debugturretAngle);
         telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
+        telemetryA.addData("Turret rotate power", turretRotatePower);
+        telemetryA.addData("Turret angle error", currentTurretAngleError);
+
+
 
         telemetryA.update();
 

@@ -28,8 +28,8 @@ public class RobotConstants
     public static double potVoltageMax = 2.522;
     public static double turretAngleMin = -180;
     public static double turretAngleMax = 180;
-    public static double turretMaxPower = .1;
-    public static double turretRotationP = 0.1;
+    public static double turretMaxPower = .5;
+    public static double turretRotationP = 0.01;
     public static double servoAngle = 0;
     public static double leftMaxAngleSetting = 0.2;
     public static double rightMaxAngleSetting = 0.8;
