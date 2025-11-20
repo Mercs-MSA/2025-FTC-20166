@@ -51,11 +51,12 @@ public class SubSystemShooter {
     //Edited in GVIM by Steve :)
     private double [][] turretSensorCorrectionTable =
             {
-                    {-180,      -90,        0,       90,       180     }, //Turret angle
-                    { 2.512,     1.821,     1.13,    0.7285,   0.327   }, //Measured voltage. MUST be ordered high to low. Need to update these to 'real life'
+                    { -180,  -135,   -90,  -45,     0,    45,    90,   135,   180}, //Turret angle
+                    {2.465, 1.984, 1.615, 1.34, 1.117, 0.915, 0.721, 0.536, 0.308},
+                    //Measured voltage. MUST be ordered high to low. Need to update these to 'real life'
             };//Should move to robot constants since may be different for each robot
 
-    private double interpolateTurretAngle(double Voltage)
+    public double interpolateTurretAngle(double Voltage)
     {
         int tableWidth = turretSensorCorrectionTable[0].length;//Number of columns in the array. (Technically the number of columns in the first row since Java can have variable sized rows)
         double lowerA = 0; //Declare here so lifetime lasts to the end of the method
@@ -63,8 +64,8 @@ public class SubSystemShooter {
 
         for (int i = 0; i < tableWidth; i++)
         {
-            lowerA = turretSensorCorrectionTable[i][0];//Get the parameters from the table and use as the segment lower voltage points
-            lowerV = turretSensorCorrectionTable[i][1];
+            lowerA = turretSensorCorrectionTable[0][i];//Get the parameters from the table and use as the segment lower voltage points
+            lowerV = turretSensorCorrectionTable[1][i];
             if (Voltage >= lowerV)
             {
                 if (i == 0)//Voltage is higher than the highest entry in the table so maxed out
@@ -73,8 +74,8 @@ public class SubSystemShooter {
                 }
                 else
                 {
-                    double upperA = turretSensorCorrectionTable[i - 1][0];//Get the parameters for the previous table entry which is the higher voltage segment
-                    double upperV = turretSensorCorrectionTable[i - 1][1];
+                    double upperA = turretSensorCorrectionTable[0][i - 1];//Get the parameters for the previous table entry which is the higher voltage segment
+                    double upperV = turretSensorCorrectionTable[1][i - 1];
                     LERP interpolator = new LERP(lowerV, lowerA, upperV, upperA, true);//Create a LERP to interpolate between the lower voltage and upper voltage
                     return interpolator.interpolated(Voltage);//Actually interpolate and return the calculated voltage
                 }
