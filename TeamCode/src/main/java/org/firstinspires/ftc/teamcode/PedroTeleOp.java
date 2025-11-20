@@ -11,6 +11,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.robot.Robot;
 
 //import com.bylazar.ftcontrol.panels.Panels;
@@ -24,6 +25,7 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 import org.firstinspires.ftc.teamcode.Waypoints;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.opencv.core.Mat;
 
 import java.util.function.Supplier;
 //config name                hub                slot                    description
@@ -47,6 +49,19 @@ import java.util.function.Supplier;
 //sensor_otos               control                I2C 1                otos sensor //WE DO NOT USE THIS
 //pinpoint                  control                I2C 2                pinpoint sensor for odometry!
 //Turret Position Sensor -  control                Analog Input 0
+
+//Controller Buttons Used:
+//Gamepad 1:
+//Left joystick - moving forward, backword, and strafing
+//Right joystick - turning
+//X button - goes to box
+//Circle button - stops holding box position
+//dpad left + dpad right - box bind, resets position to box pose
+//Gamepad 2:
+//dpad up - sets shooter angle to max angle
+//dpad down - sets shooter angle to min angle
+
+
 @Config
 @TeleOp
 public class PedroTeleOp extends OpMode {
@@ -54,6 +69,7 @@ public class PedroTeleOp extends OpMode {
     private SubSystemShooter subSystemShooter;
     private boolean automatedDrive;
     private boolean shouldDoPositionLoop = false;
+    boolean currentlyTurning = false;
     private Telemetry telemetryA;
     private RobotConstants.alliance previousAlliance;
     private Pose pose = null;
@@ -63,9 +79,44 @@ public class PedroTeleOp extends OpMode {
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
     public static double turretTargetAngle = 0;
+    private double desiredHeading = 0;
     private double debugturretAngle = 0;
+
     //private TelemetryManager telemetryP = Panels.getTelemetry();
 
+    public void initializeHardware()
+    {
+        try
+        {
+            subSystemShooter = new SubSystemShooter(hardwareMap);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void updateConstants()
+    {
+        pose = (Pose) blackboard.get("Position");
+        previousAlliance = (RobotConstants.alliance) blackboard.get("Alliance");
+        follower = Constants.createFollower(hardwareMap);
+        if (pose != null)
+        {
+            follower.setStartingPose(pose);
+            blackboard.remove("Position");
+        } else
+        {
+            shouldDoPositionLoop = true;
+            pose = Waypoints.startPoseBlueAudience;
+        }
+        if (previousAlliance != null)
+        {
+            blackboard.remove("Alliance");
+        }
+        else
+        {
+            previousAlliance = RobotConstants.alliance.BLUE;
+        }
+    }
     private void setStartPos()
     {
         if (gamepad1.a)
@@ -103,7 +154,6 @@ public class PedroTeleOp extends OpMode {
             joystickMultiplier = 1;
         }
     }
-
     private void draw()
     {
     }
@@ -141,34 +191,147 @@ public class PedroTeleOp extends OpMode {
         turretRotatePower = clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
         subSystemShooter.setTurretRotationSpeed(turretRotatePower);
     }
+    public void updatePedroDrive()
+    {
+        if (!automatedDrive)
+        {
+            double forward = -gamepad1.left_stick_y * joystickMultiplier;
+            double strafe = -gamepad1.left_stick_x * joystickMultiplier;
+            double turn = -gamepad1.right_stick_x;
+            boolean fieldCentric = false; //If false, it's robot centric
+
+            if (!slowMode)
+            {
+                follower.setTeleOpDrive(forward, strafe, turn, fieldCentric);
+            }
+            else
+            {
+                follower.setTeleOpDrive(forward * slowModeMultiplier, strafe * slowModeMultiplier, turn * slowModeMultiplier, fieldCentric);
+            }
+        }
+    }
+    public void updatePedroDriveTest()
+    {
+
+        if (!automatedDrive)
+        {
+            double forward = -gamepad1.left_stick_y * joystickMultiplier;
+            double strafe = -gamepad1.left_stick_x * joystickMultiplier;
+            double turn = -gamepad1.right_stick_x;
+            boolean fieldCentric = false; //If false, it's robot centric
+
+            if (Math.abs(turn) >= RobotConstants.joystickRotateDeadband)
+            {
+                currentlyTurning = true;
+            }
+            else
+            {
+                double currentHeading = follower.getPose().getHeading();
+                if (currentlyTurning)
+                {
+                    currentlyTurning = false;
+                    desiredHeading = Math.toDegrees(currentHeading);
+                }
+                double headingError = wrapRange(Math.toDegrees(currentHeading) - Math.toDegrees(desiredHeading), 180);
+                if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone) {
+
+                    turn = headingError * RobotConstants.headingPFactor;
+                }
+                else
+                {
+                    turn = 0;
+                }
+            }
+
+
+            if (!slowMode)
+            {
+                follower.setTeleOpDrive(forward, strafe, turn, fieldCentric);
+            }
+            else
+            {
+                follower.setTeleOpDrive(forward * slowModeMultiplier, strafe * slowModeMultiplier, turn * slowModeMultiplier, fieldCentric);
+            }
+        }
+    }
+    public void updateAutomatedDrive()
+    {
+        //Automated PathFollowing
+        if (gamepad1.aWasPressed()) {
+            follower.holdPoint(Waypoints.redBox);
+            automatedDrive = true;
+        }
+
+        //Stop automated following if the follower is done
+        if (automatedDrive && gamepad1.bWasPressed()) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
+    }
+    public void updateShooter()
+    {
+        if (gamepad2.dpadUpWasPressed())
+        {
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMaxAngle);
+        }
+        else if (gamepad2.dpadDownWasPressed())
+        {
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
+        }
+
+
+    }
+    public void updateSlowMode()
+    {
+//        //Optional way to change slow mode strength
+//        if (gamepad1.xWasPressed()) {
+//            slowModeMultiplier += 0.25;
+//        }
+//
+//        //Optional way to change slow mode strength
+//        if (gamepad2.yWasPressed()) {
+//            slowModeMultiplier -= 0.25;
+//        }
+
+        //Slow Mode
+        if (gamepad1.rightBumperWasPressed()) {
+            slowMode = !slowMode;
+        }
+    }
+    public void updateBoxBind()
+    {
+        if (gamepad1.dpadLeftWasPressed() && gamepad1.dpadRightWasPressed())
+        {
+            if (previousAlliance == RobotConstants.alliance.RED)
+            {
+                follower.setPose(Waypoints.redBox);
+            }
+            else if (previousAlliance == RobotConstants.alliance.BLUE)
+            {
+                follower.setPose(Waypoints.blueBox);
+            }
+        }
+    }
+    public void updateTelemetry()
+    {
+        telemetryA.addData("position", follower.getPose());
+        telemetryA.addData("velocity", follower.getVelocity());
+        telemetryA.addData("automatedDrive", automatedDrive);
+        telemetryA.addData("turretTargetAngle", turretTargetAngle );
+        telemetryA.addData("turretAngle", debugturretAngle);
+        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
+
+        telemetryA.update();
+
+    }
+
+    //main loops
     @Override
     public void init()
     {
-        try {
-            subSystemShooter = new SubSystemShooter(hardwareMap);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        pose = (Pose) blackboard.get("Position");
-        previousAlliance = (RobotConstants.alliance) blackboard.get("Alliance");
-        follower = Constants.createFollower(hardwareMap);
-        if (pose != null)
-        {
-            follower.setStartingPose(pose);
-            blackboard.remove("Position");
-        } else
-        {
-            shouldDoPositionLoop = true;
-            pose = Waypoints.startPoseBlueAudience;
-        }
-        if (previousAlliance != null)
-        {
-            blackboard.remove("Alliance");
-        }
-        else
-        {
-            previousAlliance = RobotConstants.alliance.BLUE;
-        }
+        initializeHardware();
+        updateConstants();
+
         follower.update();
         telemetryA = new MultipleTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(),this.telemetry);
 
@@ -209,93 +372,18 @@ public class PedroTeleOp extends OpMode {
     @Override
     public void loop()
     {
-        //Call this once per loop
         follower.update();
 
-        if (!automatedDrive)
-        {
-            //Make the last parameter false for field-centric
-            //In case the drivers want to use a "slowMode" you can scale the vectors
+        updateSlowMode();
 
-            //This is the normal version to use in the TeleOp
-            if (!slowMode) follower.setTeleOpDrive(
-                    -gamepad1.left_stick_y * joystickMultiplier,
-                    -gamepad1.left_stick_x * joystickMultiplier,
-                    -gamepad1.right_stick_x,
-                    false // Robot Centric
-            );
+        updatePedroDrive();
+        updateAutomatedDrive();
 
-                //This is how it looks with slowMode on
-            else follower.setTeleOpDrive
-                    (
-                    -gamepad1.left_stick_y * slowModeMultiplier * joystickMultiplier,
-                    -gamepad1.left_stick_x * slowModeMultiplier * joystickMultiplier,
-                    -gamepad1.right_stick_x * slowModeMultiplier,
-                    false // Robot Centric
-            );
-        }
+        updateBoxBind();
 
-        //Automated PathFollowing
-        if (gamepad1.aWasPressed()) {
-            follower.holdPoint(Waypoints.redBox);
-            automatedDrive = true;
-        }
-
-        //Stop automated following if the follower is done
-        if (automatedDrive && gamepad1.bWasPressed()) {
-            follower.startTeleopDrive();
-            automatedDrive = false;
-        }
-
-        //Slow Mode
-        if (gamepad1.rightBumperWasPressed()) {
-            slowMode = !slowMode;
-        }
-
-        if (gamepad2.dpadUpWasPressed())
-        {
-            subSystemShooter.setShooterAngle(RobotConstants.shooterMaxAngle);
-        }
-        else if (gamepad2.dpadDownWasPressed())
-        {
-            subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
-        }
-
-        if (gamepad1.dpadLeftWasPressed() && gamepad1.dpadRightWasPressed())
-        {
-            if (previousAlliance == RobotConstants.alliance.RED)
-            {
-                follower.setPose(Waypoints.redBox);
-            }
-            else if (previousAlliance == RobotConstants.alliance.BLUE)
-            {
-                follower.setPose(Waypoints.blueBox);
-            }
-        }
-//        //Optional way to change slow mode strength
-//        if (gamepad1.xWasPressed()) {
-//            slowModeMultiplier += 0.25;
-//        }
-//
-//        //Optional way to change slow mode strength
-//        if (gamepad2.yWasPressed()) {
-//            slowModeMultiplier -= 0.25;
-//        }
+        updateShooter();
         updateTurret();
-        telemetryA.addData("position", follower.getPose());
-        telemetryA.addData("velocity", follower.getVelocity());
-        telemetryA.addData("automatedDrive", automatedDrive);
-        telemetryA.addData("turretTargetAngle", turretTargetAngle );
-        telemetryA.addData("turretAngle", debugturretAngle);
-        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
-//        telemetryP.debug(
-//                Rectangle(
-//                        Point()
-//                )
-//        );
 
-        telemetryA.update();
-
-
+        updateTelemetry();
     }
 }
