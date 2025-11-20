@@ -1535,22 +1535,22 @@ module BallStore2()
       translate([0, 0, -4])
         Ball();
       //Ramp ball 1
-      translate([2.6, -4.2, -3.2])
-        Ball();
+//      translate([2.6, -4.2, -3.2])
+//        Ball();
       //Ramp ball 2
-      translate([-2.6, -4.2, -3.2])
-        Ball();
+//      translate([-2.6, -4.2, -3.2])
+//        Ball();
     }
     translate([0, 0, -6.5])
     {
-      //Main ball ramp
-      hull()
-      {
-        translate([0, -1, 0.1])
-          cube([5, .1, .1], center = true);
-        translate([0, -5, .8])
-          cube([8.5, .1, .1], center = true);
-      }
+//      //Main ball ramp
+//      hull()
+//      {
+//        translate([0, -1, 0.1])
+//          cube([5, .1, .1], center = true);
+//        translate([0, -5, .8])
+//          cube([8.5, .1, .1], center = true);
+//      }
       
       //Ball cylinder channel and servo support
       difference()
@@ -1610,6 +1610,87 @@ module SonicHubHoles()
 }
 
 module BallLifter()
+{
+  translate([1.9, 0, -6.5 + ServoRotateOffset])
+  {
+    translate(BallLifterOffset)
+    {
+      rotate(90 + BallLifterAngle, [0, 1, 0])
+      {
+        BallLifterUpper();
+        BallLifterLower();
+      }
+    }
+  }
+}
+
+ShoulderLength = 1.0;
+UpperArmLength = 3.5;
+
+WristRotation = 48;
+
+module BallLifterLower()
+{
+  translate([ShoulderLength + UpperArmLength - .2, 0, 0])
+    rotate(WristRotation, [0, 1, 0])
+      translate([.9, 0, 0])
+        difference()
+        {
+          cube([1.8, 1, .3], center = true);
+          //Bottom flat
+          translate([.7, 0, .3])
+            rotate(17, [0, 1, 0])
+              cube([2, 3, .7], center = true);
+        }
+}
+
+module BallLifterUpper()
+{
+        difference()
+        {
+          union()
+          {
+            //Shoulder
+            hull()
+            {
+              //Servo fulcrum
+              translate([0, 0.7, 0])
+                rotate(90, [1, 0, 0])
+                  cylinder(d = 1.5, h = .5, center = true);
+              translate([ShoulderLength, 0, 0])
+                cube([.1, .9, .3], center = true);
+            }
+            hull()
+            {
+              translate([ShoulderLength, 0, 0])
+                cube([.1, .9, .3], center = true);
+              translate([ShoulderLength + UpperArmLength - .2, 0, 0])
+              rotate(90, [1, 0, 0])
+              cylinder(d = .3, h = 1, center = true);
+            }
+          }
+          //Servo stuff
+          rotate(-90, [1, 0, 0])
+          {
+            //cylinder(d = 5/25.4, h = 3, $fn = 6); //Servo screw access
+            //Servo hub flattener
+            translate([0, 0, -1.55])
+              cylinder(d = 1.5, h = 2);
+            //Servo hub mount holes
+            //Amazon
+            translate([0, 0, 0.6])
+              rotate(45, [0, 0, 1])
+                QuadHoles(d = .275 * 2, hole = 3.2/25.4);
+            //GoBilda Sonic Hub
+            SonicHubHoles();
+          }
+//          //Band attach hole
+//          translate([BallLifterArmLength + .4, -.7, 0])
+//            cylinder(d = .2, h = 1, center = true);
+        }
+}
+
+module BallLifter_old()
 {
  BallLifterArmLength = 4.5;//4.8
   
@@ -2140,7 +2221,7 @@ module Print3D()
 //  ServoBlock(BlockDepth = .21, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
 //ToDo :  BallStore2(); 
 //  TurretServoGear();
-  //BallLifter();
+  BallLifter();
 //  TurretSensorGear();
 //  IntakeWheel();
 //  UpperBallTractionPulley(DoGuide = false, RollerSections = 7);
@@ -2152,7 +2233,7 @@ module Print3D()
 //  ServoBlock(BlockWidthOffset = 0.05, ServoOrientation = 0);
   //Turret drive servo mount spacers
 //  ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
-  LazySusanInnerSpacer(T = 3 / 25.4);
+//  LazySusanInnerSpacer(T = 3 / 25.4);
 //LazySusanOuterSpacer();
 }
 
