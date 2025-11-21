@@ -141,7 +141,7 @@ public class AutonOne extends OpMode {
 
         pathState = state.START;
 
-        follower = Constants.createFollower(hardwareMap);
+        //follower = Constants.createFollower(hardwareMap);
         buildPaths();
         follower.setStartingPose(startingPose);
         updateTelemetry();
@@ -156,7 +156,7 @@ public class AutonOne extends OpMode {
 
         if (startingPose != prevStartingPose)
         {
-            follower = Constants.createFollower(hardwareMap);
+            //follower = Constants.createFollower(hardwareMap);
             buildPaths();
             follower.setStartingPose(startingPose);
             updateTelemetry();

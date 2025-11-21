@@ -38,8 +38,8 @@ public class RobotConstants
     public static double farDistance = 148; //In inches
     public static double shooterVelocity = 300;
     public static double shooterAngle = 45;
-    public static double podX = 0;
-    public static double podY = 0;
+    public double podX = 0;
+    public double podY = 0;
     private static double robotAPodYOffset = 0;
     private static double robotAPodXOffset = 0;
     //    public final static double robotBPodYOffset = -19.5/2.54;
@@ -47,7 +47,7 @@ public class RobotConstants
     //    public final static double robotBPodXOffset = 7.5/2.54;
     private static double robotBPodXOffset = 2.65;//220mm to the right of the center
 
-    public static void setRobotID(int robotID)
+    public RobotConstants(int robotID)
     {
         if (robotID == 0)
         {

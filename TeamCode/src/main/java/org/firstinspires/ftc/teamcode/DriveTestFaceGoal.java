@@ -94,7 +94,7 @@ public class DriveTestFaceGoal extends LinearOpMode
 
         subSystemShooter = new SubSystemShooter(hardwareMap);
 
-        RobotConstants.setRobotID(robotID);
+        //RobotConstants.setRobotID(robotID);
         Waypoints.setRobotID(robotID);
 
         robotIMUSubSystem = new SubSystemRobotIMU(hardwareMap, robotID);

@@ -31,20 +31,24 @@ public class Constants {
             .rightRearMotorDirection(DcMotorEx.Direction.REVERSE)
             .useBrakeModeInTeleOp(false);
 
-    public static Follower createFollower(HardwareMap hardwareMap) {
+    public static Follower createFollower(HardwareMap hardwareMap, RobotConstants robotConstants) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                .pinpointLocalizer(localizerConstants)
+                .pinpointLocalizer(initializeLocalizerConstants(robotConstants))
                 .mecanumDrivetrain(driveConstants)
                 .pathConstraints(pathConstraints)
                 .build();
     }
 
-    public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(RobotConstants.podY)
-            .strafePodX(RobotConstants.podX)
-            .distanceUnit(DistanceUnit.INCH)
-            .hardwareMapName("pinpoint")
-            .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+    private static PinpointConstants initializeLocalizerConstants(RobotConstants robotConstants)
+    {
+        PinpointConstants localizerConstants = new PinpointConstants()
+                .forwardPodY(robotConstants.podY)
+                .strafePodX(robotConstants.podX)
+                .distanceUnit(DistanceUnit.INCH)
+                .hardwareMapName("pinpoint")
+                .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
+                .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
+                .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        return localizerConstants;
+    }
 }

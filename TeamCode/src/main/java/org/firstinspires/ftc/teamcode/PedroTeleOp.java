@@ -82,6 +82,7 @@ public class PedroTeleOp extends OpMode {
     private double turretTargetAngleTelem;
     private SubSystemRobotID subSystemRobotID;
     private Pose robotPose;
+    private RobotConstants robotConstants;
 
 
     //private TelemetryManager telemetryP = Panels.getTelemetry();
@@ -110,10 +111,9 @@ public class PedroTeleOp extends OpMode {
     }
     public void updateConstants()
     {
-        RobotConstants.setRobotID(subSystemRobotID.getRobotID());
         startingPose = (Pose) blackboard.get("Position");
         alliance = (RobotConstants.alliance) blackboard.get("Alliance");
-        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap, robotConstants);
         if (startingPose != null)
         {
             follower.setStartingPose(startingPose);
@@ -369,8 +369,8 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("Turret rotate power", turretRotatePower);
         telemetryA.addData("Turret angle error", currentTurretAngleError);
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
-        telemetryA.addData("Robot podX offset", RobotConstants.podX);
-        telemetryA.addData("Robot podY offset", RobotConstants.podY);
+        telemetryA.addData("Robot podX offset", robotConstants.podX);
+        telemetryA.addData("Robot podY offset", robotConstants.podY);
 
         telemetryA.update();
 
@@ -383,6 +383,7 @@ public class PedroTeleOp extends OpMode {
         robotPose = new Pose();
         goalPose = new Pose();
         initializeHardware();
+        robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
         updateConstants();
 
         follower.update();
