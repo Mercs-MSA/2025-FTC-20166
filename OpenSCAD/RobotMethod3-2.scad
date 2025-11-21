@@ -1634,7 +1634,8 @@ module BallLifterLower()
   translate([ShoulderLength + UpperArmLength - .2, 0, 0])
     rotate(WristRotation, [0, 1, 0])
       translate([.9, 0, 0])
-        difference()
+      {
+/*        difference()
         {
           cube([1.8, 1, .3], center = true);
           //Bottom flat
@@ -1642,6 +1643,17 @@ module BallLifterLower()
             rotate(17, [0, 1, 0])
               cube([2, 3, .7], center = true);
         }
+        */
+        hull()
+        {
+          translate([.45, 0, 0])
+            rotate(17, [0, 1, 0])
+              cube([.95, 1.0, .02], center = true);
+          translate([-1, 0, -.025])
+            rotate(-45, [0, 0, 1])
+              cube([.2, 1, .25], center = true);
+        }
+      }
 }
 
 module BallLifterUpper()
@@ -1657,16 +1669,20 @@ module BallLifterUpper()
               translate([0, 0.7, 0])
                 rotate(90, [1, 0, 0])
                   cylinder(d = 1.5, h = .5, center = true);
+              rotate(-45 , [1, 0, 0])
               translate([ShoulderLength, 0, 0])
                 cube([.1, .9, .3], center = true);
             }
             hull()
             {
               translate([ShoulderLength, 0, 0])
-                cube([.1, .9, .3], center = true);
-              translate([ShoulderLength + UpperArmLength - .2, 0, 0])
-              rotate(90, [1, 0, 0])
-              cylinder(d = .3, h = 1, center = true);
+                rotate(-45 , [1, 0, 0])
+                  cube([.1, .9, .3], center = true);
+              translate([ShoulderLength + UpperArmLength - .386, 0, 0.098])
+                rotate(-42, [0, 1, 0])
+                  rotate(45 , [1, 0, 0])
+                    translate([0, 0, -0.05])
+                    cylinder(d = .35, h = 1, center = true);
             }
           }
           //Servo stuff
@@ -2099,8 +2115,8 @@ module IntakeWheel()
     translate([0, 0, -0.5])
       SonicHubHoles();
 
-    for (i = [0:10])
-      rotate((360/11) * i, [0, 0, 1])
+    for (i = [0:9])
+      rotate((360/10) * i, [0, 0, 1])
         translate([0, IntakeD / 2, 0])
         {
           cube([.4, .1, .5], center = true);
@@ -2210,6 +2226,45 @@ module DXF()
   
 }
 
+module Coupler()
+{
+  difference()
+  {
+    cylinder(d = .8, h = 2, center = true);
+    cylinder(d = 8.1/25.4, h = 2.1, $fn = 6, center = true);
+  }
+}
+
+module TurretCableGuide()
+{
+  difference()
+  {
+    translate([-1.9/2, 0, 0])
+      cube([1.9, 1, 1]);
+    translate([0, 0, .6])
+      rotate(-45, [1, 0,0])
+        cylinder(d = .7, h = 3, center = true);
+    translate([0, 0, 1.5])
+      rotate(45, [1, 0, 0])
+        cube([2, 2, 1], center = true);
+    translate([0, .2, .8])
+    rotate(45, [1, 0, 0])
+    {
+      translate([.55, 0, 0])
+        cube([.15, .25, 3], center = true);
+      translate([-.55, 0, 0])
+        cube([.15, .25, 3], center = true);
+    }
+    translate([0, 0.95, 0])
+      rotate(45, [1, 0, 0])
+        cube([1.2, .5, .18], center = true);
+    translate([.8, .6, -0.1])
+      cylinder(d = M3FreeHoleD, h = 3);
+    translate([-.8, .6, -0.1])
+      cylinder(d = M3FreeHoleD, h = 3);
+  }
+}
+
 module Print3D()
 {
 //  BearingBlock(L = 1.4, H = 1, T = 0.3, VO = 0.52, MS = 1.0, MD = 0.118);
@@ -2221,9 +2276,9 @@ module Print3D()
 //  ServoBlock(BlockDepth = .21, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
 //ToDo :  BallStore2(); 
 //  TurretServoGear();
-  BallLifter();
+//  BallLifter();
 //  TurretSensorGear();
-//  IntakeWheel();
+  IntakeWheel();
 //  UpperBallTractionPulley(DoGuide = false, RollerSections = 7);
 //  UpperBallTractionPulley(DoGuide = true);
 //  ChannelSpacer(23.7);
@@ -2235,6 +2290,8 @@ module Print3D()
 //  ServoBlock(BlockDepth = .31, BlockWidth = 21/25.41, BlockLength =  2.3, OpeningWidth = 21/25.4, BlockWidthOffset = 0, AddAttachHoles = false, ServoOrientation = 180);
 //  LazySusanInnerSpacer(T = 3 / 25.4);
 //LazySusanOuterSpacer();
+//  Coupler();
+//  TurretCableGuide();
 }
 
 if (!DoPrint)
