@@ -2265,6 +2265,35 @@ module TurretCableGuide()
   }
 }
 
+module BatteryHolder()
+{
+  WallT = 2;
+  MountSpacing = 8 * 8.5;
+  
+  difference()
+  {
+    union()
+    {      
+      cube([44 + WallT + WallT, 123  + WallT + WallT, 20], center = true);
+      hull()
+      {
+        translate([0, MountSpacing, -8.0])
+          cylinder(d = 10, h = 4, center = true);
+        translate([0, -MountSpacing, -8.0])
+          cylinder(d = 10, h = 4, center = true);
+      }
+    }
+    translate([0, 0, 5])
+      cube([44 , 123  , 20], center = true);
+    translate([0, 0, -8.5])
+      cube([50 , 30  , 3], center = true);
+    translate([0, MountSpacing, -8.5])
+      cylinder(d = M4FreeHoleD * 25.4, h = 10, center = true);
+    translate([0, -MountSpacing, -8.5])
+      cylinder(d = M4FreeHoleD * 25.4, h = 10, center = true);
+  }
+}
+
 module Print3D()
 {
 //  BearingBlock(L = 1.4, H = 1, T = 0.3, VO = 0.52, MS = 1.0, MD = 0.118);
@@ -2278,7 +2307,7 @@ module Print3D()
 //  TurretServoGear();
 //  BallLifter();
 //  TurretSensorGear();
-  IntakeWheel();
+//  IntakeWheel();
 //  UpperBallTractionPulley(DoGuide = false, RollerSections = 7);
 //  UpperBallTractionPulley(DoGuide = true);
 //  ChannelSpacer(23.7);
@@ -2292,6 +2321,8 @@ module Print3D()
 //LazySusanOuterSpacer();
 //  Coupler();
 //  TurretCableGuide();
+scale(1/25.4)
+  BatteryHolder();
 }
 
 if (!DoPrint)
