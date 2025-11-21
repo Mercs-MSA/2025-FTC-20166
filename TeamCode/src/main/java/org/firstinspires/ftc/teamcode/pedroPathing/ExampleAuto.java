@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
+//import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
 
 @Autonomous(name = "Example Auto", group = "Examples")
 public class ExampleAuto extends OpMode {

@@ -34,6 +34,14 @@ public class Waypoints
     public static double blueGoalPointy = 60;
     public static SparkFunOTOS.Pose2D startPointMiddleBottom = new SparkFunOTOS.Pose2D(0, -63, Math.toRadians(0));
     public static Pose2D startPointMiddleBottomPinpoint = new Pose2D(DistanceUnit.INCH,-63, 0, AngleUnit.RADIANS, Math.toRadians(0));
+
+    // Waypoints for testing turret
+    public static Pose tempStart = new Pose(0,0,Math.toRadians(90));
+    public static Pose forward = new Pose(0,10,Math.toRadians(90));
+    public static Pose backward = new Pose(0,-10,Math.toRadians(90));
+    public static Pose left = new Pose(-10,0,Math.toRadians(90));
+    public static Pose right = new Pose(10,10,Math.toRadians(90));
+
     public static void setRobotID(int robotID)
     {
 

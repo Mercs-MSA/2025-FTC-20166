@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
+//import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 import org.firstinspires.ftc.teamcode.Utilities.LERP;
 import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
@@ -48,6 +48,8 @@ import java.util.List;
 //Sensors
 //pinpoint                  control                I2C 2                pinpoint sensor for odometry!
 //turretPositionSensor      control                Analog Input 0
+//limitSwitch               control               Digital 1             limit Switch
+//limitSwitchT              control               Digital 3             limit Switch Two
 
 @TeleOp
 //@Disabled
@@ -61,7 +63,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     private SubSystemRobotID robotIDSubSystem;
     private int robotID = 0;
     private SubSystemRobotIMU robotIMUSubSystem;
-    private SubSystemRobotPinpoint robotPinpointSubSystem;
+    //private SubSystemRobotPinpoint robotPinpointSubSystem;
     private double driveTranslateX;
     private double turretDelta = 0;
     private double goalHeading = 0;
@@ -117,12 +119,12 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 //        myOtos.calibrateImu();
 //        myOtos.resetTracking();
 
-        robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
+        //robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
 
         sleep(500);
 
-        Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
-        robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
+        //Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
+       // robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
         //SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 90);
         //myOtos.setOffset(offset);
 
@@ -156,9 +158,9 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
 
     public void updateRobotPose()
     {
-        robotPinpointSubSystem.updatePinpoint();
-        Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
-        robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
+        //robotPinpointSubSystem.updatePinpoint();
+       // Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
+        //robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
     }
 
 
@@ -308,19 +310,19 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
     }
     private void updateTelemetryA()
     {
-        Pose2D pinpointStart = robotPinpointSubSystem.getStartPose();
+        //Pose2D pinpointStart = robotPinpointSubSystem.getStartPose();
 
         //Robot status
         telemetryA.addData("Robot ID: ", robotIDSubSystem.getRobotID());
         telemetryA.addLine();
 
-        telemetryA.addData("Pinpoint start X", pinpointStart.getX(DistanceUnit.INCH));
-        telemetryA.addData("Pinpoint start Y", pinpointStart.getY(DistanceUnit.INCH));
-        telemetryA.addData("Pinpoint start T", pinpointStart.getHeading(AngleUnit.DEGREES));
+       // telemetryA.addData("Pinpoint start X", pinpointStart.getX(DistanceUnit.INCH));
+      //  telemetryA.addData("Pinpoint start Y", pinpointStart.getY(DistanceUnit.INCH));
+        //telemetryA.addData("Pinpoint start T", pinpointStart.getHeading(AngleUnit.DEGREES));
         telemetryA.addLine();
 
-        telemetryA.addData("Pinpoint pod offset X", robotPinpointSubSystem.getPodOffsets().getX(DistanceUnit.MM));
-        telemetryA.addData("Pinpoint pod offset Y", robotPinpointSubSystem.getPodOffsets().getY(DistanceUnit.MM));
+        //telemetryA.addData("Pinpoint pod offset X", robotPinpointSubSystem.getPodOffsets().getX(DistanceUnit.MM));
+       // telemetryA.addData("Pinpoint pod offset Y", robotPinpointSubSystem.getPodOffsets().getY(DistanceUnit.MM));
         telemetryA.addLine();
 
         telemetryA.addData("Pinpoint X coordinate", robotPose.getX());

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotIMU;
-import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
+//import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotPinpoint;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 //Fl Motor - Motor 0
@@ -30,8 +31,8 @@ import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 //Shooter Turret Rotation - Servo 2
 //Turret Position Sensor - Analog Input 0
 
-@TeleOp
-//@Disabled
+//@TeleOp
+@Disabled
 public class DriveTestFaceGoal extends LinearOpMode
 {
     private Telemetry telemetryA;
@@ -39,7 +40,7 @@ public class DriveTestFaceGoal extends LinearOpMode
     private SubSystemRobotID robotIDSubSystem;
     private int robotID = 0;
     private SubSystemRobotIMU robotIMUSubSystem;
-    private SubSystemRobotPinpoint robotPinpointSubSystem;
+    //private SubSystemRobotPinpoint robotPinpointSubSystem;
     private Pose2D robotPos;
     private double driveTranslateX;
     private double driveTranslateY;
@@ -103,10 +104,10 @@ public class DriveTestFaceGoal extends LinearOpMode
         myOtos.calibrateImu();
         myOtos.resetTracking();
 
-        robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
+        //robotPinpointSubSystem = new SubSystemRobotPinpoint(hardwareMap, robotID);
 
-        Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
-        robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
+        //Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
+        //robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
         //SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 90);
         //myOtos.setOffset(offset);
 
@@ -142,8 +143,8 @@ public class DriveTestFaceGoal extends LinearOpMode
 
     public void updateRobotPose()
     {
-        Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
-        robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
+        //Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
+        //robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
     }
 
 
@@ -288,8 +289,8 @@ public class DriveTestFaceGoal extends LinearOpMode
             updateDriveControls();
             calculateDrivePower();
 
-            robotPinpointSubSystem.updatePinpoint();
-            robotPos = robotPinpointSubSystem.getPinpointPos();
+            //robotPinpointSubSystem.updatePinpoint();
+            //robotPos = robotPinpointSubSystem.getPinpointPos();
 
             setDriveMotors((FLXPower + FLYPower + FLRPower), (FRXPower + FRYPower + FRRPower), (BLXPower + BLYPower + BLRPower), (BRXPower + BRYPower + BRRPower));
             updateTelemetryA();

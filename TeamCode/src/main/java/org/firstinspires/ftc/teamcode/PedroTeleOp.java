@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 //import com.bylazar.ftcontrol.panels.json.Point;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -40,9 +41,11 @@ import java.util.function.Supplier;
 //transfer2                  control              5                     transfer2 turret belt servo 2
 
 //Sensors
-//sensor_otos               control                I2C 1                otos sensor //WE DO NOT USE THIS
-//pinpoint                  control                I2C 2                pinpoint sensor for odometry!
-//Turret Position Sensor -  control                Analog Input 0
+//sensor_otos               control               I2C 1                 otos sensor //WE DO NOT USE THIS
+//pinpoint                  control               I2C 2                 pinpoint sensor for odometry!
+//limitSwitch               control               Digital 1             limit Switch
+//limitSwitch2             control               Digital 3             limit Switch Two
+//Turret Position Sensor -  control               Analog Input 0
 
 //Controller Buttons Used:
 //Gamepad 1:
@@ -50,7 +53,7 @@ import java.util.function.Supplier;
 //Right joystick - turning
 //X button - goes to box
 //Circle button - stops holding box position
-//dpad left + dpad right - box bind, resets position to box pose
+//dpad left + dpad right - box bind, resets position to box startingPose
 //Gamepad 2:
 //dpad up - sets shooter angle to max angle
 //dpad down - sets shooter angle to min angle
@@ -65,8 +68,8 @@ public class PedroTeleOp extends OpMode {
     private boolean shouldDoPositionLoop = false;
     boolean currentlyTurning = false;
     private Telemetry telemetryA;
-    private RobotConstants.alliance previousAlliance;
-    private Pose pose = null;
+    private RobotConstants.alliance alliance;
+    private Pose startingPose = null;
     private int joystickMultiplier;
     private Pose goalPose;
     private Supplier<PathChain> pathChain;
@@ -77,7 +80,8 @@ public class PedroTeleOp extends OpMode {
     double currentTurretAngleError;
     double turretRotatePower;
     private double turretTargetAngleTelem;
-    Pose robotPose;
+    private SubSystemRobotID subSystemRobotID;
+    private Pose robotPose;
 
 
     //private TelemetryManager telemetryP = Panels.getTelemetry();
@@ -97,6 +101,7 @@ public class PedroTeleOp extends OpMode {
     {
         try
         {
+            subSystemRobotID = new SubSystemRobotID(hardwareMap);
             subSystemShooter = new SubSystemShooter(hardwareMap);
         }
         catch (InterruptedException e) {
@@ -105,60 +110,85 @@ public class PedroTeleOp extends OpMode {
     }
     public void updateConstants()
     {
-        pose = (Pose) blackboard.get("Position");
-        previousAlliance = (RobotConstants.alliance) blackboard.get("Alliance");
+        RobotConstants.setRobotID(subSystemRobotID.getRobotID());
+        startingPose = (Pose) blackboard.get("Position");
+        alliance = (RobotConstants.alliance) blackboard.get("Alliance");
         follower = Constants.createFollower(hardwareMap);
-        if (pose != null)
+        if (startingPose != null)
         {
-            follower.setStartingPose(pose);
+            follower.setStartingPose(startingPose);
             blackboard.remove("Position");
         } else
         {
             shouldDoPositionLoop = true;
-            pose = Waypoints.startPoseBlueAudience;
+            startingPose = Waypoints.startPoseBlueAudience;
         }
-        if (previousAlliance != null)
+        if (alliance != null)
         {
             blackboard.remove("Alliance");
         }
         else
         {
-            previousAlliance = RobotConstants.alliance.BLUE;
+            alliance = RobotConstants.alliance.BLUE;
         }
     }
     private void setStartPos()
     {
+//        if (gamepad1.a)
+//        {
+//            startingPose = Waypoints.redStartPoseWall;
+//            goalPose = Waypoints.redShooterPoint;
+//            alliance = RobotConstants.alliance.RED;
+//        }
+//        else if (gamepad1.b)
+//        {
+//            startingPose = Waypoints.startPoseRedAudience;
+//            goalPose = Waypoints.redShooterPoint;
+//            alliance = RobotConstants.alliance.RED;
+//        }
+//        else if (gamepad1.x)
+//        {
+//            startingPose = Waypoints.blueStartPoseWall;
+//            goalPose = Waypoints.blueShooterPoint;
+//            alliance = RobotConstants.alliance.BLUE;
+//        }
+//        else if (gamepad1.y) {
+//            startingPose = Waypoints.startPoseBlueAudience;
+//            goalPose = Waypoints.blueShooterPoint;
+//            alliance = RobotConstants.alliance.BLUE;
+//        }
+        //turret testing
         if (gamepad1.a)
         {
-            pose = Waypoints.redStartPoseWall;
-            goalPose = Waypoints.redShooterPoint;
-            previousAlliance = RobotConstants.alliance.RED;
+            startingPose = Waypoints.tempStart;
+            goalPose = Waypoints.right;
+            alliance = RobotConstants.alliance.RED;
         }
         else if (gamepad1.b)
         {
-            pose = Waypoints.startPoseRedAudience;
-            goalPose = Waypoints.redShooterPoint;
-            previousAlliance = RobotConstants.alliance.RED;
+            startingPose = Waypoints.tempStart;
+            goalPose = Waypoints.backward;
+            alliance = RobotConstants.alliance.RED;
         }
         else if (gamepad1.x)
         {
-            pose = Waypoints.blueStartPoseWall;
-            goalPose = Waypoints.blueShooterPoint;
-            previousAlliance = RobotConstants.alliance.BLUE;
+            startingPose = Waypoints.tempStart;
+            goalPose = Waypoints.left;
+            alliance = RobotConstants.alliance.BLUE;
         }
         else if (gamepad1.y) {
-            pose = Waypoints.startPoseBlueAudience;
-            goalPose = Waypoints.blueShooterPoint;
-            previousAlliance = RobotConstants.alliance.BLUE;
+            startingPose = Waypoints.tempStart;
+            goalPose = Waypoints.forward;
+            alliance = RobotConstants.alliance.BLUE;
         }
     }
     private void changeAllianceMultiplier()
     {
-        if (previousAlliance == RobotConstants.alliance.RED)
+        if (alliance == RobotConstants.alliance.RED)
         {
             joystickMultiplier = -1;
         }
-        else if (previousAlliance == RobotConstants.alliance.BLUE)
+        else if (alliance == RobotConstants.alliance.BLUE)
         {
             joystickMultiplier = 1;
         }
@@ -318,11 +348,11 @@ public class PedroTeleOp extends OpMode {
     {
         if (gamepad1.dpadLeftWasPressed() && gamepad1.dpadRightWasPressed())
         {
-            if (previousAlliance == RobotConstants.alliance.RED)
+            if (alliance == RobotConstants.alliance.RED)
             {
                 follower.setPose(Waypoints.redBox);
             }
-            else if (previousAlliance == RobotConstants.alliance.BLUE)
+            else if (alliance == RobotConstants.alliance.BLUE)
             {
                 follower.setPose(Waypoints.blueBox);
             }
@@ -338,8 +368,9 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
         telemetryA.addData("Turret rotate power", turretRotatePower);
         telemetryA.addData("Turret angle error", currentTurretAngleError);
-
-
+        telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
+        telemetryA.addData("Robot podX offset", RobotConstants.podX);
+        telemetryA.addData("Robot podY offset", RobotConstants.podY);
 
         telemetryA.update();
 
@@ -349,6 +380,8 @@ public class PedroTeleOp extends OpMode {
     @Override
     public void init()
     {
+        robotPose = new Pose();
+        goalPose = new Pose();
         initializeHardware();
         updateConstants();
 
@@ -367,17 +400,19 @@ public class PedroTeleOp extends OpMode {
     {
         if (shouldDoPositionLoop)
         {
-            Pose prevPose = pose;
+            Pose prevPose = startingPose;
             setStartPos();
 
-            if (pose != prevPose)
+            if (startingPose != prevPose)
             {
-                follower.setStartingPose(pose);
+                follower.setStartingPose(startingPose);
                 changeAllianceMultiplier();
             }
 
-            telemetryA.addData("Starting Pose: ", pose);
+            telemetryA.addData("Starting Pose: ", startingPose);
+            telemetryA.addData("Goal Pose: ", goalPose);
             telemetryA.addData("Doing loop? ",shouldDoPositionLoop);
+
             telemetryA.update();
         }
     }
@@ -397,7 +432,7 @@ public class PedroTeleOp extends OpMode {
 
         updateSlowMode();
 
-        updatePedroDriveTest();
+        updatePedroDrive();
         updateAutomatedDrive();
 
         updateBoxBind();

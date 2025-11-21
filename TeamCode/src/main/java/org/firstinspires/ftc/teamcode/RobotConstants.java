@@ -14,13 +14,6 @@ public class RobotConstants
     };
     public static double headingPFactor = (2.0 / 90.0);
     public final static double joystickRotateDeadband = 0.05;
-    public final static double robotAPodYOffset = 0;
-    public final static double robotAPodXOffset = 0;
-//    public final static double robotBPodYOffset = -19.5/2.54;
-    public final static double robotBPodYOffset = -7.8;//45mm in front of the center
-//    public final static double robotBPodXOffset = 7.5/2.54;
-    public final static double robotBPodXOffset = 2.65;//220mm to the right of the center
-
     public static int robotId;
     public static double distanceFromGoal = 0;
     public static double potVoltage = .5;
@@ -45,13 +38,28 @@ public class RobotConstants
     public static double farDistance = 148; //In inches
     public static double shooterVelocity = 300;
     public static double shooterAngle = 45;
+    public static double podX = 0;
+    public static double podY = 0;
+    private static double robotAPodYOffset = 0;
+    private static double robotAPodXOffset = 0;
+    //    public final static double robotBPodYOffset = -19.5/2.54;
+    private static double robotBPodYOffset = -7.8;//45mm in front of the center
+    //    public final static double robotBPodXOffset = 7.5/2.54;
+    private static double robotBPodXOffset = 2.65;//220mm to the right of the center
+
     public static void setRobotID(int robotID)
     {
         if (robotID == 0)
         {
-
+            podX = robotAPodXOffset;
+            podY = robotAPodYOffset;
         }
         else if (robotID == 1)
+        {
+            podX = robotBPodXOffset;
+            podY = robotBPodYOffset;
+        }
+        else if (robotID == 2)
         {
 
         }
