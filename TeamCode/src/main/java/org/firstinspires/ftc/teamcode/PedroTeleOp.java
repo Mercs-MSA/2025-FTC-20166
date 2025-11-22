@@ -318,11 +318,11 @@ public class PedroTeleOp extends OpMode {
     {
         if (gamepad2.dpadUpWasPressed())
         {
-            subSystemShooter.setTransfer(false);
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMaxAngle);
         }
         else if (gamepad2.dpadDownWasPressed())
         {
-            subSystemShooter.setTransfer(true);
+            subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
         }
 
 

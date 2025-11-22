@@ -51,8 +51,11 @@ public class SubSystemShooter {
     //Edited in GVIM by Steve :)
     private double [][] turretSensorCorrectionTable =
             {
-                    { -180,  -135,   -90,  -45,     0,    45,    90,   135,   180}, //Turret angle
-                    {2.465, 1.984, 1.615, 1.34, 1.117, 0.915, 0.721, 0.536, 0.308},
+//                    { -180,  -135,   -90,  -45,     0,    45,    90,   135,   180}, //Turret angle
+//                    {2.465, 1.984, 1.615, 1.34, 1.141, 0.915, 0.721, 0.536, 0.308}, //ROBOT 0
+
+                    { -180,  -135,   -90,   -45,     0,    45,    90,   135,   180},
+                    {2.553, 2.032, 1.671, 1.379, 1.135, 0.931, 0.743, 0.556, 0.347},
                     //Measured voltage. MUST be ordered high to low. Need to update these to 'real life'
             };//Should move to robot constants since may be different for each robot
 
