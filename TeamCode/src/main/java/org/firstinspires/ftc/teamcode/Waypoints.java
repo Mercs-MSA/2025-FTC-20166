@@ -17,9 +17,14 @@ public class Waypoints
     public static final Pose redShooterPoint = new Pose(144, 144, Math.toRadians(45));
     public static final Pose redShooterPark = new Pose (120, 120, Math.toRadians(45));
     public static final Pose blueShooterPoint = new Pose(20, 120, Math.toRadians(135));
+    public static final Pose blueAudienceParkTemp = new Pose(17, 105, Math.toRadians(90));
 
     public static Pose startPoseBlueAudience = new Pose(27,128,Math.toRadians(135));
+
+    public static Pose blueWallParkTemp = new Pose (60, 35, Math.toRadians(90));
     public static Pose startPoseRedAudience = new Pose(117,128,Math.toRadians(45));
+    public static Pose redAudienceParkTemp = new Pose (127, 105, Math.toRadians(90));
+    public static Pose redWallParkTemp = new Pose(82, 35, Math.toRadians(90));
     public static Pose redBox = new Pose(38.5,33.5,Math.toRadians(90));
     public static Pose blueBox = new Pose(105.2,33.5,Math.toRadians(90));
 

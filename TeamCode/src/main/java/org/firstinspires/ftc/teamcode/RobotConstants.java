@@ -53,8 +53,8 @@ public class RobotConstants
     private static double robotBPodYOffset = -7.8;//45mm in front of the center
     //    public final static double robotBPodXOffset = 7.5/2.54;
     private static double robotBPodXOffset = 2.65;//220mm to the right of the center
-    private static double robotCPodXOffset = 0;
-    private static double robotCPodYOffset = 6.1;
+    private static double robotCPodXOffset = -7.5;
+    private static double robotCPodYOffset = -7.5;
 
     public RobotConstants(int robotID)
     {

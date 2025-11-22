@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.RobotConstants;
+import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Waypoints;
 
 @Autonomous
@@ -27,6 +28,9 @@ public class AutonOne extends OpMode {
     private final Pose pickup2Pose = new Pose(43, 130, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose pickup3Pose = new Pose(49, 135, Math.toRadians(0)); // Lowest (Third Set) of Artifacts from the Spike Mark.
     private Path scorePreload;
+    private SubSystemRobotID subSystemRobotID;
+    private RobotConstants robotConstants;
+
     private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
 
     private enum state {
@@ -132,18 +136,30 @@ public class AutonOne extends OpMode {
     @Override
     public void init()
     {
+        try {
+            subSystemRobotID = new SubSystemRobotID(hardwareMap);
+            robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        follower = Constants.createFollower(hardwareMap, robotConstants);
+
+
+        startingPose = Waypoints.blueStartPoseWall;
+
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        startingPose = Waypoints.blueStartPoseWall;
-        goalPose = Waypoints.blueShooterPoint;
+
+        goalPose = Waypoints.blueWallParkTemp;
 
         pathState = state.START;
 
-        //follower = Constants.createFollower(hardwareMap);
+        //follower = Constants.createFollower(hardwareMap, robotConstants);
+        follower.setPose(startingPose);
         buildPaths();
-        follower.setStartingPose(startingPose);
+        follower.update();
         updateTelemetry();
     }
 
@@ -151,6 +167,7 @@ public class AutonOne extends OpMode {
     @Override
     public void init_loop()
     {
+
         Pose prevStartingPose = startingPose;
         setStartingPose();
 
@@ -158,9 +175,12 @@ public class AutonOne extends OpMode {
         {
             //follower = Constants.createFollower(hardwareMap);
             buildPaths();
-            follower.setStartingPose(startingPose);
-            updateTelemetry();
+            follower.setPose(startingPose);
+
         }
+        follower.update();
+        updateTelemetry();
+
     }
 
     /** This method is called once at the start of the OpMode.
@@ -189,24 +209,24 @@ public class AutonOne extends OpMode {
             if (gamepad1.a)
             {
                 startingPose = Waypoints.redStartPoseWall;
-                goalPose = Waypoints.redShooterPark;
+                goalPose = Waypoints.redWallParkTemp; //11/22
                 isRedTeam = true;
             }
             else if (gamepad1.b)
             {
                 startingPose = Waypoints.startPoseRedAudience;
-                goalPose = Waypoints.redShooterPark;
+                goalPose = Waypoints.redAudienceParkTemp; // 11/22 change
                 isRedTeam = true;
             }
             else if (gamepad1.x)
             {
                 startingPose = Waypoints.blueStartPoseWall;
-                goalPose = Waypoints.blueShooterPoint;
+                goalPose = Waypoints.blueWallParkTemp; // 11/22 change
                 isRedTeam = false;
             }
             else if (gamepad1.y) {
                 startingPose = Waypoints.startPoseBlueAudience;
-                goalPose = Waypoints.blueShooterPoint;
+                goalPose = Waypoints.blueAudienceParkTemp; // 11/22 change
                 isRedTeam = false;
             }
     }
@@ -216,13 +236,20 @@ public class AutonOne extends OpMode {
         telemetry.addData("Starting Pose x", startingPose.getX());
         telemetry.addData("Starting Pose y", startingPose.getY());
         telemetry.addData("Starting Pose Heading", Math.toDegrees(startingPose.getHeading()));
-
+        telemetry.addLine();
+        telemetry.addData("Goal Pose x", goalPose.getX());
+        telemetry.addData("Goal Pose y", goalPose.getY());
+        telemetry.addData("Goal Pose Heading", Math.toDegrees(goalPose.getHeading()));
+        telemetry.addLine();
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Red Team?", isRedTeam);
+        telemetry.addLine();
+        telemetry.addData("PodXOffset", robotConstants.podX);
+        telemetry.addData("PodYOffset", robotConstants.podY);
 
         telemetry.update();
     }
