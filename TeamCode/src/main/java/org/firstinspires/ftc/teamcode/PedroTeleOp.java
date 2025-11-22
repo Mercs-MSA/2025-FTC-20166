@@ -116,7 +116,7 @@ public class PedroTeleOp extends OpMode {
         follower = Constants.createFollower(hardwareMap, robotConstants);
         if (startingPose != null)
         {
-            follower.setStartingPose(startingPose);
+            //follower.setPose(startingPose);
             blackboard.remove("Position");
         } else
         {
@@ -131,54 +131,31 @@ public class PedroTeleOp extends OpMode {
         {
             alliance = RobotConstants.alliance.BLUE;
         }
+        follower.setPose(startingPose);
     }
     private void setStartPos()
     {
-//        if (gamepad1.a)
-//        {
-//            startingPose = Waypoints.redStartPoseWall;
-//            goalPose = Waypoints.redShooterPoint;
-//            alliance = RobotConstants.alliance.RED;
-//        }
-//        else if (gamepad1.b)
-//        {
-//            startingPose = Waypoints.startPoseRedAudience;
-//            goalPose = Waypoints.redShooterPoint;
-//            alliance = RobotConstants.alliance.RED;
-//        }
-//        else if (gamepad1.x)
-//        {
-//            startingPose = Waypoints.blueStartPoseWall;
-//            goalPose = Waypoints.blueShooterPoint;
-//            alliance = RobotConstants.alliance.BLUE;
-//        }
-//        else if (gamepad1.y) {
-//            startingPose = Waypoints.startPoseBlueAudience;
-//            goalPose = Waypoints.blueShooterPoint;
-//            alliance = RobotConstants.alliance.BLUE;
-//        }
-        //turret testing
         if (gamepad1.a)
         {
-            startingPose = Waypoints.tempStart;
-            goalPose = Waypoints.right;
+            startingPose = Waypoints.redStartPoseWall;
+            //goalPose = Waypoints.redShooterPoint;
             alliance = RobotConstants.alliance.RED;
         }
         else if (gamepad1.b)
         {
-            startingPose = Waypoints.tempStart;
-            goalPose = Waypoints.backward;
+            startingPose = Waypoints.startPoseRedAudience;
+            //goalPose = Waypoints.redShooterPoint;
             alliance = RobotConstants.alliance.RED;
         }
         else if (gamepad1.x)
         {
-            startingPose = Waypoints.tempStart;
-            goalPose = Waypoints.left;
+            startingPose = Waypoints.blueStartPoseWall;
+            //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
         }
         else if (gamepad1.y) {
-            startingPose = Waypoints.tempStart;
-            goalPose = Waypoints.forward;
+            startingPose = Waypoints.startPoseBlueAudience;
+            //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
         }
     }
@@ -223,7 +200,7 @@ public class PedroTeleOp extends OpMode {
         double currentTurretAngle;
         double goalHeading = getPointsHeading(goalPose.getX(), goalPose.getY(), robotPose.getX(), robotPose.getY());
 
-        double turretDelta = goalHeading - Math.toDegrees(robotPose.getHeading());
+        double turretDelta = wrapRange(goalHeading - Math.toDegrees(robotPose.getHeading()), 180);
         turretTargetAngleTelem = turretDelta;
 
         //this is for turret rotation
@@ -360,14 +337,15 @@ public class PedroTeleOp extends OpMode {
     }
     public void updateTelemetry()
     {
-        telemetryA.addData("position", robotPose);
-        telemetryA.addData("velocity", follower.getVelocity());
+        telemetryA.addData("position X", robotPose.getX());
+        telemetryA.addData("position Y", robotPose.getY());
+        telemetryA.addData("position theta", Math.toDegrees(robotPose.getHeading()));
         telemetryA.addData("automatedDrive", automatedDrive);
         telemetryA.addData("turretTargetAngle", turretTargetAngleTelem);
         telemetryA.addData("turretAngle", debugturretAngle);
-        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
-        telemetryA.addData("Turret rotate power", turretRotatePower);
         telemetryA.addData("Turret angle error", currentTurretAngleError);
+        telemetryA.addData("Turret rotate power", turretRotatePower);
+//        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
         telemetryA.addData("Robot podX offset", robotConstants.podX);
         telemetryA.addData("Robot podY offset", robotConstants.podY);
@@ -395,6 +373,7 @@ public class PedroTeleOp extends OpMode {
 //                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
 //
 //                .build();
+
     }
     @Override
     public void init_loop()
@@ -406,7 +385,7 @@ public class PedroTeleOp extends OpMode {
 
             if (startingPose != prevPose)
             {
-                follower.setStartingPose(startingPose);
+                follower.setPose(startingPose);
                 changeAllianceMultiplier();
             }
 
@@ -423,6 +402,15 @@ public class PedroTeleOp extends OpMode {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
+        if (alliance == RobotConstants.alliance.BLUE )
+        {
+            goalPose = Waypoints.blueShooterPoint;
+        }
+        else
+        {
+            goalPose = Waypoints.redShooterPoint;
+        }
+
         follower.startTeleopDrive();
     }
     @Override
