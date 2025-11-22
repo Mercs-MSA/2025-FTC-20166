@@ -19,12 +19,14 @@ public class SubSystemRobotID {
     {
         if (limitSwitch.getState() && limitSwitch2.getState()) {
             return 0;
-        } else if (!limitSwitch.getState() && limitSwitch2.getState())
+        }
+        else if (!limitSwitch.getState() && limitSwitch2.getState())
         {
             return 1;
-        } else
+        }
+        else
         {
-            return 0; //sigma skibidi ohio
+            return 2;
         }
     }
 

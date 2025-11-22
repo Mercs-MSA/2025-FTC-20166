@@ -44,7 +44,7 @@ import java.util.function.Supplier;
 //sensor_otos               control               I2C 1                 otos sensor //WE DO NOT USE THIS
 //pinpoint                  control               I2C 2                 pinpoint sensor for odometry!
 //limitSwitch               control               Digital 1             limit Switch
-//limitSwitch2             control               Digital 3             limit Switch Two
+//limitSwitch2             control                Digital 3             limit Switch Two
 //Turret Position Sensor -  control               Analog Input 0
 
 //Controller Buttons Used:
