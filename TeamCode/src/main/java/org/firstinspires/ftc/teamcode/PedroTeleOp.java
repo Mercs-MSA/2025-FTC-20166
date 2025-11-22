@@ -240,15 +240,15 @@ public class PedroTeleOp extends OpMode {
             double forward = -gamepad1.left_stick_y * joystickMultiplier;
             double strafe = -gamepad1.left_stick_x * joystickMultiplier;
             double turn = -gamepad1.right_stick_x;
-            boolean fieldCentric = false; //If false, it's robot centric
+            boolean robotCentric = gamepad1.left_bumper; //If true, it's robot centric
 
             if (!slowMode)
             {
-                follower.setTeleOpDrive(forward, strafe, turn, fieldCentric);
+                follower.setTeleOpDrive(forward, strafe, turn, robotCentric);
             }
             else
             {
-                follower.setTeleOpDrive(forward * slowModeMultiplier, strafe * slowModeMultiplier, turn * slowModeMultiplier, fieldCentric);
+                follower.setTeleOpDrive(forward * slowModeMultiplier, strafe * slowModeMultiplier, turn * slowModeMultiplier, robotCentric);
             }
         }
     }

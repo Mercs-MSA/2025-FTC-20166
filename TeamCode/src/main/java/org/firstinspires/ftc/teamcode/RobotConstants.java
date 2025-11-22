@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.Utilities.LERP;
 
@@ -40,8 +43,12 @@ public class RobotConstants
     public static double shooterAngle = 45;
     public double podX = 0;
     public double podY = 0;
-    private static double robotAPodYOffset = 0;
-    private static double robotAPodXOffset = 0;
+    public GoBildaPinpointDriver.EncoderDirection encoderForward;
+    public GoBildaPinpointDriver.EncoderDirection encoderStrafe;
+    public DcMotorSimple.Direction leftSideDirection;
+    public DcMotorSimple.Direction rightSideDirection;
+    private static double robotAPodYOffset = -6.25;
+    private static double robotAPodXOffset = 6.5;
     //    public final static double robotBPodYOffset = -19.5/2.54;
     private static double robotBPodYOffset = -7.8;//45mm in front of the center
     //    public final static double robotBPodXOffset = 7.5/2.54;
@@ -53,11 +60,19 @@ public class RobotConstants
         {
             podX = robotAPodXOffset;
             podY = robotAPodYOffset;
+            encoderForward = GoBildaPinpointDriver.EncoderDirection.FORWARD;
+            encoderStrafe = GoBildaPinpointDriver.EncoderDirection.REVERSED;
+            leftSideDirection = DcMotorSimple.Direction.FORWARD;
+            rightSideDirection = DcMotorSimple.Direction.FORWARD;
         }
         else if (robotID == 1)
         {
             podX = robotBPodXOffset;
             podY = robotBPodYOffset;
+            encoderForward = GoBildaPinpointDriver.EncoderDirection.FORWARD;
+            encoderStrafe = GoBildaPinpointDriver.EncoderDirection.REVERSED;
+            leftSideDirection = DcMotorSimple.Direction.FORWARD;
+            rightSideDirection = DcMotorSimple.Direction.REVERSE;
         }
         else if (robotID == 2)
         {
