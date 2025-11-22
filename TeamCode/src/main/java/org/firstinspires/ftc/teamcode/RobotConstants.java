@@ -48,7 +48,7 @@ public class RobotConstants
     public DcMotorSimple.Direction leftSideDirection;
     public DcMotorSimple.Direction rightSideDirection;
     private static double robotAPodYOffset = -6.25;
-    private static double robotAPodXOffset = 6.5;
+    private static double robotAPodXOffset = -6.5;
     //    public final static double robotBPodYOffset = -19.5/2.54;
     private static double robotBPodYOffset = -7.8;//45mm in front of the center
     //    public final static double robotBPodXOffset = 7.5/2.54;
@@ -61,7 +61,7 @@ public class RobotConstants
             podX = robotAPodXOffset;
             podY = robotAPodYOffset;
             encoderForward = GoBildaPinpointDriver.EncoderDirection.FORWARD;
-            encoderStrafe = GoBildaPinpointDriver.EncoderDirection.REVERSED;
+            encoderStrafe = GoBildaPinpointDriver.EncoderDirection.FORWARD;
             leftSideDirection = DcMotorSimple.Direction.FORWARD;
             rightSideDirection = DcMotorSimple.Direction.FORWARD;
         }
