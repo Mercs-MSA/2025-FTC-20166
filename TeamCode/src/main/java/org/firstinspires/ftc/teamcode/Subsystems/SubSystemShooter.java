@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -7,8 +8,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.RobotConstants;
+import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
 import org.firstinspires.ftc.teamcode.Utilities.LERP;
 import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
+import org.firstinspires.ftc.teamcode.Waypoints;
 
 public class SubSystemShooter {
     private LERP shooterTiltLeftLERP;
@@ -20,8 +23,13 @@ public class SubSystemShooter {
     private DcMotorEx shooterFlyWheel;
     private CRServo turretRotation;
     private CRServo transferServo1;
+    private RobotConstants.alliance alliance;
+    private Pose goalPose;
     private CRServo transferServo2;
     private AnalogInput turretPositionSensor;
+    private double turretDelta;
+    private double turretRotatePower;
+    private double currentTurretAngleError;
 
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
@@ -41,12 +49,27 @@ public class SubSystemShooter {
 
         turretPositionSensor = hardwareMap.get(AnalogInput.class, "turretPositionSensor");
 
+        turretDelta = 0;
+
     }
 
     public void setTurretRotationSpeed(double power)
     {
         turretRotation.setPower(power);
     }
+    public void setAlliance(RobotConstants.alliance alliance)
+    {
+        this.alliance = alliance;
+        if (alliance == RobotConstants.alliance.RED)
+        {
+            goalPose = Waypoints.redShooterPoint;
+        }
+        else if (alliance == RobotConstants.alliance.BLUE)
+        {
+            goalPose = Waypoints.blueShooterPoint;
+        }
+    }
+
 
     //Edited in GVIM by Steve :)
     private double [][] turretSensorCorrectionTable =
@@ -107,6 +130,23 @@ public class SubSystemShooter {
     {
         return turretPositionSensor.getVoltage();
     }
+    public void updateTurret(Pose robotPos)
+    {
+        double currentTurretAngle;
+        double goalHeading = GeneralUtils.getPointsHeading(goalPose.getX(), goalPose.getY(), robotPos.getX(), robotPos.getY());
+
+        turretDelta = GeneralUtils.wrapRange(goalHeading - Math.toDegrees(robotPos.getHeading()), 180);
+
+        //this is for turret rotation.
+        currentTurretAngle = getTurretAngle();
+        currentTurretAngleError =  turretDelta - currentTurretAngle;
+        turretRotatePower = GeneralUtils.clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
+        setTurretRotationSpeed(turretRotatePower);
+    }
+    public double getTurretDelta()
+    {
+        return turretDelta;
+    }
     public void setShooterAngle(double tiltAngle)
     {
         shooterTiltLeft.setPosition(shooterTiltLeftLERP.interpolated(tiltAngle));
@@ -116,6 +156,10 @@ public class SubSystemShooter {
     public void setShooterSpeed(double velocity)
     {
         shooterFlyWheel.setVelocity(velocity);
+    }
+    public double getTurretRotatePower()
+    {
+        return turretRotatePower;
     }
     public void setTransfer(boolean enabled)
     {
@@ -129,6 +173,10 @@ public class SubSystemShooter {
             transferServo1.setPower(0);
             transferServo2.setPower(0);
         }
+    }
+    public double getTurretError()
+    {
+        return currentTurretAngleError;
     }
     public double getShooterSpeed()
     {

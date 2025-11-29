@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
+import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
@@ -86,18 +87,7 @@ public class PedroTeleOp extends OpMode {
 
 
     //private TelemetryManager telemetryP = Panels.getTelemetry();
-    public static double getPointsHeading(double x, double y, double xr, double yr)
-    {
-        double calculatedAngleRads = Math.atan2(y-yr, x-xr);
-        double calculatedAngleDegs = Math.toDegrees(calculatedAngleRads);
-        //double correctedAngle = calculatedAngleDegs - 90.0;
-        return calculatedAngleDegs;
-    }
 
-    public static double getPointsDistance(double x, double y, double xr, double yr)
-    {
-        return Math.hypot(xr-x,yr-y);
-    }
     public void initializeHardware()
     {
         try
@@ -173,42 +163,11 @@ public class PedroTeleOp extends OpMode {
     private void draw()
     {
     }
-    public double wrapRange(double number, double range)
-    {
-        while(number >= range)
-            number -= (range * 2);
-        while(number <= -range)
-            number += (range * 2);
-        return number;
-    }
-    public double clampRange(double number, double range)
-    {
-        if (number > range)
-        {
-            return range;
-        }
-        else if (number < -range)
-        {
-            return -range;
-        } else
-        {
-            return number;
-        }
-    }
+
+
     public void updateTurret()
     {
-        double currentTurretAngle;
-        double goalHeading = getPointsHeading(goalPose.getX(), goalPose.getY(), robotPose.getX(), robotPose.getY());
 
-        double turretDelta = wrapRange(goalHeading - Math.toDegrees(robotPose.getHeading()), 180);
-        turretTargetAngleTelem = turretDelta;
-
-        //this is for turret rotation
-        currentTurretAngle = subSystemShooter.getTurretAngle();
-        debugturretAngle = currentTurretAngle;
-        currentTurretAngleError =  turretDelta - currentTurretAngle;
-        turretRotatePower = clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
-        subSystemShooter.setTurretRotationSpeed(turretRotatePower);
     }
     public void updatePedroDrive()
     {
@@ -255,7 +214,7 @@ public class PedroTeleOp extends OpMode {
                     currentlyTurning = false;
                     desiredHeading = Math.toDegrees(currentHeading);
                 }
-                double headingError = wrapRange(Math.toDegrees(currentHeading) - Math.toDegrees(desiredHeading), 180);
+                double headingError = GeneralUtils.wrapRange(Math.toDegrees(currentHeading) - Math.toDegrees(desiredHeading), 180);
                 if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone) {
 
                     turn = headingError * RobotConstants.headingPFactor;
@@ -341,10 +300,10 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("position Y", robotPose.getY());
         telemetryA.addData("position theta", Math.toDegrees(robotPose.getHeading()));
         telemetryA.addData("automatedDrive", automatedDrive);
-        telemetryA.addData("turretTargetAngle", turretTargetAngleTelem);
-        telemetryA.addData("turretAngle", debugturretAngle);
-        telemetryA.addData("Turret angle error", currentTurretAngleError);
-        telemetryA.addData("Turret rotate power", turretRotatePower);
+        telemetryA.addData("turretTargetAngle", subSystemShooter.getTurretDelta());
+        telemetryA.addData("turretAngle", subSystemShooter.getTurretAngle());
+        telemetryA.addData("Turret Error", subSystemShooter.getTurretError());
+        telemetryA.addData("Turret Power", subSystemShooter.getTurretRotatePower());
 //        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
         telemetryA.addData("Robot podX offset", robotConstants.podX);
@@ -378,6 +337,7 @@ public class PedroTeleOp extends OpMode {
     @Override
     public void init_loop()
     {
+
         if (shouldDoPositionLoop)
         {
             Pose prevPose = startingPose;
@@ -395,6 +355,7 @@ public class PedroTeleOp extends OpMode {
 
             telemetryA.update();
         }
+        subSystemShooter.setAlliance(alliance);
     }
     @Override
     public void start()
@@ -427,7 +388,7 @@ public class PedroTeleOp extends OpMode {
         updateBoxBind();
 
         updateTransfer();
-        updateTurret();
+        subSystemShooter.updateTurret(robotPose);
 
         updateTelemetry();
     }
