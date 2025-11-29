@@ -155,7 +155,7 @@ public class SubSystemShooter {
         currentTurretAngle = getTurretAngle();
         currentTurretAngleError =  turretDelta - currentTurretAngle;
         turretRotatePower = GeneralUtils.clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
-        //setTurretRotationSpeed(turretRotatePower);
+        setTurretRotationSpeed(turretRotatePower);
     }
     public double getTurretDelta()
     {
