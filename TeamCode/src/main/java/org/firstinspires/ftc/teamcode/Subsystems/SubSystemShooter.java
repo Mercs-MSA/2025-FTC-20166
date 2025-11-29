@@ -20,11 +20,12 @@ public class SubSystemShooter {
     private LERP turretInterpolator2;
     private Servo shooterTiltLeft;
     private Servo shooterTiltRight;
+    private Servo transferArm;
     private DcMotorEx shooterFlyWheel;
     private CRServo turretRotation;
     private CRServo transferServo1;
-    private RobotConstants.alliance alliance;
-    private Pose goalPose;
+//    private RobotConstants.alliance alliance;
+//    private Pose goalPose;
     private CRServo transferServo2;
     private AnalogInput turretPositionSensor;
     private double turretDelta;
@@ -36,6 +37,8 @@ public class SubSystemShooter {
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
         turretInterpolator1 = new LERP(1.13,0,2.512,-180,true);
         turretInterpolator2 = new LERP(.327,180,1.13,0,true);
+
+        transferArm = hardwareMap.get(Servo.class, "lift");
 
         shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");//shooterTiltLeft
         shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");//shooterTiltRight
@@ -57,21 +60,21 @@ public class SubSystemShooter {
     {
         turretRotation.setPower(power);
     }
-    public void setAlliance(RobotConstants.alliance alliance)
-    {
-        this.alliance = alliance;
-        if (alliance == RobotConstants.alliance.RED)
-        {
-            goalPose = Waypoints.redShooterPoint;
-        }
-        else if (alliance == RobotConstants.alliance.BLUE)
-        {
-            goalPose = Waypoints.blueShooterPoint;
-        }
-    }
+//    public void setAlliance(RobotConstants.alliance alliance)
+//    {
+//        this.alliance = alliance;
+//        if (alliance == RobotConstants.alliance.RED)
+//        {
+//            goalPose = Waypoints.redShooterPoint;
+//        }
+//        else if (alliance == RobotConstants.alliance.BLUE)
+//        {
+//            goalPose = Waypoints.blueShooterPoint;
+//        }
+//    }
 
 
-    //Edited in GVIM by Steve :)
+    //Edited in VISUAL STUDIO CODE by Steve :)
     private double [][] turretSensorCorrectionTable =
             {
 //                    { -180,  -135,   -90,  -45,     0,    45,    90,   135,   180}, //Turret angle
@@ -130,10 +133,21 @@ public class SubSystemShooter {
     {
         return turretPositionSensor.getVoltage();
     }
+    public void setLiftArm(boolean enabled)
+    {
+        if (enabled)
+        {
+            transferArm.setPosition(RobotConstants.robotCliftArmUpAngle);
+        }
+        else
+        {
+            transferArm.setPosition(RobotConstants.robotCliftArmDownAngle);
+        }
+    }
     public void updateTurret(Pose robotPos)
     {
         double currentTurretAngle;
-        double goalHeading = GeneralUtils.getPointsHeading(goalPose.getX(), goalPose.getY(), robotPos.getX(), robotPos.getY());
+        double goalHeading = GeneralUtils.getPointsHeading(Waypoints.goalPoint.getX(), Waypoints.goalPoint.getY(), robotPos.getX(), robotPos.getY());
 
         turretDelta = GeneralUtils.wrapRange(goalHeading - Math.toDegrees(robotPos.getHeading()), 180);
 
@@ -141,7 +155,7 @@ public class SubSystemShooter {
         currentTurretAngle = getTurretAngle();
         currentTurretAngleError =  turretDelta - currentTurretAngle;
         turretRotatePower = GeneralUtils.clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
-        setTurretRotationSpeed(turretRotatePower);
+        //setTurretRotationSpeed(turretRotatePower);
     }
     public double getTurretDelta()
     {
@@ -155,7 +169,7 @@ public class SubSystemShooter {
 
     public void setShooterSpeed(double velocity)
     {
-        shooterFlyWheel.setVelocity(velocity);
+        shooterFlyWheel.setVelocity(-velocity);
     }
     public double getTurretRotatePower()
     {
@@ -165,8 +179,8 @@ public class SubSystemShooter {
     {
         if (enabled)
         {
-            transferServo1.setPower(-RobotConstants.turretMaxPower);
-            transferServo2.setPower(RobotConstants.turretMaxPower);
+            transferServo1.setPower(RobotConstants.turretMaxPower);
+            transferServo2.setPower(-RobotConstants.turretMaxPower);
         }
         else
         {

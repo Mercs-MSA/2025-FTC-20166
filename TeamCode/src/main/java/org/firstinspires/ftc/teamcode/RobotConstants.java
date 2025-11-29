@@ -37,24 +37,42 @@ public class RobotConstants
     public static double nearVelocity = 1000;
     public static double nearDistance = 6; //In inches
     public static double farShooterAngle = 50;
+
+
+    //liftArm angles
+    public static double robotCliftArmDownAngle = 0.386;
+    public static double robotCliftArmUpAngle = 0.7;
+    public static double robotAliftArmDownAngle = 0.4;
+    public static double robotAliftArmUpAngle = 0.7;
+    public static double robotBliftArmDownAngle = 0.4;
+    public static double robotBliftArmUpAngle = 0.7;
+    public static double liftArmUpAngle = 0.7;
+    public static double liftArmDownAngle = 0.4;
+
     public static double farVelocity = 1650;
     public static double farDistance = 148; //In inches
     public static double shooterVelocity = 300;
     public static double shooterAngle = 45;
-    public double podX = 0;
-    public double podY = 0;
+
+
+
     public GoBildaPinpointDriver.EncoderDirection encoderForward;
     public GoBildaPinpointDriver.EncoderDirection encoderStrafe;
     public DcMotorSimple.Direction leftSideDirection;
     public DcMotorSimple.Direction rightSideDirection;
+
+    //pinpoint offsets
+    public double podX = 0;
+    public double podY = 0;
     private static double robotAPodYOffset = -6.25;
     private static double robotAPodXOffset = -6.5;
-    //    public final static double robotBPodYOffset = -19.5/2.54;
     private static double robotBPodYOffset = -7.8;//45mm in front of the center
-    //    public final static double robotBPodXOffset = 7.5/2.54;
     private static double robotBPodXOffset = 2.65;//220mm to the right of the center
     private static double robotCPodXOffset = -7.5;
     private static double robotCPodYOffset = -7.5;
+
+
+
 
     public RobotConstants(int robotID)
     {
@@ -62,6 +80,8 @@ public class RobotConstants
         {
             podX = robotAPodXOffset;
             podY = robotAPodYOffset;
+            liftArmDownAngle = robotAliftArmDownAngle;
+            liftArmUpAngle = robotAliftArmUpAngle;
             encoderForward = GoBildaPinpointDriver.EncoderDirection.FORWARD;
             encoderStrafe = GoBildaPinpointDriver.EncoderDirection.FORWARD;
             leftSideDirection = DcMotorSimple.Direction.FORWARD;
@@ -71,6 +91,8 @@ public class RobotConstants
         {
             podX = robotBPodXOffset;
             podY = robotBPodYOffset;
+            liftArmDownAngle = robotBliftArmDownAngle;
+            liftArmUpAngle = robotBliftArmUpAngle;
             encoderForward = GoBildaPinpointDriver.EncoderDirection.FORWARD;
             encoderStrafe = GoBildaPinpointDriver.EncoderDirection.REVERSED;
             leftSideDirection = DcMotorSimple.Direction.FORWARD;
@@ -80,6 +102,8 @@ public class RobotConstants
         {
             podX = robotCPodXOffset;
             podY = robotCPodYOffset;
+            liftArmDownAngle = robotCliftArmDownAngle;
+            liftArmUpAngle = robotCliftArmUpAngle;
             encoderForward = GoBildaPinpointDriver.EncoderDirection.REVERSED;
             encoderStrafe = GoBildaPinpointDriver.EncoderDirection.REVERSED;
             leftSideDirection = DcMotorSimple.Direction.FORWARD;

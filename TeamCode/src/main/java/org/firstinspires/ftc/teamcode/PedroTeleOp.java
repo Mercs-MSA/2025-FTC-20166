@@ -42,11 +42,13 @@ import java.util.function.Supplier;
 //transfer2                  control              5                     transfer2 turret belt servo 2
 
 //Sensors
+
+
 //sensor_otos               control               I2C 1                 otos sensor //WE DO NOT USE THIS
-//pinpoint                  control               I2C 2                 pinpoint sensor for odometry!
+//pinpoint                  expansion             I2C 0                 pinpoint sensor for odometry!
 //limitSwitch               control               Digital 1             limit Switch
-//limitSwitch2             control                Digital 3             limit Switch Two
-//Turret Position Sensor -  control               Analog Input 0
+//limitSwitch2              control               Digital 3             limit Switch Two
+//Turret Position Sensor    control               Analog Input 0
 
 //Controller Buttons Used:
 //Gamepad 1:
@@ -78,9 +80,6 @@ public class PedroTeleOp extends OpMode {
     private double slowModeMultiplier = 0.5;
     private double desiredHeading = 0;
     private double debugturretAngle = 0;
-    double currentTurretAngleError;
-    double turretRotatePower;
-    private double turretTargetAngleTelem;
     private SubSystemRobotID subSystemRobotID;
     private Pose robotPose;
     private RobotConstants robotConstants;
@@ -121,6 +120,7 @@ public class PedroTeleOp extends OpMode {
         {
             alliance = RobotConstants.alliance.BLUE;
         }
+        Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
         follower.setPose(startingPose);
     }
     private void setStartPos()
@@ -190,52 +190,53 @@ public class PedroTeleOp extends OpMode {
     }
     public void updatePose()
     {
+        follower.update();
         robotPose = follower.getPose();
     }
-    public void updatePedroDriveTest()
-    {
-
-        if (!automatedDrive)
-        {
-            double forward = -gamepad1.left_stick_y * joystickMultiplier;
-            double strafe = -gamepad1.left_stick_x * joystickMultiplier;
-            double turn = -gamepad1.right_stick_x;
-            boolean fieldCentric = !gamepad1.left_bumper; //If false, it's robot centric
-
-            if (Math.abs(turn) >= RobotConstants.joystickRotateDeadband)
-            {
-                currentlyTurning = true;
-            }
-            else
-            {
-                double currentHeading = robotPose.getHeading();
-                if (currentlyTurning)
-                {
-                    currentlyTurning = false;
-                    desiredHeading = Math.toDegrees(currentHeading);
-                }
-                double headingError = GeneralUtils.wrapRange(Math.toDegrees(currentHeading) - Math.toDegrees(desiredHeading), 180);
-                if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone) {
-
-                    turn = headingError * RobotConstants.headingPFactor;
-                }
-                else
-                {
-                    turn = 0;
-                }
-            }
-
-
-            if (!slowMode)
-            {
-                follower.setTeleOpDrive(forward, strafe, turn, fieldCentric);
-            }
-            else
-            {
-                follower.setTeleOpDrive(forward * slowModeMultiplier, strafe * slowModeMultiplier, turn * slowModeMultiplier, fieldCentric);
-            }
-        }
-    }
+////    public void updatePedroDriveTest()
+////    {
+////
+////        if (!automatedDrive)
+////        {
+////            double forward = -gamepad1.left_stick_y * joystickMultiplier;
+////            double strafe = -gamepad1.left_stick_x * joystickMultiplier;
+////            double turn = -gamepad1.right_stick_x;
+////            boolean fieldCentric = !gamepad1.left_bumper; //If false, it's robot centric
+////
+////            if (Math.abs(turn) >= RobotConstants.joystickRotateDeadband)
+////            {
+////                currentlyTurning = true;
+////            }
+////            else
+////            {
+////                double currentHeading = robotPose.getHeading();
+////                if (currentlyTurning)
+////                {
+////                    currentlyTurning = false;
+////                    desiredHeading = Math.toDegrees(currentHeading);
+////                }
+////                double headingError = GeneralUtils.wrapRange(Math.toDegrees(currentHeading) - Math.toDegrees(desiredHeading), 180);
+////                if (Math.abs(headingError) > RobotConstants.headingErrorDeadZone) {
+////
+////                    turn = headingError * RobotConstants.headingPFactor;
+////                }
+////                else
+////                {
+////                    turn = 0;
+////                }
+////            }
+//
+//
+//            if (!slowMode)
+//            {
+//                follower.setTeleOpDrive(forward, strafe, turn, fieldCentric);
+//            }
+//            else
+//            {
+//                follower.setTeleOpDrive(forward * slowModeMultiplier, strafe * slowModeMultiplier, turn * slowModeMultiplier, fieldCentric);
+//            }
+//        }
+//    }
     public void updateAutomatedDrive()
     {
         //Automated PathFollowing
@@ -260,8 +261,34 @@ public class PedroTeleOp extends OpMode {
         {
             subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
         }
+    }
+    public void doTest()
+    {
 
-
+        if(gamepad2.left_bumper)
+        {
+            subSystemShooter.setTransfer(true);
+        }
+        else
+        {
+            subSystemShooter.setTransfer(false);
+        }
+        if (gamepad2.right_bumper)
+        {
+            subSystemShooter.setShooterSpeed(1500);
+        }
+        else
+        {
+            subSystemShooter.setShooterSpeed(0);
+        }
+        if (gamepad2.y)
+        {
+            subSystemShooter.setLiftArm(true);
+        }
+        else if (gamepad2.a)
+        {
+            subSystemShooter.setLiftArm(false);
+        }
     }
     public void updateSlowMode()
     {
@@ -318,7 +345,6 @@ public class PedroTeleOp extends OpMode {
     public void init()
     {
         robotPose = new Pose();
-        goalPose = new Pose();
         initializeHardware();
         robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
         updateConstants();
@@ -346,38 +372,35 @@ public class PedroTeleOp extends OpMode {
             if (startingPose != prevPose)
             {
                 follower.setPose(startingPose);
+                Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
                 changeAllianceMultiplier();
             }
 
+            updatePose();
+
             telemetryA.addData("Starting Pose: ", startingPose);
-            telemetryA.addData("Goal Pose: ", goalPose);
+            telemetryA.addData("Goal Pose: ", Waypoints.goalPoint);
             telemetryA.addData("Doing loop? ",shouldDoPositionLoop);
 
-            telemetryA.update();
+            updateTelemetry();
+
         }
-        subSystemShooter.setAlliance(alliance);
+//        subSystemShooter.setAlliance(alliance);
     }
+
     @Override
     public void start()
     {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
-        if (alliance == RobotConstants.alliance.BLUE )
-        {
-            goalPose = Waypoints.blueShooterPoint;
-        }
-        else
-        {
-            goalPose = Waypoints.redShooterPoint;
-        }
-
+        Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
+        follower.update();
         follower.startTeleopDrive();
     }
     @Override
     public void loop()
     {
-        follower.update();
         updatePose();
 
         updateSlowMode();
@@ -389,6 +412,9 @@ public class PedroTeleOp extends OpMode {
 
         updateTransfer();
         subSystemShooter.updateTurret(robotPose);
+
+        // do bs
+        //doTest();
 
         updateTelemetry();
     }
