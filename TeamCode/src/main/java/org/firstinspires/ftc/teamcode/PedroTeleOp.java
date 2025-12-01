@@ -143,8 +143,15 @@ public class PedroTeleOp extends OpMode {
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
         }
-        else if (gamepad1.y) {
+        else if (gamepad1.y)
+        {
             startingPose = Waypoints.startPoseBlueAudience;
+            //goalPose = Waypoints.blueShooterPoint;
+            alliance = RobotConstants.alliance.BLUE;
+        }
+        else if (gamepad1.right_bumper)
+        {
+            startingPose = Waypoints.startPoseNeutral;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
         }

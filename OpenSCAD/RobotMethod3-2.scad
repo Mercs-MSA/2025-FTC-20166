@@ -2269,28 +2269,34 @@ module BatteryHolder()
 {
   WallT = 2;
   MountSpacing = 8 * 8.5;
+  Width = 46;
+  Offset = 2;
   
   difference()
   {
     union()
     {      
-      cube([44 + WallT + WallT, 123  + WallT + WallT, 20], center = true);
-      hull()
-      {
-        translate([0, MountSpacing, -8.0])
-          cylinder(d = 10, h = 4, center = true);
-        translate([0, -MountSpacing, -8.0])
-          cylinder(d = 10, h = 4, center = true);
-      }
+      cube([Width + WallT + WallT, 123  + WallT + WallT, 20], center = true);
+      translate([Offset, 0, 0])
+        hull()
+        {
+          translate([0, MountSpacing, -8.0])
+            cylinder(d = 10, h = 4, center = true);
+          translate([0, -MountSpacing, -8.0])
+            cylinder(d = 10, h = 4, center = true);
+        }
     }
     translate([0, 0, 5])
-      cube([44 , 123  , 20], center = true);
+      cube([Width , 123  , 20], center = true);
     translate([0, 0, -8.5])
       cube([50 , 30  , 3], center = true);
-    translate([0, MountSpacing, -8.5])
-      cylinder(d = M4FreeHoleD * 25.4, h = 10, center = true);
-    translate([0, -MountSpacing, -8.5])
-      cylinder(d = M4FreeHoleD * 25.4, h = 10, center = true);
+    translate([Offset, 0, 0])
+    {
+      translate([0, MountSpacing, -8.5])
+        cylinder(d = M4FreeHoleD * 25.4, h = 10, center = true);
+      translate([0, -MountSpacing, -8.5])
+        cylinder(d = M4FreeHoleD * 25.4, h = 10, center = true);
+    }
   }
 }
 
