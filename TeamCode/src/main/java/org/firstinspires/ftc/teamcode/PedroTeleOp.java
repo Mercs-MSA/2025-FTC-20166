@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 //import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 //import com.bylazar.ftcontrol.panels.json.Canvas;
 //import com.bylazar.ftcontrol.panels.json.Rectangle;
-import com.bylazar.telemetry.PanelsTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -20,7 +21,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
-import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
@@ -167,8 +167,23 @@ public class PedroTeleOp extends OpMode {
             joystickMultiplier = 1;
         }
     }
-    private void draw()
+    private void drawField()
     {
+        TelemetryPacket fieldPayload = new TelemetryPacket(true);
+
+        fieldPayload.fieldOverlay()
+                .setTranslation(-robotPose.getX(), -robotPose.getY())
+                .setRotation(robotPose.getHeading())
+                .strokeRect(-5,-5,10,10)
+                .strokeLine(0,0,-5,0)
+                .setStroke("red")
+                .setRotation(Math.toRadians(Math.toDegrees(robotPose.getHeading()) + subSystemShooter.getTurretAngle()))
+                .strokeLine(0,0,-10,0)
+                .setStroke("blue")
+                .setRotation(Math.toRadians(subSystemShooter.getTurretDelta() + Math.toDegrees(robotPose.getHeading())))
+                .strokeLine(0,0,-15,0);
+
+        FtcDashboard.getInstance().sendTelemetryPacket(fieldPayload);
     }
 
 
@@ -328,7 +343,7 @@ public class PedroTeleOp extends OpMode {
             }
         }
     }
-    public void updateTelemetry()
+    public void updateTelemetryA()
     {
         telemetryA.addData("position X", robotPose.getX());
         telemetryA.addData("position Y", robotPose.getY());
@@ -343,8 +358,25 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("Robot podX offset", robotConstants.podX);
         telemetryA.addData("Robot podY offset", robotConstants.podY);
 
-        telemetryA.update();
+        //drawField();
 
+        TelemetryPacket fieldPayload = new TelemetryPacket(true);
+
+        fieldPayload.fieldOverlay()
+                .setTranslation(-robotPose.getX(),-robotPose.getY())
+                .setRotation(0)
+                .strokeRect(-5,-5,10,10)
+                .strokeLine(0,0,-5,0)
+                .setStroke("red")
+                .setRotation(Math.toRadians(0 + subSystemShooter.getTurretAngle()))
+                .strokeLine(0,0,-10,0)
+                .setStroke("blue")
+                .setRotation(Math.toRadians(0))
+                .strokeLine(0,0,-15,0);
+
+        FtcDashboard.getInstance().sendTelemetryPacket(fieldPayload);
+
+        updateTelemetry(telemetryA);
     }
 
     //main loops
@@ -357,7 +389,8 @@ public class PedroTeleOp extends OpMode {
         updateConstants();
 
         follower.update();
-        telemetryA = new MultipleTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(),this.telemetry);
+        telemetryA = new MultipleTelemetry(this.telemetry,FtcDashboard.getInstance().getTelemetry());
+        telemetryA.update();
 
         changeAllianceMultiplier();
 //        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
@@ -389,12 +422,11 @@ public class PedroTeleOp extends OpMode {
             telemetryA.addData("Goal Pose: ", Waypoints.goalPoint);
             telemetryA.addData("Doing loop? ",shouldDoPositionLoop);
 
-            updateTelemetry();
+            updateTelemetryA();
 
         }
 //        subSystemShooter.setAlliance(alliance);
     }
-
     @Override
     public void start()
     {
@@ -423,6 +455,6 @@ public class PedroTeleOp extends OpMode {
         // do bs
         //doTest();
 
-        updateTelemetry();
+        updateTelemetryA();
     }
 }

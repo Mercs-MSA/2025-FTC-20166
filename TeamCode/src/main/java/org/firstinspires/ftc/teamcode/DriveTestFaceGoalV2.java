@@ -161,6 +161,7 @@ public class DriveTestFaceGoalV2 extends LinearOpMode
         //robotPinpointSubSystem.updatePinpoint();
        // Pose2D pinpointPos = robotPinpointSubSystem.getPinpointPos();
         //robotPose = new RobotStatus(pinpointPos.getX(DistanceUnit.INCH), pinpointPos.getY(DistanceUnit.INCH), pinpointPos.getHeading(AngleUnit.DEGREES), true);
+        robotPose = new RobotStatus(0, 0, 0, true);
     }
 
 

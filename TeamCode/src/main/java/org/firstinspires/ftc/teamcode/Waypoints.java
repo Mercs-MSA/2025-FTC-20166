@@ -30,7 +30,7 @@ public class Waypoints
     public static final Pose blueShooterPark = new Pose(33, 115, Math.toRadians(135));
 
 
-    public static Pose startPoseNeutral = new Pose(0,0,Math.toRadians(0));
+    public static Pose startPoseNeutral = new Pose(8,8,Math.toRadians(0));
     public static Pose startPoseBlueAudience = new Pose(27,128,Math.toRadians(135));
     public static Pose startPoseRedAudience = new Pose(117,128,Math.toRadians(45));
     public static Pose redBox = new Pose(38.5,33.5,Math.toRadians(90));

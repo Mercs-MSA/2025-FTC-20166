@@ -147,7 +147,7 @@ public class SubSystemShooter {
     public void updateTurret(Pose robotPos)
     {
         double currentTurretAngle;
-        double goalHeading = GeneralUtils.getPointsHeading(Waypoints.goalPoint.getX(), Waypoints.goalPoint.getY(), robotPos.getX(), robotPos.getY());
+        double goalHeading = GeneralUtils.getPointsHeading(Waypoints.goalPoint.getX(), Waypoints.goalPoint.getY(), robotPos.getX(), robotPos.getY()) - 180;
 
         turretDelta = GeneralUtils.wrapRange(goalHeading - Math.toDegrees(robotPos.getHeading()), 180);
 
