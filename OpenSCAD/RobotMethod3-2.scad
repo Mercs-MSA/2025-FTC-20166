@@ -65,15 +65,17 @@ ServoHOffset = 102 / 25.4;
 ServoVOffset = 14 / 25.4;
 LazySusanOuterD = 200/25.4;
 LazySusanInnerD = 146/25.4;
-LazySusanInnderMountD = 157.5/25.4;
+LazySusanInnerMountD = 157.5/25.4;
 LazySusanOuterMountD = 187/25.4;
 LazySusanMountHoleD = 3/16;
-LazySusanAccessHoleD = 10.5/25.4;
+LazySusanAccessHoleD = 10.2/25.4;
 LazySusanT = .2;
 ServoBlockLength = 2.7;
 ServoBlockLengthOpening = 41/25.4;
-TurretServoLocation = [-2.5, 3.70, 0]; //[-2.39, 4.2, 0];//[-4.51, -2.15, 0]
-TurretSensorLocation = [1.5, 4.4, -0.2]; //[-4.1, 2.85, -0.2];//[0, 5.0, -0.2]
+TurretServoLocation = [-2.5, 3.70, 0];
+TurretSensorLocation2 = [-3.9, 2.565, 0];
+TurretMotorLocation = [-4.87, 1.11, 0];
+TurretSensorLocation = [1.5, 4.4, -0.2];
 TurretSensorMountD = 9.3/25.4;
 ShooterVersion = 2;
 BallLifterOffset = [2.6, .18, 4.11];//[3, .18, 4.11]
@@ -363,6 +365,10 @@ module TurretServo()
     //Drive servo
     translate(TurretServoLocation)
       translate([-ServoRotateOffset, ServoRotateOffset, -.52])
+        rotate(-5, [0, 0, 1])
+          TurretServoGear();
+    //Motor version of drive gear
+    translate(TurretMotorLocation)
         rotate(-5, [0, 0, 1])
           TurretServoGear();
     //Position sensor
@@ -1202,9 +1208,15 @@ module RampPlate()
     //Ball opening
     cylinder(d = LazySusanInnerD + .05, h = 1, center = true);
     //Lazy Susan inner ring attach holes
-    QuadHoles(d = LazySusanInnderMountD, hole = LazySusanMountHoleD);
+    QuadHoles(d = LazySusanInnerMountD, hole = LazySusanMountHoleD);
+    //Lazy Susan outer holes (Lower mounted turret motor)
+    rotate(8, [0, 0, 1])
+      QuadHoles(d = LazySusanOuterMountD, hole = LazySusanMountHoleD);
     //Lazy Susan outer access holes
     QuadHoles(d = LazySusanOuterMountD, hole = LazySusanAccessHoleD);
+    //Lazy Susan inner access holes
+    rotate(-25, [0, 0, 1])
+      QuadHoles(d = LazySusanInnerMountD, hole = LazySusanAccessHoleD);
     //Shooter servo block mount holes
     //Left
     translate([-ShooterOuterCurveRadius + BallExitOffset - RampXOffset + .08, ServoHOffset - 0.8, -ShooterPlateT / 2])
@@ -1236,11 +1248,7 @@ module RampPlate()
       }
     //Turret sensor opening
     translate(TurretSensorLocation)
-      intersection()
-      {
-        cylinder(d = TurretSensorMountD, h = 1.5, center = true);
-        cube([8.5 / 25.4, TurretSensorMountD, 1.5], center = true);
-      }
+      TurretSensorHole();
     translate([UpperBallTractionLocation[0], -3.0, ShooterPlateT / 2])
       LowerBallTractionMountHoles();
     //Side support mount holes
@@ -1253,6 +1261,14 @@ module RampPlate()
   }
 }
 
+module TurretSensorHole()
+{
+  intersection()
+  {
+    cylinder(d = TurretSensorMountD, h = 1.5, center = true);
+    cube([8.5 / 25.4, TurretSensorMountD, 1.5], center = true);
+  }
+}
 module RampPlateAssembly()
 {
   RampPlate();
@@ -1365,7 +1381,7 @@ module LazySusanInnerSpacer(T = .1)
     cylinder(d = LazySusanInnerD, h = 1, center = true);
     echo (((LazySusanOuterD + LazySusanInnerD) / 2) - LazySusanInnerD);
 
-    QuadHoles(d = LazySusanInnderMountD, hole = LazySusanMountHoleD);
+    QuadHoles(d = LazySusanInnerMountD, hole = LazySusanMountHoleD);
   }
 }
 
@@ -1378,10 +1394,23 @@ module TurretMountPlate()
       cylinder(d = LazySusanOuterD + 1, h = ShooterPlateT, center = true);
       cube([RobotOuterWidth + ShooterPlateT + ShooterPlateT, 3, ShooterPlateT], center = true);
     }
+    //Turret motor option
+    translate(TurretMotorLocation)
+    {
+      cylinder(d = .2, h = 2, center = true);
+      YellowJacketMountPattern();
+    }
     //Shooter ball opening
     cylinder(d = LazySusanInnerD, h = ShooterPlateT + 0.1, center = true);
-    //Lazy Susan Attachholes
+    //Lazy Susan attach holes
     QuadHoles(d = LazySusanOuterMountD, hole = M5FreeHoleD);
+    QuadHoles(d = LazySusanInnerMountD, hole = M5FreeHoleD);
+    //Lazy Susan access holes
+    rotate(45, [0, 0, 1])
+    {
+      QuadHoles(d = LazySusanOuterMountD, hole = LazySusanAccessHoleD);
+      QuadHoles(d = LazySusanInnerMountD, hole = LazySusanAccessHoleD);
+    }
     //Base mount holes
     for (i = [-4 : 4])
     {      
@@ -1394,8 +1423,14 @@ module TurretMountPlate()
       translate([-(RobotOuterWidth / 2) + ((8 + 32) / 25.4), (i * 8) / 25.4, 0])
         cylinder(d = M4FreeHoleD, h = .5, center = true);
     }
-    
-    
+    //Lower turret sensor option
+    translate(TurretSensorLocation2)
+    {
+    TurretSensorHole();
+      if (ShowGears)
+        rotate(-5, [0, 0, 1])
+          TurretSensorGear();
+    }
   }
 }
 
@@ -2211,12 +2246,12 @@ module DXF()
 {
   projection(cut = false)
   //ShooterBasePlate2BottomPlate();
-  ShooterBasePlate2TopPlate();
+  //ShooterBasePlate2TopPlate();
   //rotate(90, [0, 1, 0]) ShooterBody2SidePlateScoop();
   //rotate(90, [0, 1, 0]) ShooterBody2SidePlateFlywheel();
   //rotate(90, [0, 1, 0]) RampPivotPlate();
   //RampPlate();
-  //TurretMountPlate();
+  TurretMountPlate();
   //SidePlateOuter();
   //SidePlateInner();
   //IntakePlate();
@@ -2340,8 +2375,8 @@ if (!DoPrint)
 else
 {
   scale(25.4)
-//    DXF();
-  Print3D();
+    DXF();
+//  Print3D();
 }
 //IntakeSpinner();
 
