@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
+import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
@@ -67,6 +68,7 @@ import java.util.function.Supplier;
 public class PedroTeleOp extends OpMode {
     private Follower follower;
     private SubSystemShooter subSystemShooter;
+    private double DTG;
     private boolean automatedDrive;
     private boolean shouldDoPositionLoop = false;
     boolean currentlyTurning = false;
@@ -214,6 +216,8 @@ public class PedroTeleOp extends OpMode {
     {
         follower.update();
         robotPose = follower.getPose();
+        goalPose = Waypoints.goalPoint;
+        DTG = GeneralUtils.getPointsDistance(goalPose.getX(),goalPose.getY(),robotPose.getX(),robotPose.getY());
     }
 ////    public void updatePedroDriveTest()
 ////    {
@@ -357,24 +361,9 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
         telemetryA.addData("Robot podX offset", robotConstants.podX);
         telemetryA.addData("Robot podY offset", robotConstants.podY);
+        telemetryA.addData("DTG", DTG);
 
-        //drawField();
-
-        TelemetryPacket fieldPayload = new TelemetryPacket(true);
-
-        fieldPayload.fieldOverlay()
-                .setTranslation(-robotPose.getX(),-robotPose.getY())
-                .setRotation(0)
-                .strokeRect(-5,-5,10,10)
-                .strokeLine(0,0,-5,0)
-                .setStroke("red")
-                .setRotation(Math.toRadians(0 + subSystemShooter.getTurretAngle()))
-                .strokeLine(0,0,-10,0)
-                .setStroke("blue")
-                .setRotation(Math.toRadians(0))
-                .strokeLine(0,0,-15,0);
-
-        FtcDashboard.getInstance().sendTelemetryPacket(fieldPayload);
+        drawField();
 
         updateTelemetry(telemetryA);
     }
@@ -450,7 +439,7 @@ public class PedroTeleOp extends OpMode {
         updateBoxBind();
 
         updateTransfer();
-        subSystemShooter.updateTurret(robotPose);
+        subSystemShooter.updateTurret(robotPose, DTG);
 
         // do bs
         //doTest();

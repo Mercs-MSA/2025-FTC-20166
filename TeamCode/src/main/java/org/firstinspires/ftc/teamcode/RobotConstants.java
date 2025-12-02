@@ -37,7 +37,10 @@ public class RobotConstants
     public static double nearVelocity = 1000;
     public static double nearDistance = 6; //In inches
     public static double farShooterAngle = 50;
-
+    public static double farVelocity = 1650;
+    public static double farDistance = 148; //In inches
+    public static double shooterVelocity = 300;
+    public static double shooterAngle = 45;
 
     //liftArm angles
     public static double robotCliftArmDownAngle = 0.386;
@@ -48,12 +51,6 @@ public class RobotConstants
     public static double robotBliftArmUpAngle = 0.7;
     public static double liftArmUpAngle = 0.7;
     public static double liftArmDownAngle = 0.4;
-
-    public static double farVelocity = 1650;
-    public static double farDistance = 148; //In inches
-    public static double shooterVelocity = 300;
-    public static double shooterAngle = 45;
-
 
 
     public GoBildaPinpointDriver.EncoderDirection encoderForward;

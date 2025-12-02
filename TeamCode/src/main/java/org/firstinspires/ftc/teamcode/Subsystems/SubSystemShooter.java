@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Waypoints;
 public class SubSystemShooter {
     private LERP shooterTiltLeftLERP;
     private LERP shooterTiltRightLERP;
-    private LERP turretInterpolator1;
-    private LERP turretInterpolator2;
+    private LERP shooterAngleLERP;
+    private LERP shooterVelocityLERP;
     private Servo shooterTiltLeft;
     private Servo shooterTiltRight;
     private Servo transferArm;
@@ -35,8 +35,9 @@ public class SubSystemShooter {
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
-        turretInterpolator1 = new LERP(1.13,0,2.512,-180,true);
-        turretInterpolator2 = new LERP(.327,180,1.13,0,true);
+        shooterAngleLERP = new LERP(RobotConstants.farDistance,RobotConstants.farShooterAngle,RobotConstants.nearDistance,RobotConstants.nearShooterAngle,false);
+        shooterVelocityLERP = new LERP(RobotConstants.farDistance,RobotConstants.farVelocity,RobotConstants.nearDistance,RobotConstants.nearVelocity,false);
+
 
         transferArm = hardwareMap.get(Servo.class, "lift");
 
@@ -144,7 +145,7 @@ public class SubSystemShooter {
             transferArm.setPosition(RobotConstants.robotCliftArmDownAngle);
         }
     }
-    public void updateTurret(Pose robotPos)
+    private void updateTurretHeading(Pose robotPos)
     {
         double currentTurretAngle;
         double goalHeading = GeneralUtils.getPointsHeading(Waypoints.goalPoint.getX(), Waypoints.goalPoint.getY(), robotPos.getX(), robotPos.getY()) - 180;
@@ -156,6 +157,17 @@ public class SubSystemShooter {
         currentTurretAngleError =  turretDelta - currentTurretAngle;
         turretRotatePower = GeneralUtils.clampRange(RobotConstants.turretRotationP*currentTurretAngleError, RobotConstants.turretMaxPower);
         setTurretRotationSpeed(turretRotatePower);
+    }
+
+    private void updateTurretAngle(Pose robotPos, double dis)
+    {
+        setShooterAngle(shooterAngleLERP.interpolated(dis));
+    }
+
+    public void updateTurret(Pose robotPos, double dis)
+    {
+        updateTurretHeading(robotPos);
+        updateTurretAngle(robotPos, dis);
     }
     public double getTurretDelta()
     {
