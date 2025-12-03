@@ -15,11 +15,23 @@ public class LERP
         //Checks if line should have a cap or not
         hasCap = cap;
 
-        //Point coordinates
-        this.x1 = x1;
-        this.x2 = x2;
-        this.y1 = y1;
-        this.y2 = y2;
+        if(x2 > x1)
+        {
+            //Point coordinates
+            this.x1 = x1;
+            this.x2 = x2;
+            this.y1 = y1;
+            this.y2 = y2;
+        }
+        else
+        {
+            //Point coordinates
+            this.x1 = x2;
+            this.x2 = x1;
+            this.y1 = y2;
+            this.y2 = y1;
+        }
+
 
         //Calculating slope and intercept
         slope = (this.y2 - this.y1) / (this.x2 - this.x1);
