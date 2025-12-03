@@ -33,6 +33,7 @@ import java.util.function.Supplier;
 //BL                         control              2                     back left motor
 //BR                         control              3                     back right motor
 //shooterFlyWheel            expansion            0                     shooter flywheel motor
+//intake                     expansion            1                     intake motor
 
 //servos
 //shooterTiltLeft            control              0                     shooterTiltLeft servo
@@ -291,29 +292,45 @@ public class PedroTeleOp extends OpMode {
     public void doTest()
     {
 
-        if(gamepad2.left_bumper)
-        {
-            subSystemShooter.setTransfer(true);
-        }
-        else
-        {
-            subSystemShooter.setTransfer(false);
-        }
-        if (gamepad2.right_bumper)
-        {
-            subSystemShooter.setShooterSpeed(1500);
-        }
-        else
-        {
-            subSystemShooter.setShooterSpeed(0);
-        }
+//        if(gamepad2.left_bumper)
+//        {
+//
+//        }
+//        else
+//        {
+//
+//        }
+//        if (gamepad2.right_bumper)
+//        {
+//            subSystemShooter.setShooterSpeed(1500);
+//        }
+//        else
+//        {
+//            subSystemShooter.setShooterSpeed(0);
+//        }
         if (gamepad2.y)
         {
             subSystemShooter.setLiftArm(true);
+            subSystemShooter.setTransfer(true);
+
         }
-        else if (gamepad2.a)
+        else
         {
             subSystemShooter.setLiftArm(false);
+            subSystemShooter.setTransfer(false);
+        }
+
+        if (gamepad2.x)
+        {
+            subSystemShooter.setIntakeSpeed(800);
+        }
+        else if (gamepad2.b)
+        {
+            subSystemShooter.setIntakeSpeed(-800);
+        }
+        else
+        {
+            subSystemShooter.setIntakeSpeed(0);
         }
     }
     public void updateSlowMode()
@@ -331,6 +348,16 @@ public class PedroTeleOp extends OpMode {
         //Slow Mode
         if (gamepad1.rightBumperWasPressed()) {
             slowMode = !slowMode;
+        }
+    }
+    public void updateFeedback()
+    {
+        double targetVel = subSystemShooter.getShooterTargetVelocity();
+        double vel = subSystemShooter.getShooterVelocity();
+
+        if (Math.abs(vel - targetVel) < 75)
+        {
+            gamepad2.rumble(500);
         }
     }
     public void updateBoxBind()
@@ -353,11 +380,19 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("position Y", robotPose.getY());
         telemetryA.addData("position theta", Math.toDegrees(robotPose.getHeading()));
         telemetryA.addData("automatedDrive", automatedDrive);
+        telemetryA.addLine();
+        telemetryA.addLine("Turret Data");
         telemetryA.addData("turretTargetAngle", subSystemShooter.getTurretDelta());
         telemetryA.addData("turretAngle", subSystemShooter.getTurretAngle());
         telemetryA.addData("Turret Error", subSystemShooter.getTurretError());
         telemetryA.addData("Turret Power", subSystemShooter.getTurretRotatePower());
+        telemetryA.addData("Turret Target Velocity", subSystemShooter.getShooterTargetVelocity());
+        telemetryA.addData("Turret Actual Velocity", subSystemShooter.getShooterVelocity());
+        telemetryA.addData("Intake Target Velocity", subSystemShooter.getIntakeTargetVelocity());
+        telemetryA.addData("Intake Actual Velocity", subSystemShooter.getIntakeVelocity());
+
 //        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
+        telemetryA.addLine();
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
         telemetryA.addData("Robot podX offset", robotConstants.podX);
         telemetryA.addData("Robot podY offset", robotConstants.podY);
@@ -441,8 +476,10 @@ public class PedroTeleOp extends OpMode {
         updateTransfer();
         subSystemShooter.updateTurret(robotPose, DTG);
 
+        updateFeedback();
+
         // do bs
-        //doTest();
+        doTest();
 
         updateTelemetryA();
     }

@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
 import org.firstinspires.ftc.teamcode.Utilities.LERP;
-import org.firstinspires.ftc.teamcode.Utilities.RobotStatus;
 import org.firstinspires.ftc.teamcode.Waypoints;
 
 public class SubSystemShooter {
@@ -22,6 +21,7 @@ public class SubSystemShooter {
     private Servo shooterTiltRight;
     private Servo transferArm;
     private DcMotorEx shooterFlyWheel;
+    private DcMotorEx intakeMotor;
     private CRServo turretRotation;
     private CRServo transferServo1;
 //    private RobotConstants.alliance alliance;
@@ -31,7 +31,8 @@ public class SubSystemShooter {
     private double turretDelta;
     private double turretRotatePower;
     private double currentTurretAngleError;
-
+    private double shooterTargetVelocity;
+    private double intakeShooterVelocity;
     public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
@@ -51,9 +52,12 @@ public class SubSystemShooter {
 
         shooterFlyWheel = hardwareMap.get(DcMotorEx.class, "shooterFlyWheel");
 
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
+
         turretPositionSensor = hardwareMap.get(AnalogInput.class, "turretPositionSensor");
 
         turretDelta = 0;
+        shooterTargetVelocity = 0;
 
     }
 
@@ -168,6 +172,13 @@ public class SubSystemShooter {
     {
         updateTurretHeading(robotPos);
         updateTurretAngle(robotPos, dis);
+        updateTurretFlywheel(dis);
+    }
+
+    public void updateTurretFlywheel(double distance)
+    {
+        shooterTargetVelocity = shooterVelocityLERP.interpolated(distance);
+        setShooterSpeed(shooterTargetVelocity);
     }
     public double getTurretDelta()
     {
@@ -181,7 +192,13 @@ public class SubSystemShooter {
 
     public void setShooterSpeed(double velocity)
     {
-        shooterFlyWheel.setVelocity(-velocity);
+        shooterFlyWheel.setVelocity(velocity);
+    }
+
+    public void setIntakeSpeed(double velocity)
+    {
+        this.intakeShooterVelocity = velocity;
+        intakeMotor.setVelocity(velocity);
     }
     public double getTurretRotatePower()
     {
@@ -204,9 +221,20 @@ public class SubSystemShooter {
     {
         return currentTurretAngleError;
     }
-    public double getShooterSpeed()
+    public double getShooterVelocity()
     {
         return shooterFlyWheel.getVelocity();
     }
-
+    public double getShooterTargetVelocity()
+    {
+        return shooterTargetVelocity;
+    }
+    public double getIntakeVelocity()
+    {
+        return intakeMotor.getVelocity();
+    }
+    public double getIntakeTargetVelocity()
+    {
+        return intakeShooterVelocity;
+    }
 }

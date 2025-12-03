@@ -37,7 +37,7 @@ public class RobotConstants
     public static double nearVelocity = 1000;
     public static double nearDistance = 6; //In inches
     public static double farShooterAngle = 50;
-    public static double farVelocity = 1650;
+    public static double farVelocity = 1500;
     public static double farDistance = 148; //In inches
     public static double shooterVelocity = 300;
     public static double shooterAngle = 45;
