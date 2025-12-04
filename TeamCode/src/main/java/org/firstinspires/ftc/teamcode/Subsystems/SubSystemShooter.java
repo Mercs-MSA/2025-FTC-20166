@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Waypoints;
 
 public class SubSystemShooter {
     private LERP shooterTiltLeftLERP;
+    private RobotConstants robotConstants;
     private LERP shooterTiltRightLERP;
     private LERP shooterAngleLERP;
     private LERP shooterVelocityLERP;
@@ -33,12 +34,13 @@ public class SubSystemShooter {
     private double currentTurretAngleError;
     private double shooterTargetVelocity;
     private double intakeShooterVelocity;
-    public SubSystemShooter(HardwareMap hardwareMap) throws InterruptedException {
+    public SubSystemShooter(HardwareMap hardwareMap, RobotConstants robotConstants) throws InterruptedException {
+        this.robotConstants = robotConstants;
+
         shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
         shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
         shooterAngleLERP = new LERP(RobotConstants.farDistance,RobotConstants.farShooterAngle,RobotConstants.nearDistance,RobotConstants.nearShooterAngle,true);
         shooterVelocityLERP = new LERP(RobotConstants.farDistance,RobotConstants.farVelocity,RobotConstants.nearDistance,RobotConstants.nearVelocity,false);
-
 
         transferArm = hardwareMap.get(Servo.class, "lift");
 
@@ -142,11 +144,11 @@ public class SubSystemShooter {
     {
         if (enabled)
         {
-            transferArm.setPosition(RobotConstants.robotCliftArmUpAngle);
+            transferArm.setPosition(robotConstants.liftArmUpAngle);
         }
         else
         {
-            transferArm.setPosition(RobotConstants.robotCliftArmDownAngle);
+            transferArm.setPosition(robotConstants.liftArmDownAngle);
         }
     }
     private void updateTurretHeading(Pose robotPos)

@@ -46,11 +46,11 @@ public class RobotConstants
     public static double robotCliftArmDownAngle = 0.386;
     public static double robotCliftArmUpAngle = 0.7;
     public static double robotAliftArmDownAngle = 0.4;
-    public static double robotAliftArmUpAngle = 0.7;
+    public static double robotAliftArmUpAngle = 0.75;
     public static double robotBliftArmDownAngle = 0.4;
     public static double robotBliftArmUpAngle = 0.7;
-    public static double liftArmUpAngle = 0.7;
-    public static double liftArmDownAngle = 0.4;
+    public double liftArmUpAngle = 0.7;
+    public double liftArmDownAngle = 0.4;
 
 
     public GoBildaPinpointDriver.EncoderDirection encoderForward;

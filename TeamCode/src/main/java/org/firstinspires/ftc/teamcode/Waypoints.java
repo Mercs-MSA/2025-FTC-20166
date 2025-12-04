@@ -64,8 +64,8 @@ public class Waypoints
             pickupThreePositioning = new Pose(50, 36, 180);
             pickupThreeCollect = new Pose(17, 36, 180);
             endPose = new Pose(20, 90, 90);
-            goalPark = redShooterPark;
-            goalPoint = redShooterPoint;
+            goalPark = blueShooterPark;
+            goalPoint = blueShooterPoint;
         }
     }
     //temp variables

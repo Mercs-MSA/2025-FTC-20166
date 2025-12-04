@@ -98,7 +98,8 @@ public class PedroTeleOp extends OpMode {
         try
         {
             subSystemRobotID = new SubSystemRobotID(hardwareMap);
-            subSystemShooter = new SubSystemShooter(hardwareMap);
+            robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
+            subSystemShooter = new SubSystemShooter(hardwareMap, robotConstants);
         }
         catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -164,18 +165,25 @@ public class PedroTeleOp extends OpMode {
             startingPose = Waypoints.startPoseNeutral;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
-            startPosVerbose = "Testing, in bottom left corner facing right";
+            startPosVerbose = "Testing, in bottom left corner facing right (BLUE)";
+        }
+        else if (gamepad1.dpad_up)
+        {
+            startingPose = Waypoints.startPoseNeutral;
+            //goalPose = Waypoints.blueShooterPoint;
+            alliance = RobotConstants.alliance.RED;
+            startPosVerbose = "Testing, in bottom left corner facing right (RED)";
         }
     }
     private void changeAllianceMultiplier()
     {
         if (alliance == RobotConstants.alliance.RED)
         {
-            joystickMultiplier = -1;
+            joystickMultiplier = 1;
         }
         else if (alliance == RobotConstants.alliance.BLUE)
         {
-            joystickMultiplier = 1;
+            joystickMultiplier = -1;
         }
     }
     private void drawField()
@@ -436,7 +444,6 @@ public class PedroTeleOp extends OpMode {
     {
         robotPose = new Pose();
         initializeHardware();
-        robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
         updateConstants();
 
         follower.update();
