@@ -81,6 +81,9 @@ public class PedroTeleOp extends OpMode {
     private Supplier<PathChain> pathChain;
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
+    private String startPosVerbose;
+    private String allianceVerbose;
+    private boolean defaultFieldCentric = true;
     private double desiredHeading = 0;
     private double debugturretAngle = 0;
     private SubSystemRobotID subSystemRobotID;
@@ -133,30 +136,35 @@ public class PedroTeleOp extends OpMode {
             startingPose = Waypoints.redStartPoseWall;
             //goalPose = Waypoints.redShooterPoint;
             alliance = RobotConstants.alliance.RED;
+            startPosVerbose = "Against audience wall, near red goal, forward";
         }
         else if (gamepad1.b)
         {
             startingPose = Waypoints.startPoseRedAudience;
             //goalPose = Waypoints.redShooterPoint;
             alliance = RobotConstants.alliance.RED;
+            startPosVerbose = "Against red goal, right wheels on tape, top right corner touching goal";
         }
         else if (gamepad1.x)
         {
             startingPose = Waypoints.blueStartPoseWall;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
+            startPosVerbose = "Against audience wall, near blue goal, forward";
         }
         else if (gamepad1.y)
         {
             startingPose = Waypoints.startPoseBlueAudience;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
+            startPosVerbose = "Against blue goal, left wheels on tape, top left corner touching goal";
         }
         else if (gamepad1.right_bumper)
         {
             startingPose = Waypoints.startPoseNeutral;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
+            startPosVerbose = "Testing, in bottom left corner facing right";
         }
     }
     private void changeAllianceMultiplier()
@@ -196,12 +204,31 @@ public class PedroTeleOp extends OpMode {
     }
     public void updatePedroDrive()
     {
+        double forward;
+        double strafe;
         if (!automatedDrive)
         {
-            double forward = -gamepad1.left_stick_y * joystickMultiplier;
-            double strafe = -gamepad1.left_stick_x * joystickMultiplier;
+            boolean robotCentric;
+            if (defaultFieldCentric)
+            {
+                robotCentric = gamepad1.left_bumper;
+            }
+            else
+            {
+                robotCentric = !gamepad1.left_bumper;
+            }
+            if (!robotCentric)
+            {
+                forward = -gamepad1.left_stick_y * joystickMultiplier;
+                strafe = -gamepad1.left_stick_x * joystickMultiplier;
+            }
+            else
+            {
+
+                forward = -gamepad1.left_stick_y;
+                strafe = -gamepad1.left_stick_x;
+            }
             double turn = -gamepad1.right_stick_x;
-            boolean robotCentric = !gamepad1.left_bumper; //If true, it's robot centric
 
             if (!slowMode)
             {
@@ -355,7 +382,7 @@ public class PedroTeleOp extends OpMode {
         double targetVel = subSystemShooter.getShooterTargetVelocity();
         double vel = subSystemShooter.getShooterVelocity();
 
-        if (Math.abs(vel - targetVel) < 75)
+        if (Math.abs(vel - targetVel) <= 100)
         {
             gamepad2.rumble(500);
         }
@@ -432,6 +459,14 @@ public class PedroTeleOp extends OpMode {
         {
             Pose prevPose = startingPose;
             setStartPos();
+            if (alliance == RobotConstants.alliance.RED)
+            {
+                allianceVerbose = "Red";
+            }
+            else if (alliance == RobotConstants.alliance.BLUE)
+            {
+                allianceVerbose = "Blue";
+            }
 
             if (startingPose != prevPose)
             {
@@ -439,15 +474,17 @@ public class PedroTeleOp extends OpMode {
                 Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
                 changeAllianceMultiplier();
             }
+            if (gamepad1.left_bumper)
+            {
+                defaultFieldCentric = !defaultFieldCentric;
+            }
 
+            telemetryA.addData("Alliance: ", allianceVerbose);
+            telemetryA.addData("Starting pos: ", startPosVerbose);
+            telemetryA.addData("Is Default drive mode field-centric?", defaultFieldCentric);
             updatePose();
 
-            telemetryA.addData("Starting Pose: ", startingPose);
-            telemetryA.addData("Goal Pose: ", Waypoints.goalPoint);
-            telemetryA.addData("Doing loop? ",shouldDoPositionLoop);
-
-            updateTelemetryA();
-
+            telemetryA.update();
         }
 //        subSystemShooter.setAlliance(alliance);
     }
