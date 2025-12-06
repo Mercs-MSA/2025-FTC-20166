@@ -24,7 +24,7 @@ public class Waypoints
     //PedroPoints
     public static final Pose blueStartPoseWall = new Pose(60, 8, Math.toRadians(90));
     public static final Pose redStartPoseWall = new Pose(84, 8, Math.toRadians(90));
-    public static final Pose redShooterPoint = new Pose(144, 137, Math.toRadians(45));
+    public static final Pose redShooterPoint = new Pose(144, 144, Math.toRadians(45));
     public static final Pose redShooterPark = new Pose (120, 120, Math.toRadians(45));
     public static final Pose blueShooterPoint = new Pose(0, 144, Math.toRadians(135));
     public static final Pose blueShooterPark = new Pose(33, 115, Math.toRadians(135));

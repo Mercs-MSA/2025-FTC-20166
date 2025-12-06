@@ -22,6 +22,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
@@ -68,8 +72,13 @@ import java.util.function.Supplier;
 @TeleOp
 public class PedroTeleOp extends OpMode {
     private Follower follower;
+    ElapsedTime timer = new ElapsedTime();
+
     private SubSystemShooter subSystemShooter;
     private double DTG;
+    public static double telemetryUpper = 2500;
+    public static double telemetryLower = 0;
+    public static double tempVelocity = 1000;
     private boolean automatedDrive;
     private boolean shouldDoPositionLoop = false;
     boolean currentlyTurning = false;
@@ -89,7 +98,8 @@ public class PedroTeleOp extends OpMode {
     private SubSystemRobotID subSystemRobotID;
     private Pose robotPose;
     private RobotConstants robotConstants;
-
+    RevBlinkinLedDriver blinkinLedDriver;
+    RevBlinkinLedDriver.BlinkinPattern pattern;
 
     //private TelemetryManager telemetryP = Panels.getTelemetry();
 
@@ -104,7 +114,40 @@ public class PedroTeleOp extends OpMode {
         catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
     }
+
+    private void initializeLEDs(){
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
+    }
+
+    public String getReadyShoot()
+    {
+
+        String test = "Nothing";
+        if (timer.time() > 95)
+        {
+            test = "Endgame";
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        }
+        else
+        {
+            if (Math.abs(subSystemShooter.getShooterVelocity() - subSystemShooter.getShooterTargetVelocity()) < 50 && subSystemShooter.getShooterTargetVelocity() != 0)
+            {
+                test = "Ready to shoot";
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            }
+            else
+            {
+                test = "Not ready";
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
+            }
+
+        }
+        return test;
+    }
+
     public void updateConstants()
     {
         startingPose = (Pose) blackboard.get("Position");
@@ -167,7 +210,7 @@ public class PedroTeleOp extends OpMode {
             alliance = RobotConstants.alliance.BLUE;
             startPosVerbose = "Testing, in bottom left corner facing right (BLUE)";
         }
-        else if (gamepad1.dpad_up)
+        else if (gamepad1.left_bumper)
         {
             startingPose = Waypoints.startPoseNeutral;
             //goalPose = Waypoints.blueShooterPoint;
@@ -219,11 +262,11 @@ public class PedroTeleOp extends OpMode {
             boolean robotCentric;
             if (defaultFieldCentric)
             {
-                robotCentric = gamepad1.left_bumper;
+                robotCentric = gamepad1.dpad_up;
             }
             else
             {
-                robotCentric = !gamepad1.left_bumper;
+                robotCentric = !gamepad1.dpad_up;
             }
             if (!robotCentric)
             {
@@ -343,6 +386,14 @@ public class PedroTeleOp extends OpMode {
 //        {
 //            subSystemShooter.setShooterSpeed(0);
 //        }
+        if (gamepad2.dpad_right)
+        {
+            subSystemShooter.setTurretTargetVelocity(tempVelocity);
+        }
+        else
+        {
+            subSystemShooter.setTurretTargetVelocity(0);
+        }
         if (gamepad2.y)
         {
             subSystemShooter.setLiftArm(true);
@@ -357,11 +408,11 @@ public class PedroTeleOp extends OpMode {
 
         if (gamepad2.x)
         {
-            subSystemShooter.setIntakeSpeed(800);
+            subSystemShooter.setIntakeSpeed(1200);
         }
         else if (gamepad2.b)
         {
-            subSystemShooter.setIntakeSpeed(-800);
+            subSystemShooter.setIntakeSpeed(-1200);
         }
         else
         {
@@ -390,9 +441,12 @@ public class PedroTeleOp extends OpMode {
         double targetVel = subSystemShooter.getShooterTargetVelocity();
         double vel = subSystemShooter.getShooterVelocity();
 
-        if (Math.abs(vel - targetVel) <= 100)
+        if (Math.abs(vel - targetVel) <= 25)
         {
-            gamepad2.rumble(500);
+            if (gamepad2.dpad_up)
+            {
+                gamepad2.rumble(500);
+            }
         }
     }
     public void updateBoxBind()
@@ -426,13 +480,19 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("Intake Target Velocity", subSystemShooter.getIntakeTargetVelocity());
         telemetryA.addData("Intake Actual Velocity", subSystemShooter.getIntakeVelocity());
 
-//        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
         telemetryA.addLine();
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
         telemetryA.addData("Robot podX offset", robotConstants.podX);
         telemetryA.addData("Robot podY offset", robotConstants.podY);
         telemetryA.addData("DTG", DTG);
 
+        telemetryA.addLine();
+        telemetryA.addData("Upper: ", telemetryUpper);
+        telemetryA.addData("Lower: ", telemetryLower);
+
+        telemetryA.addData("potVoltage",subSystemShooter.getPotVoltage());
+        telemetryA.addData("ready to shoot", getReadyShoot());
+        telemetry.addData("timer", timer);
         drawField();
 
         updateTelemetry(telemetryA);
@@ -444,8 +504,11 @@ public class PedroTeleOp extends OpMode {
     {
         robotPose = new Pose();
         initializeHardware();
-        updateConstants();
+        initializeLEDs();
 
+
+        updateConstants();
+        getReadyShoot();
         follower.update();
         telemetryA = new MultipleTelemetry(this.telemetry,FtcDashboard.getInstance().getTelemetry());
         telemetryA.update();
@@ -504,6 +567,8 @@ public class PedroTeleOp extends OpMode {
         Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
         follower.update();
         follower.startTeleopDrive();
+        timer.reset();
+
     }
     @Override
     public void loop()
@@ -517,7 +582,7 @@ public class PedroTeleOp extends OpMode {
 
         updateBoxBind();
 
-        updateTransfer();
+//        updateTransfer();
         subSystemShooter.updateTurret(robotPose, DTG);
 
         updateFeedback();

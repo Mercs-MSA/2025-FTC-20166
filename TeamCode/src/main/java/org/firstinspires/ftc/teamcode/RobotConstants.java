@@ -33,12 +33,12 @@ public class RobotConstants
     public static double rightMinAngleSetting = 0.1;
     public static double shooterMaxAngle = 84;
     public static double shooterMinAngle = 41;
-    public static double nearShooterAngle = 80;
-    public static double nearVelocity = 1000;
-    public static double nearDistance = 6; //In inches
+    public static double nearShooterAngle = 70;
+    public static double nearVelocity = 1020;
+    public static double nearDistance = 30; //In inches
     public static double farShooterAngle = 50;
-    public static double farVelocity = 1500;
-    public static double farDistance = 148; //In inches
+    public static double farVelocity = 1620;
+    public static double farDistance = 165; //In inches
     public static double shooterVelocity = 300;
     public static double shooterAngle = 45;
 

@@ -3,8 +3,11 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.RobotConstants;
@@ -30,6 +33,7 @@ public class SubSystemShooter {
     private CRServo transferServo2;
     private AnalogInput turretPositionSensor;
     private double turretDelta;
+    PIDFCoefficients pidStore;
     private double turretRotatePower;
     private double currentTurretAngleError;
     private double shooterTargetVelocity;
@@ -53,6 +57,10 @@ public class SubSystemShooter {
         turretRotation = hardwareMap.get(CRServo.class, "turretRotation");
 
         shooterFlyWheel = hardwareMap.get(DcMotorEx.class, "shooterFlyWheel");
+        pidStore = shooterFlyWheel.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        pidStore.d = 0.005;
+        pidStore.p = 200;
+        shooterFlyWheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidStore);
 
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
 
@@ -179,7 +187,7 @@ public class SubSystemShooter {
 
     public void updateTurretFlywheel(double distance)
     {
-        shooterTargetVelocity = shooterVelocityLERP.interpolated(distance);
+//        shooterTargetVelocity = shooterVelocityLERP.interpolated(distance);
         setShooterSpeed(shooterTargetVelocity);
     }
     public double getTurretDelta()
@@ -238,5 +246,13 @@ public class SubSystemShooter {
     public double getIntakeTargetVelocity()
     {
         return intakeShooterVelocity;
+    }
+    public PIDFCoefficients getCoefficients()
+    {
+        return pidStore;
+    }
+    public void setTurretTargetVelocity(double in)
+    {
+        shooterTargetVelocity = in;
     }
 }
