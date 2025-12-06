@@ -1020,6 +1020,8 @@ module ShooterBody2()
     translate([0, 0, ShooterWallHeight])
       ShooterBasePlate2TopAssembly();
       
+    //Inside ball guide
+    BallGuide();
     translate([0, 0, (BallDiameter + BallClearance) / 2])
     {
       //Left (scoop) side 
@@ -1032,6 +1034,16 @@ module ShooterBody2()
   }
 }
 
+module BallGuide()
+{
+  hull()
+  {
+    translate([1.45, -2, 2.5])
+      cube([1.6, .1, 3], center = true);
+    translate([2.2, -4.5, 2.5])
+      cube([.1, .1, 2], center = true);
+  }
+}
 
 module ServoBlockHoles()
 {
@@ -2362,8 +2374,8 @@ module Print3D()
 //LazySusanOuterSpacer();
 //  Coupler();
 //  TurretCableGuide();
-scale(1/25.4)
-  BatteryHolder();
+// scale(1/25.4) BatteryHolder();
+  BallGuide();
 }
 
 if (!DoPrint)
@@ -2375,8 +2387,8 @@ if (!DoPrint)
 else
 {
   scale(25.4)
-    DXF();
-//  Print3D();
+//    DXF();
+  Print3D();
 }
 //IntakeSpinner();
 
