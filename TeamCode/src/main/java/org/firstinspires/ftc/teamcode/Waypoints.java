@@ -22,8 +22,8 @@ public class Waypoints
     public static Pose endPose;
 
     //PedroPoints
-    public static final Pose blueStartPoseWall = new Pose(60, 8, Math.toRadians(90));
-    public static final Pose redStartPoseWall = new Pose(84, 8, Math.toRadians(90));
+    public static final Pose blueStartPoseWall = new Pose(53.6, 8.2, Math.toRadians(180));
+    public static final Pose redStartPoseWall = new Pose(87.6, 8.2, Math.toRadians(0));
     public static final Pose redShooterPoint = new Pose(144, 144, Math.toRadians(45));
     public static final Pose redShooterPark = new Pose (120, 120, Math.toRadians(45));
     public static final Pose blueShooterPoint = new Pose(0, 144, Math.toRadians(135));
@@ -32,10 +32,10 @@ public class Waypoints
 
     public static Pose startPoseNeutral = new Pose(8,8,Math.toRadians(0));
     public static Pose startPoseBlueAudience = new Pose(27,128,Math.toRadians(135));
-    public static Pose startPoseRedAudience = new Pose(117,128,Math.toRadians(45));
-    public static Pose redBox = new Pose(38,30,Math.toRadians(90));
-    public static Pose blueBox = new Pose(105.2,30,Math.toRadians(90));
-
+    public static Pose startPoseRedAudience = new Pose(128,109.7,Math.toRadians(270));
+    public static Pose redBox = new Pose(36.7,31.5,Math.toRadians(0));
+    public static Pose blueBox = new Pose(104.4,31.5,Math.toRadians(180));
+    public static Pose box;
     public static double blueGoalPointx = 60;
     public static double blueGoalPointy = 60;
     public static SparkFunOTOS.Pose2D startPointMiddleBottom = new SparkFunOTOS.Pose2D(0, -63, Math.toRadians(0));
@@ -54,6 +54,7 @@ public class Waypoints
             endPose = new Pose(124, 100, 0);
             goalPark = redShooterPark;
             goalPoint = redShooterPoint;
+            box = redBox;
         }
         else
         {
@@ -66,6 +67,7 @@ public class Waypoints
             endPose = new Pose(20, 90, 90);
             goalPark = blueShooterPark;
             goalPoint = blueShooterPoint;
+            box = blueBox;
         }
     }
     //temp variables

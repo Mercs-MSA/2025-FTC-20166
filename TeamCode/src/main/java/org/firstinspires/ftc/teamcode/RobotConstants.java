@@ -49,6 +49,8 @@ public class RobotConstants
     public static double robotAliftArmUpAngle = 0.75;
     public static double robotBliftArmDownAngle = 0.4;
     public static double robotBliftArmUpAngle = 0.7;
+    public double gateUpAngle = 0.2;
+    public double gateDownAngle = 0.5;
     public double liftArmUpAngle = 0.7;
     public double liftArmDownAngle = 0.4;
 

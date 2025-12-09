@@ -46,6 +46,8 @@ import java.util.function.Supplier;
 //turretRotation             control              3                     turretRotation servo
 //transfer1                  control              4                     transfer1 turret belt servo 1
 //transfer2                  control              5                     transfer2 turret belt servo 2
+//gate                       expansion            0                     gate in shooter
+//led                        expansion            1                     light emitting diodes
 
 //Sensors
 
@@ -160,7 +162,7 @@ public class PedroTeleOp extends OpMode {
         } else
         {
             shouldDoPositionLoop = true;
-            startingPose = Waypoints.startPoseBlueAudience;
+            startingPose = Waypoints.startPoseNeutral;
         }
         if (alliance != null)
         {
@@ -262,11 +264,11 @@ public class PedroTeleOp extends OpMode {
             boolean robotCentric;
             if (defaultFieldCentric)
             {
-                robotCentric = gamepad1.dpad_up;
+                robotCentric = gamepad1.left_bumper;
             }
             else
             {
-                robotCentric = !gamepad1.dpad_up;
+                robotCentric = !gamepad1.left_bumper;
             }
             if (!robotCentric)
             {
@@ -346,7 +348,7 @@ public class PedroTeleOp extends OpMode {
     {
         //Automated PathFollowing
         if (gamepad1.aWasPressed()) {
-            follower.holdPoint(Waypoints.redBox);
+            follower.holdPoint(Waypoints.box);
             automatedDrive = true;
         }
 
@@ -378,22 +380,15 @@ public class PedroTeleOp extends OpMode {
 //        {
 //
 //        }
-//        if (gamepad2.right_bumper)
+
+//        if (gamepad2.dpad_right)
 //        {
-//            subSystemShooter.setShooterSpeed(1500);
+//            subSystemShooter.setTurretTargetVelocity(tempVelocity);
 //        }
 //        else
 //        {
-//            subSystemShooter.setShooterSpeed(0);
+//            subSystemShooter.setTurretTargetVelocity(0);
 //        }
-        if (gamepad2.dpad_right)
-        {
-            subSystemShooter.setTurretTargetVelocity(tempVelocity);
-        }
-        else
-        {
-            subSystemShooter.setTurretTargetVelocity(0);
-        }
         if (gamepad2.y)
         {
             subSystemShooter.setLiftArm(true);
@@ -465,6 +460,7 @@ public class PedroTeleOp extends OpMode {
     }
     public void updateTelemetryA()
     {
+        telemetryA.addData("Alliance", allianceVerbose);
         telemetryA.addData("position X", robotPose.getX());
         telemetryA.addData("position Y", robotPose.getY());
         telemetryA.addData("position theta", Math.toDegrees(robotPose.getHeading()));
@@ -542,16 +538,19 @@ public class PedroTeleOp extends OpMode {
             {
                 follower.setPose(startingPose);
                 Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
-                changeAllianceMultiplier();
             }
-            if (gamepad1.left_bumper)
+            if (gamepad1.dpad_up)
             {
                 defaultFieldCentric = !defaultFieldCentric;
             }
+            changeAllianceMultiplier();
 
-            telemetryA.addData("Alliance: ", allianceVerbose);
-            telemetryA.addData("Starting pos: ", startPosVerbose);
-            telemetryA.addData("Is Default drive mode field-centric?", defaultFieldCentric);
+
+
+            telemetryA.addData("Alliance", allianceVerbose);
+            telemetryA.addData("Starting Position", startPosVerbose);
+            telemetryA.addData("Default Drive Mode", (defaultFieldCentric) ? "Field Centric" : "Robot Centric");
+            telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
             updatePose();
 
             telemetryA.update();

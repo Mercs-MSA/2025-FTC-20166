@@ -24,6 +24,7 @@ public class SubSystemShooter {
     private Servo shooterTiltLeft;
     private Servo shooterTiltRight;
     private Servo transferArm;
+    private Servo gateServo;
     private DcMotorEx shooterFlyWheel;
     private DcMotorEx intakeMotor;
     private CRServo turretRotation;
@@ -50,6 +51,8 @@ public class SubSystemShooter {
 
         shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");//shooterTiltLeft
         shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");//shooterTiltRight
+
+        gateServo = hardwareMap.get(Servo.class, "gate");
 
         transferServo1 = hardwareMap.get(CRServo.class, "transfer1");
         transferServo2 = hardwareMap.get(CRServo.class, "transfer2");
@@ -153,10 +156,13 @@ public class SubSystemShooter {
         if (enabled)
         {
             transferArm.setPosition(robotConstants.liftArmUpAngle);
+            gateServo.setPosition(robotConstants.gateUpAngle);
         }
         else
         {
             transferArm.setPosition(robotConstants.liftArmDownAngle);
+            gateServo.setPosition(robotConstants.gateDownAngle);
+
         }
     }
     private void updateTurretHeading(Pose robotPos)
@@ -187,7 +193,7 @@ public class SubSystemShooter {
 
     public void updateTurretFlywheel(double distance)
     {
-//        shooterTargetVelocity = shooterVelocityLERP.interpolated(distance);
+        shooterTargetVelocity = shooterVelocityLERP.interpolated(distance);
         setShooterSpeed(shooterTargetVelocity);
     }
     public double getTurretDelta()
