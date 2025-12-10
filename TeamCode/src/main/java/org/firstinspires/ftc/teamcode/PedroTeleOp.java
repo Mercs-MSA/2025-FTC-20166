@@ -46,8 +46,8 @@ import java.util.function.Supplier;
 //turretRotation             control              3                     turretRotation servo
 //transfer1                  control              4                     transfer1 turret belt servo 1
 //transfer2                  control              5                     transfer2 turret belt servo 2
-//gate                       expansion            0                     gate in shooter
-//led                        expansion            1                     light emitting diodes
+//led                        expansion            0                     light emitting diodes
+//gate                       expansion            1                     gate in shooter
 
 //Sensors
 
@@ -517,43 +517,47 @@ public class PedroTeleOp extends OpMode {
 //                .build();
 
     }
+    public void init_loopSelections(){
+        Pose prevPose = startingPose;
+        setStartPos();
+        if (alliance == RobotConstants.alliance.RED)
+        {
+            allianceVerbose = "Red";
+        }
+        else if (alliance == RobotConstants.alliance.BLUE)
+        {
+            allianceVerbose = "Blue";
+        }
+
+        if (startingPose != prevPose)
+        {
+            follower.setPose(startingPose);
+            Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
+        }
+        if (gamepad1.dpad_up)
+        {
+            defaultFieldCentric = !defaultFieldCentric;
+        }
+        changeAllianceMultiplier();
+
+
+
+        telemetryA.addData("Alliance", allianceVerbose);
+        telemetryA.addData("Starting Position", startPosVerbose);
+        telemetryA.addData("Default Drive Mode", (defaultFieldCentric) ? "Field Centric" : "Robot Centric");
+        telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
+        updatePose();
+
+        telemetryA.update();
+
+    }
     @Override
     public void init_loop()
     {
 
         if (shouldDoPositionLoop)
         {
-            Pose prevPose = startingPose;
-            setStartPos();
-            if (alliance == RobotConstants.alliance.RED)
-            {
-                allianceVerbose = "Red";
-            }
-            else if (alliance == RobotConstants.alliance.BLUE)
-            {
-                allianceVerbose = "Blue";
-            }
-
-            if (startingPose != prevPose)
-            {
-                follower.setPose(startingPose);
-                Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
-            }
-            if (gamepad1.dpad_up)
-            {
-                defaultFieldCentric = !defaultFieldCentric;
-            }
-            changeAllianceMultiplier();
-
-
-
-            telemetryA.addData("Alliance", allianceVerbose);
-            telemetryA.addData("Starting Position", startPosVerbose);
-            telemetryA.addData("Default Drive Mode", (defaultFieldCentric) ? "Field Centric" : "Robot Centric");
-            telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
-            updatePose();
-
-            telemetryA.update();
+            init_loopSelections();
         }
 //        subSystemShooter.setAlliance(alliance);
     }

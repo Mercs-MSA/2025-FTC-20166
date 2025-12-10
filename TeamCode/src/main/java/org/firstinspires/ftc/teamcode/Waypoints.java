@@ -13,7 +13,7 @@ public class Waypoints
 {
     public static Pose goalPark;
     public static Pose goalPoint;
-    public static Pose pickupOnePositioning;
+    public static Pose shootZone;
     public static Pose pickupOneCollect;
     public static Pose pickupTwoPositioning;
     public static Pose pickupTwoCollect;
@@ -42,15 +42,26 @@ public class Waypoints
     public static Pose2D startPointMiddleBottomPinpoint = new Pose2D(DistanceUnit.INCH,-63, 0, AngleUnit.RADIANS, Math.toRadians(0));
 
     // Waypoints for testing turret
-
+    public Waypoints(boolean isRed)
+    {
+        setTeam(isRed);
+    }
     public static void setTeam(boolean isRed) {
         if (isRed) {
-            pickupOnePositioning = new Pose(94, 84, 0);
-            pickupOneCollect = new Pose(127, 84, 0);
-            pickupTwoPositioning = new Pose(94, 60, 0);
-            pickupTwoCollect = new Pose(127, 60, 0);
-            pickupThreePositioning = new Pose(94, 36, 0);
-            pickupThreeCollect = new Pose(127, 36, 0);
+            //pickupOnePositioning = new Pose(94, 84, 0);
+            //pickupOneCollect = new Pose(127, 84, 0);
+//            pickupTwoPositioning = new Pose(94, 60, 0);
+//            pickupTwoCollect = new Pose(127, 60, 0);
+//            pickupThreePositioning = new Pose(94, 36, 0);
+//            pickupThreeCollect = new Pose(127, 36, 0);
+            shootZone = new Pose (120, 120, Math.toRadians(45));
+            pickupOneCollect = new Pose (120, 120, Math.toRadians(45));
+            pickupTwoPositioning = new Pose (120, 120, Math.toRadians(45));
+            pickupTwoCollect = new Pose (120, 120, Math.toRadians(45));
+            pickupThreePositioning = new Pose (120, 120, Math.toRadians(45));
+            pickupThreeCollect = new Pose (120, 120, Math.toRadians(45));
+
+
             endPose = new Pose(124, 100, 0);
             goalPark = redShooterPark;
             goalPoint = redShooterPoint;
@@ -58,12 +69,20 @@ public class Waypoints
         }
         else
         {
-            pickupOnePositioning = new Pose(50, 84, 180);
-            pickupOneCollect = new Pose(17, 84, 180);
-            pickupTwoPositioning = new Pose(50, 60, 180);
-            pickupTwoCollect = new Pose(17, 60, 180);
-            pickupThreePositioning = new Pose(50, 36, 180);
-            pickupThreeCollect = new Pose(17, 36, 180);
+//            pickupOnePositioning = new Pose(72, 0, 0);
+//           // pickupOnePositioning = new Pose(50, 84, 180);
+//            pickupOneCollect = new Pose(17, 84, 180);
+//            pickupTwoPositioning = new Pose(50, 60, 180);
+//            pickupTwoCollect = new Pose(17, 60, 180);
+//            pickupThreePositioning = new Pose(50, 36, 180);
+//            pickupThreeCollect = new Pose(17, 36, 180);
+//            pickupOnePositioning = new Pose (120, 120, Math.toRadians(45));
+//            pickupOneCollect = new Pose (120, 120, Math.toRadians(45));
+//            pickupTwoPositioning = new Pose (120, 120, Math.toRadians(45));
+//            pickupTwoCollect = new Pose (120, 120, Math.toRadians(45));
+//            pickupThreePositioning = new Pose (120, 120, Math.toRadians(45));
+//            pickupThreeCollect = new Pose (120, 120, Math.toRadians(45));
+
             endPose = new Pose(20, 90, 90);
             goalPark = blueShooterPark;
             goalPoint = blueShooterPoint;
