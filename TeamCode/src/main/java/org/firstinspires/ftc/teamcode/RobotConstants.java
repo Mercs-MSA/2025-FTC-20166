@@ -15,6 +15,11 @@ public class RobotConstants
         BLUE,
         RED
     };
+    public enum location {
+        FRONT,
+        BACK,
+        TEST
+    }
     public static double headingPFactor = (2.0 / 90.0);
     public final static double joystickRotateDeadband = 0.05;
     public static int robotId;

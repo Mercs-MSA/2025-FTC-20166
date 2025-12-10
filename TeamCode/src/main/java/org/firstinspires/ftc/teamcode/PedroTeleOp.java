@@ -23,7 +23,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.SubSystemRobotID;
 import org.firstinspires.ftc.teamcode.Subsystems.SubSystemShooter;
 import org.firstinspires.ftc.teamcode.Utilities.GeneralUtils;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -86,6 +85,8 @@ public class PedroTeleOp extends OpMode {
     boolean currentlyTurning = false;
     private Telemetry telemetryA;
     private RobotConstants.alliance alliance;
+    private RobotConstants.location location;
+
     private Pose startingPose = null;
     private int joystickMultiplier;
     private Pose goalPose;
@@ -172,7 +173,7 @@ public class PedroTeleOp extends OpMode {
         {
             alliance = RobotConstants.alliance.BLUE;
         }
-        Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
+        Waypoints.setWaypoints(alliance, location);
         follower.setPose(startingPose);
     }
     private void setStartPos()
@@ -532,7 +533,7 @@ public class PedroTeleOp extends OpMode {
         if (startingPose != prevPose)
         {
             follower.setPose(startingPose);
-            Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
+            Waypoints.setWaypoints(alliance, location);
         }
         if (gamepad1.dpad_up)
         {
@@ -567,7 +568,7 @@ public class PedroTeleOp extends OpMode {
         //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
         //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
         //If you don't pass anything in, it uses the default (false)
-        Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
+        Waypoints.setWaypoints(alliance, location);
         follower.update();
         follower.startTeleopDrive();
         timer.reset();

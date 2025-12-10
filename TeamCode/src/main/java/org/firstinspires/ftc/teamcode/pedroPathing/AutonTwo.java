@@ -10,6 +10,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -43,16 +44,20 @@ public class AutonTwo extends OpMode {
     private boolean defaultFieldCentric = true;
     private String allianceVerbose;
     private RobotConstants.alliance alliance;
+    private RobotConstants.location location;
+
     private String startPosVerbose;
     private int joystickMultiplier;
     private double DTG;
     private Pose goalPose;
     private Pose robotPose;
+    private int ballCount = 3;
 
     private static ElapsedTime timeoutTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     private int timeoutPeriod = 0;
     private Waypoints waypoints;
+
 
 
 
@@ -257,6 +262,7 @@ public class AutonTwo extends OpMode {
     private void processBallLiftUp()
     {
         subSystemShooter.setLiftArm(true);
+        restartTimeout(500);
 
         currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
         waitTimerDoneNextState = state.SHOOT_BALL_LIFT_DOWN_STATE;
@@ -265,9 +271,19 @@ public class AutonTwo extends OpMode {
     private void processBallLiftDown()
     {
         subSystemShooter.setLiftArm(false);
+        ballCount--;
+        if (ballCount > 0)
+        {
+            restartTimeout(500);
+            currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
+            waitTimerDoneNextState = state.SHOOT_BALL_LIFT_UP_STATE;
+        }
+        else
+        {
+            follower.holdPoint(waypoints.endPose);
 
-        currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
-        waitTimerDoneNextState = state.DO_NOTHING;
+            //currentAutonomousState
+        }
     }
 
     private void processShootBall()
@@ -294,13 +310,12 @@ public class AutonTwo extends OpMode {
             subSystemRobotID = new SubSystemRobotID(hardwareMap);
             robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
             subSystemShooter = new SubSystemShooter(hardwareMap, robotConstants);
-            waypoints = new Waypoints(isRedTeam);
+            waypoints = new Waypoints(alliance);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         follower = Constants.createFollower(hardwareMap, robotConstants);
-        alliance = (RobotConstants.alliance) blackboard.get("Alliance");
         //temp 12/9 ln 212
         pathTimer = new Timer();
         opmodeTimer = new Timer();
@@ -311,7 +326,7 @@ public class AutonTwo extends OpMode {
         //Setting Defaults
         startingPose = Waypoints.blueStartPoseWall;
         isRedTeam = false; //Setting to blue team
-        Waypoints.setTeam(isRedTeam);
+        Waypoints.setWaypoints(alliance, location);
 
 
         //Initialize follower
@@ -330,6 +345,7 @@ public class AutonTwo extends OpMode {
             startingPose = Waypoints.redStartPoseWall;
             //goalPose = Waypoints.redShooterPoint;
             alliance = RobotConstants.alliance.RED;
+            location = RobotConstants.location.BACK;
             startPosVerbose = "Against audience wall, near red goal, forward";
         }
         else if (gamepad1.b)
@@ -337,13 +353,15 @@ public class AutonTwo extends OpMode {
             startingPose = Waypoints.startPoseRedAudience;
             //goalPose = Waypoints.redShooterPoint;
             alliance = RobotConstants.alliance.RED;
-            startPosVerbose = "Against red goal, right wheels on tape, top right corner touching goal";
+            location = RobotConstants.location.FRONT;
+            startPosVerbose = "Against red goal, left wheels on tape, back left corner touching goal";
         }
         else if (gamepad1.x)
         {
             startingPose = Waypoints.blueStartPoseWall;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
+            location = RobotConstants.location.BACK;
             startPosVerbose = "Against audience wall, near blue goal, forward";
         }
         else if (gamepad1.y)
@@ -351,13 +369,15 @@ public class AutonTwo extends OpMode {
             startingPose = Waypoints.startPoseBlueAudience;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
-            startPosVerbose = "Against blue goal, left wheels on tape, top left corner touching goal";
+            location = RobotConstants.location.FRONT;
+            startPosVerbose = "Against blue goal, right wheels on tape, back right corner touching goal";
         }
         else if (gamepad1.right_bumper)
         {
             startingPose = Waypoints.startPoseNeutral;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.BLUE;
+            location = RobotConstants.location.BACK;
             startPosVerbose = "Testing, in bottom left corner facing right (BLUE)";
         }
         else if (gamepad1.left_bumper)
@@ -365,6 +385,7 @@ public class AutonTwo extends OpMode {
             startingPose = Waypoints.startPoseNeutral;
             //goalPose = Waypoints.blueShooterPoint;
             alliance = RobotConstants.alliance.RED;
+            location = RobotConstants.location.BACK;
             startPosVerbose = "Testing, in bottom left corner facing right (RED)";
         }
     }
@@ -384,7 +405,7 @@ public class AutonTwo extends OpMode {
         if (startingPose != prevPose)
         {
             follower.setPose(startingPose);
-            Waypoints.setTeam(alliance == RobotConstants.alliance.RED);
+            Waypoints.setWaypoints(alliance, location);
         }
 
 
@@ -414,7 +435,7 @@ public class AutonTwo extends OpMode {
         if (startingPose != prevStartingPose)
         {
             follower.setPose(startingPose);
-            Waypoints.setTeam(isRedTeam);
+            Waypoints.setWaypoints(alliance, location);
             buildPaths();
         }
         follower.update();
