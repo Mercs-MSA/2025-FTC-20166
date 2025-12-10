@@ -10,7 +10,6 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -514,9 +513,9 @@ public class AutonTwo extends OpMode {
         telemetry.addData("Starting Pose y", startingPose.getY());
         telemetry.addData("Starting Pose Heading", Math.toDegrees(startingPose.getHeading()));
         telemetry.addLine();
-        telemetry.addData("Goal Pose x", Waypoints.goalPoint.getX());
-        telemetry.addData("Goal Pose y", Waypoints.goalPoint.getY());
-        telemetry.addData("Goal Pose Heading", Math.toDegrees(Waypoints.goalPoint.getHeading()));
+        telemetry.addData("Goal Pose x", Waypoints.shooterPoint.getX());
+        telemetry.addData("Goal Pose y", Waypoints.shooterPoint.getY());
+        telemetry.addData("Goal Pose Heading", Math.toDegrees(Waypoints.shooterPoint.getHeading()));
         telemetry.addLine();
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());

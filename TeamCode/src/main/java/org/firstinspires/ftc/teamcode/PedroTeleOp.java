@@ -298,7 +298,7 @@ public class PedroTeleOp extends OpMode {
     {
         follower.update();
         robotPose = follower.getPose();
-        goalPose = Waypoints.goalPoint;
+        goalPose = Waypoints.shooterPoint;
         DTG = GeneralUtils.getPointsDistance(goalPose.getX(),goalPose.getY(),robotPose.getX(),robotPose.getY());
     }
 ////    public void updatePedroDriveTest()

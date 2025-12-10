@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -168,7 +167,7 @@ public class SubSystemShooter {
     private void updateTurretHeading(Pose robotPos)
     {
         double currentTurretAngle;
-        double goalHeading = GeneralUtils.getPointsHeading(Waypoints.goalPoint.getX(), Waypoints.goalPoint.getY(), robotPos.getX(), robotPos.getY()) - 180;
+        double goalHeading = GeneralUtils.getPointsHeading(Waypoints.shooterPoint.getX(), Waypoints.shooterPoint.getY(), robotPos.getX(), robotPos.getY()) - 180;
 
         turretDelta = GeneralUtils.wrapRange(goalHeading - Math.toDegrees(robotPos.getHeading()), 180);
 

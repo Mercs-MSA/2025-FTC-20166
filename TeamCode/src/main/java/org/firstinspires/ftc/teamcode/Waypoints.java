@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -13,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class Waypoints
 {
     public static Pose goalPark;
-    public static Pose goalPoint;
+    public static Pose shooterPoint;
     public static Pose shootZone;
     public static Pose pickupOneCollect;
     public static Pose pickupTwoPositioning;
@@ -57,7 +56,7 @@ public class Waypoints
 
             endPose = new Pose(124, 100, 0);
             goalPark = redShooterPark;
-            goalPoint = redShooterPoint;
+            shooterPoint = redShooterPoint;
             box = redBox;
         }
         else
@@ -67,7 +66,7 @@ public class Waypoints
 
             endPose = new Pose(20, 90, 90);
             goalPark = blueShooterPark;
-            goalPoint = blueShooterPoint;
+            shooterPoint = blueShooterPoint;
             box = blueBox;
         }
     }
