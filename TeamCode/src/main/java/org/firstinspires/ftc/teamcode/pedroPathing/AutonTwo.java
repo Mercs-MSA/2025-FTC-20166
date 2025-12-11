@@ -28,7 +28,6 @@ public class AutonTwo extends OpMode {
     private Pose startingPose;
     private SubSystemShooter subSystemShooter;
 
-    private boolean isRedTeam;
     private SubSystemRobotID subSystemRobotID;
     private RobotConstants robotConstants;
     private Telemetry telemetryA;
@@ -51,8 +50,6 @@ public class AutonTwo extends OpMode {
 
     private enum state {
         START,
-        GO_TO_SCORE,
-        SCORE,
         WAIT_PATH_DONE,
         DO_NOTHING,
         WAIT_TIMER_DONE_STATE,
@@ -65,22 +62,10 @@ public class AutonTwo extends OpMode {
     private state waitPathDoneNextState = state.DO_NOTHING;
 
 
-
-    private state pathState;
-    private state nextPathState;
-    private state postScorePathState;
-
-
     public void autonomousPathUpdate() {
         switch (currentAutonomousState) {
             case START:
                 processStateStart();
-                break;
-            case GO_TO_SCORE:
-                processStateGoToScore();
-                break;
-            case SCORE:
-                score();
                 break;
             case WAIT_PATH_DONE:
                 processStateWaitPathDone();
@@ -124,18 +109,8 @@ public class AutonTwo extends OpMode {
         }
     }
 
-    private void processStateGoToScore()
-    {
-        Path goToScore = new Path(new BezierLine(follower.getPose(), Waypoints.goalPark)); // 12/9 change
-        follower.followPath(goToScore);
-        pathState = state.WAIT_PATH_DONE;
-        nextPathState = state.SCORE;
-    }
-
-
     private void processStateDoNothing()
     {
-        //follower.holdPoint(Waypoints.endPose);
     }
 
     private void processStateStart()
@@ -166,9 +141,9 @@ public class AutonTwo extends OpMode {
         }
         else
         {
-            follower.holdPoint(waypoints.endPose);
+            follower.holdPoint(waypoints.autoEndParkPose);
 
-            //currentAutonomousState
+            currentAutonomousState = state.DO_NOTHING;
         }
     }
 
@@ -181,18 +156,15 @@ public class AutonTwo extends OpMode {
     private void processStateWaitPathDone() {
         if (!follower.isBusy())
         {
-            pathState = nextPathState;
+            currentAutonomousState = waitPathDoneNextState;
         }
     }
-    private void score() {
-        //Add code to score
-        pathState = postScorePathState;
-    }
+
     /** This method is called once at the init of the OpMode. **/
     @Override
     public void init()
     {
-        //Set default alliance and location
+        //Set default alliance and location etc...
         alliance = RobotConstants.alliance.BLUE;
         location = RobotConstants.location.TEST;
         try {
@@ -204,22 +176,18 @@ public class AutonTwo extends OpMode {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        waypoints.setWaypoints(alliance, location);
+        startingPose = waypoints.startingPose;
+
         follower = Constants.createFollower(hardwareMap, robotConstants);
 
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        pathState = state.START;
-
-        //Setting Defaults
-        startingPose = Waypoints.blueStartPoseWall;
-        isRedTeam = false; //Setting to blue team
-        Waypoints.setWaypoints(alliance, location);
-
+        currentAutonomousState = state.START;
 
         //Initialize follower
         follower.setPose(startingPose);
-        buildPaths();
         follower.update();
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -228,6 +196,10 @@ public class AutonTwo extends OpMode {
 
     private boolean updateInitialSettings()
     {
+        if (gamepad1.dpadUpWasPressed())
+        {
+            defaultFieldCentric = !defaultFieldCentric;
+        }
         if (gamepad1.aWasPressed())
         {
             alliance = RobotConstants.alliance.RED;
@@ -305,31 +277,15 @@ public class AutonTwo extends OpMode {
     {
         follower.update();
         robotPose = follower.getPose();
-        goalPose = Waypoints.goalPark;
+        goalPose = waypoints.goalPoint;
         DTG = GeneralUtils.getPointsDistance(goalPose.getX(),goalPose.getY(),robotPose.getX(),robotPose.getY());
     }
-    public void dhruvasinit_loopSelections()
-    {
-        Pose prevStartingPose = startingPose;
-        setStartingPose();
 
-        if (startingPose != prevStartingPose)
-        {
-            follower.setPose(startingPose);
-            Waypoints.setWaypoints(alliance, location);
-            buildPaths();
-        }
-        follower.update();
-        updateTelemetry();
-    }
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
     public void init_loop()
     {
         init_loopSelections();
-
-
-
     }
 
     /** This method is called once at the start of the OpMode.
@@ -363,30 +319,8 @@ public class AutonTwo extends OpMode {
 //        {
 //            blackboard.put("Alliance",RobotConstants.alliance.BLUE);
 //        }
-//        blackboard.put("Position",follower.getPose());
-        // 12/9 temp
-    }
-    public void setStartingPose()
-    {
-        if (gamepad1.a)
-        {
-            startingPose = Waypoints.redStartPoseWall;
-            isRedTeam = true;
-        }
-        else if (gamepad1.b)
-        {
-            startingPose = Waypoints.startPoseRedAudience;
-            isRedTeam = true;
-        }
-        else if (gamepad1.x)
-        {
-            startingPose = Waypoints.blueStartPoseWall;
-            isRedTeam = false;
-        }
-        else if (gamepad1.y) {
-            startingPose = Waypoints.startPoseBlueAudience;
-            isRedTeam = false;
-        }
+        blackboard.put("Alliance",alliance);
+        blackboard.put("Position",follower.getPose());
     }
 
     private void updateTelemetry()
@@ -395,16 +329,16 @@ public class AutonTwo extends OpMode {
         telemetry.addData("Starting Pose y", startingPose.getY());
         telemetry.addData("Starting Pose Heading", Math.toDegrees(startingPose.getHeading()));
         telemetry.addLine();
-        telemetry.addData("Goal Pose x", Waypoints.autoShootFromPose.getX());
-        telemetry.addData("Goal Pose y", Waypoints.autoShootFromPose.getY());
-        telemetry.addData("Goal Pose Heading", Math.toDegrees(Waypoints.autoShootFromPose.getHeading()));
+        telemetry.addData("Goal Pose x", waypoints.goalPoint.getX());
+        telemetry.addData("Goal Pose y", waypoints.goalPoint.getY());
+        telemetry.addData("Goal Pose Heading", Math.toDegrees(waypoints.goalPoint.getHeading()));
         telemetry.addLine();
-        telemetry.addData("path state", pathState);
+        telemetry.addData("path state", currentAutonomousState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Follower busy?", follower.isBusy());
-        telemetry.addData("Red Team?", isRedTeam);
+        telemetry.addData("Alliance", alliance);
         telemetry.addLine();
         telemetry.addData("PodXOffset", robotConstants.podX);
         telemetry.addData("PodYOffset", robotConstants.podY);

@@ -2347,6 +2347,45 @@ module BatteryHolder()
   }
 }
 
+module MiniHoles(Main = 14)
+{
+  Elong = 0.5;
+  cylinder(d = Main, h = 20, center = true);
+  for (i = [-1:1])
+    rotate((45*i) + 90, [0, 0, 1])
+    {
+      translate([-8*1.414, 0, 0])
+        hull()
+        {
+          translate([-Elong, 0, 0])
+            cylinder(d = 4, h = 20, center = true);
+          translate([Elong, 0, 0])
+            cylinder(d = 4, h = 20, center = true);
+        }
+      translate([8*1.4142, 0, 0])
+        hull()
+        {
+          translate([-Elong, 0, 0])
+            cylinder(d = 4, h = 20, center = true);
+          translate([Elong, 0, 0])
+            cylinder(d = 4, h = 20, center = true);
+        }
+    }
+  
+}
+
+module ChannelSupport(X = 27, Y = 60)
+{
+  Sections = ceil(Y / 24);
+  difference()
+  {
+    RoundedBlock($XDim = X, $YDim = Y, $ZDim = 9.5, $CurveD = 4);
+    for (i = [-Sections / 2 :Sections / 2])
+      translate([0, (i * 24), 0])
+        MiniHoles(Main = 5);
+  }
+}
+
 module Print3D()
 {
 //  BearingBlock(L = 1.4, H = 1, T = 0.3, VO = 0.52, MS = 1.0, MD = 0.118);
@@ -2364,6 +2403,7 @@ module Print3D()
 //  UpperBallTractionPulley(DoGuide = false, RollerSections = 7);
 //  UpperBallTractionPulley(DoGuide = true);
 //  ChannelSpacer(23.7);
+  ChannelSupport( Y = 47);
   //Upper ball traction servo mounts
 //  ServoBlock(BlockWidthOffset = -0.09);
   //Turret tilt servo mounts
@@ -2375,7 +2415,7 @@ module Print3D()
 //  Coupler();
 //  TurretCableGuide();
 // scale(1/25.4) BatteryHolder();
-  BallGuide();
+//  BallGuide();
 }
 
 if (!DoPrint)
@@ -2386,7 +2426,7 @@ if (!DoPrint)
 }
 else
 {
-  scale(25.4)
+//  scale(25.4)
 //    DXF();
   Print3D();
 }

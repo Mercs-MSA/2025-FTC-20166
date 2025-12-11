@@ -179,6 +179,11 @@ public class PedroTeleOp extends OpMode {
     }
     private boolean updateInitialSettings()
     {
+        if (gamepad1.dpadUpWasPressed())
+        {
+            defaultFieldCentric = !defaultFieldCentric;
+        }
+
         if (gamepad1.aWasPressed())
         {
             alliance = RobotConstants.alliance.RED;
@@ -489,10 +494,6 @@ public class PedroTeleOp extends OpMode {
         {
             follower.setPose(startingPose);
             waypoints.setWaypoints(alliance, location);
-        }
-        if (gamepad1.dpad_up)
-        {
-            defaultFieldCentric = !defaultFieldCentric;
         }
         changeAllianceMultiplier();
 
