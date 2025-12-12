@@ -294,7 +294,7 @@ public class AutonTwo extends OpMode {
     {
         subSystemShooter.setGoalPose(goalPose);
         opmodeTimer.resetTimer();
-        subSystemShooter.setAgitator(-1);
+        subSystemShooter.setAgitator(robotConstants.agitator);
         subSystemShooter.setTransfer(true);
     }
 

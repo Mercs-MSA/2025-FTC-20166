@@ -43,10 +43,10 @@ public class SubSystemShooter {
     public SubSystemShooter(HardwareMap hardwareMap, RobotConstants robotConstants) throws InterruptedException {
         this.robotConstants = robotConstants;
 
-        shooterTiltLeftLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.leftMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.leftMaxAngleSetting,true);
-        shooterTiltRightLERP = new LERP(RobotConstants.shooterMinAngle,RobotConstants.rightMinAngleSetting,RobotConstants.shooterMaxAngle,RobotConstants.rightMaxAngleSetting,true);
-        shooterAngleLERP = new LERP(RobotConstants.farDistance,RobotConstants.farShooterAngle,RobotConstants.nearDistance,RobotConstants.nearShooterAngle,true);
-        shooterVelocityLERP = new LERP(RobotConstants.farDistance,RobotConstants.farVelocity,RobotConstants.nearDistance,RobotConstants.nearVelocity,false);
+        shooterTiltLeftLERP = new LERP(robotConstants.shooterMinAngle,robotConstants.leftMinAngleSetting,robotConstants.shooterMaxAngle,robotConstants.leftMaxAngleSetting,true);
+        shooterTiltRightLERP = new LERP(robotConstants.shooterMinAngle,robotConstants.rightMinAngleSetting,robotConstants.shooterMaxAngle,robotConstants.rightMaxAngleSetting,true);
+        shooterAngleLERP = new LERP(robotConstants.farDistance,robotConstants.farShooterAngle,robotConstants.nearDistance,robotConstants.nearShooterAngle,true);
+        shooterVelocityLERP = new LERP(robotConstants.farDistance,robotConstants.farVelocity,robotConstants.nearDistance,robotConstants.nearVelocity,false);
 
         transferArm = hardwareMap.get(Servo.class, "lift");
 

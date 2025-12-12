@@ -480,7 +480,7 @@ public class PedroTeleOp extends OpMode {
     public void start()
     {
         subSystemShooter.setGoalPose(goalPose);
-        subSystemShooter.setAgitator(-1);
+        subSystemShooter.setAgitator(robotConstants.agitator);
         follower.update();
         follower.startTeleopDrive();
         timer.reset();

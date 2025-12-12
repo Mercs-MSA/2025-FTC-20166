@@ -32,20 +32,37 @@ public class RobotConstants
     public static double turretMaxPower = 1;
     public static double turretRotationP = 0.02;
     public static double servoAngle = 0;
-    public static double leftMaxAngleSetting = 0.2;
-    public static double rightMaxAngleSetting = 0.8;
-    public static double leftMinAngleSetting = 0.9;
-    public static double rightMinAngleSetting = 0.1;
-    public static double shooterMaxAngle = 84;
-    public static double shooterMinAngle = 41;
-    public static double nearShooterAngle = 70;
-    public static double nearVelocity = 1020;
-    public static double nearDistance = 30; //In inches
-    public static double farShooterAngle = 50;
-    public static double farVelocity = 1670;
-    public static double farDistance = 165; //In inches
-    public static double shooterVelocity = 300;
-    public static double shooterAngle = 45;
+    public double leftMaxAngleSetting = 0.2;
+    public double rightMaxAngleSetting = 0.8;
+    public double leftMinAngleSetting = 0.9;
+    public double rightMinAngleSetting = 0.1;
+    public double shooterMaxAngle = 84;
+    private double robotAShooterMaxAngle = 84;
+    private double robotCShooterMaxAngle = 84;
+    public double shooterMinAngle = 41;
+    private double robotAShooterMinAngle = 41;
+    private double robotCShooterMinAngle = 41;
+    public double nearShooterAngle = 70;
+    private double robotANearShooterAngle = 70;
+    private double robotCNearShooterAngle = 70;
+    public double nearVelocity = 1020;
+    private double robotANearVelocity = 1020;
+    private double robotCNearVelocity = 1020;
+    public double nearDistance = 30; //In inches
+    private double robotANearDistance = 30;
+    private double robotCNearDistance = 30;
+    public double farShooterAngle = 50;
+    private double robotAfarShooterAngle = 50;
+    private double robotCFarShooterAngle = 50;
+    public double farVelocity = 1670;
+    private double robotAFarVelocity = 1710;
+    private double robotCFarVelocity = 1770;
+    public double farDistance = 165; //In inches
+    private double robotAFarDistance = 165;
+    private double robotCFarDistance = 165;
+    private double robotCAgitator = -1;
+    private double robotAAgitator = 1;
+    public double agitator;
 
     //liftArm angles
     public static double robotCliftArmDownAngle = 0.386;
@@ -68,12 +85,12 @@ public class RobotConstants
     //pinpoint offsets
     public double podX = 0;
     public double podY = 0;
-    private static double robotAPodYOffset = -6.25;
-    private static double robotAPodXOffset = -6.5;
-    private static double robotBPodYOffset = -7.8;//45mm in front of the center
-    private static double robotBPodXOffset = 2.65;//220mm to the right of the center
-    private static double robotCPodXOffset = 0;
-    private static double robotCPodYOffset = -7.5;
+    private double robotAPodYOffset = -6.25;
+    private double robotAPodXOffset = -6.5;
+    private double robotBPodYOffset = -7.8;//45mm in front of the center
+    private double robotBPodXOffset = 2.65;//220mm to the right of the center
+    private double robotCPodXOffset = 0;
+    private double robotCPodYOffset = -7.5;
 
 
 
@@ -90,6 +107,15 @@ public class RobotConstants
             encoderStrafe = GoBildaPinpointDriver.EncoderDirection.FORWARD;
             leftSideDirection = DcMotorSimple.Direction.FORWARD;
             rightSideDirection = DcMotorSimple.Direction.FORWARD;
+            agitator = robotAAgitator;
+            shooterMaxAngle = robotAShooterMaxAngle;
+            shooterMinAngle = robotAShooterMinAngle;
+            nearShooterAngle = robotANearShooterAngle;
+            nearDistance = robotANearDistance;
+            nearVelocity = robotANearVelocity;
+            farShooterAngle = robotAfarShooterAngle;
+            farDistance = robotAFarDistance;
+            farVelocity = robotAFarVelocity;
         }
         else if (robotID == 1)
         {
@@ -112,6 +138,15 @@ public class RobotConstants
             encoderStrafe = GoBildaPinpointDriver.EncoderDirection.REVERSED;
             leftSideDirection = DcMotorSimple.Direction.FORWARD;
             rightSideDirection = DcMotorSimple.Direction.REVERSE;
+            agitator = robotCAgitator;
+            shooterMaxAngle = robotCShooterMaxAngle;
+            shooterMinAngle = robotCShooterMinAngle;
+            nearShooterAngle = robotCNearShooterAngle;
+            nearDistance = robotCNearDistance;
+            nearVelocity = robotCNearVelocity;
+            farShooterAngle = robotCFarShooterAngle;
+            farDistance = robotCFarDistance;
+            farVelocity = robotCFarVelocity;
         }
     }
 }
