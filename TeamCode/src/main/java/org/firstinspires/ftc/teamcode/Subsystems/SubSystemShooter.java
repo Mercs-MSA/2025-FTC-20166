@@ -31,6 +31,7 @@ public class SubSystemShooter {
 //    private RobotConstants.alliance alliance;
 //    private Pose goalPose;
     private CRServo transferServo2;
+    private CRServo agitator;
     private AnalogInput turretPositionSensor;
     private double turretDelta;
     PIDFCoefficients pidStore;
@@ -38,6 +39,7 @@ public class SubSystemShooter {
     private double currentTurretAngleError;
     private double shooterTargetVelocity;
     private double intakeShooterVelocity;
+    private Pose goalPose;
     public SubSystemShooter(HardwareMap hardwareMap, RobotConstants robotConstants) throws InterruptedException {
         this.robotConstants = robotConstants;
 
@@ -47,6 +49,8 @@ public class SubSystemShooter {
         shooterVelocityLERP = new LERP(RobotConstants.farDistance,RobotConstants.farVelocity,RobotConstants.nearDistance,RobotConstants.nearVelocity,false);
 
         transferArm = hardwareMap.get(Servo.class, "lift");
+
+        agitator = hardwareMap.get(CRServo.class, "BTS");
 
         shooterTiltLeft = hardwareMap.get(Servo.class, "shooterTiltLeft");//shooterTiltLeft
         shooterTiltRight = hardwareMap.get(Servo.class, "shooterTiltRight");//shooterTiltRight
@@ -146,6 +150,10 @@ public class SubSystemShooter {
         }
          */
     }
+    public void setAgitator(double power)
+    {
+        agitator.setPower(power);
+    }
     public double getPotVoltage()
     {
         return turretPositionSensor.getVoltage();
@@ -164,10 +172,15 @@ public class SubSystemShooter {
 
         }
     }
+    public void setGoalPose(Pose goalPose)
+
+    {
+        this.goalPose = goalPose;
+    }
     private void updateTurretHeading(Pose robotPos)
     {
         double currentTurretAngle;
-        double goalHeading = GeneralUtils.getPointsHeading(Waypoints.autoShootFromPose.getX(), Waypoints.autoShootFromPose.getY(), robotPos.getX(), robotPos.getY()) - 180;
+        double goalHeading = GeneralUtils.getPointsHeading(goalPose.getX(), goalPose.getY(), robotPos.getX(), robotPos.getY()) - 180;
 
         turretDelta = GeneralUtils.wrapRange(goalHeading - Math.toDegrees(robotPos.getHeading()), 180);
 

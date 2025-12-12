@@ -35,7 +35,8 @@ public class AutonTwo extends OpMode {
     private String allianceVerbose;
     private RobotConstants.alliance alliance;
     private RobotConstants.location location;
-
+    public static double telemetryUpper = 2500;
+    public static double telemetryLower = 0;
     private String startPosVerbose;
     private int joystickMultiplier;
     private double DTG;
@@ -123,7 +124,7 @@ public class AutonTwo extends OpMode {
     private void processBallLiftUp()
     {
         subSystemShooter.setLiftArm(true);
-        restartTimeout(500);
+        restartTimeout(1000);
 
         currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
         waitTimerDoneNextState = state.SHOOT_BALL_LIFT_DOWN_STATE;
@@ -135,7 +136,7 @@ public class AutonTwo extends OpMode {
         ballCount--;
         if (ballCount > 0)
         {
-            restartTimeout(500);
+            restartTimeout(2000);
             currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
             waitTimerDoneNextState = state.SHOOT_BALL_LIFT_UP_STATE;
         }
@@ -150,7 +151,7 @@ public class AutonTwo extends OpMode {
     private void processShootBall()
     {
         currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
-        restartTimeout(1000);
+        restartTimeout(7000);
         waitTimerDoneNextState = state.SHOOT_BALL_LIFT_UP_STATE;
     }
     private void processStateWaitPathDone() {
@@ -171,12 +172,10 @@ public class AutonTwo extends OpMode {
             subSystemRobotID = new SubSystemRobotID(hardwareMap);
             robotConstants = new RobotConstants(subSystemRobotID.getRobotID());
             subSystemShooter = new SubSystemShooter(hardwareMap, robotConstants);
-            waypoints = new Waypoints(alliance, location);
-
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        waypoints.setWaypoints(alliance, location);
+        waypoints = new Waypoints(alliance, location);
         startingPose = waypoints.startingPose;
 
         follower = Constants.createFollower(hardwareMap, robotConstants);
@@ -293,7 +292,10 @@ public class AutonTwo extends OpMode {
     @Override
     public void start()
     {
+        subSystemShooter.setGoalPose(goalPose);
         opmodeTimer.resetTimer();
+        subSystemShooter.setAgitator(-1);
+        subSystemShooter.setTransfer(true);
     }
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
@@ -342,7 +344,11 @@ public class AutonTwo extends OpMode {
         telemetry.addLine();
         telemetry.addData("PodXOffset", robotConstants.podX);
         telemetry.addData("PodYOffset", robotConstants.podY);
+        telemetryA.addData("Turret Target Velocity", subSystemShooter.getShooterTargetVelocity());
+        telemetryA.addData("Turret Actual Velocity", subSystemShooter.getShooterVelocity());
+        telemetryA.addData("Upper: ", telemetryUpper);
+        telemetryA.addData("Lower: ", telemetryLower);
 
-        telemetry.update();
+        telemetryA.update();
     }
 }

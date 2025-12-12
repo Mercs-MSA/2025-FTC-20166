@@ -128,7 +128,12 @@ public class PedroTeleOp extends OpMode {
     {
 
         String test = "Nothing";
-        if (timer.time() > 95)
+        if (timer.time() > 110)
+        {
+            test = "Endgame";
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+        }
+        else if (timer.time() > 95)
         {
             test = "Endgame";
             blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
@@ -170,10 +175,15 @@ public class PedroTeleOp extends OpMode {
         if (allianceGoodFromAuto && positionGoodFromAuto)
         {
             waypoints = new Waypoints(alliance, location);
+            follower.setPose(startingPose);
+            robotPose = startingPose;
         }
         else
         {
             waypoints = new Waypoints(RobotConstants.alliance.BLUE, RobotConstants.location.TEST);
+            startingPose = waypoints.startingPose;
+            follower.setPose(startingPose);
+            updatePose();
             shouldDoPositionLoop = true;
         }
     }
@@ -330,37 +340,9 @@ public class PedroTeleOp extends OpMode {
             automatedDrive = false;
         }
     }
-    public void updateTransfer()
-    {
-        if (gamepad2.dpadUpWasPressed())
-        {
-            subSystemShooter.setShooterAngle(RobotConstants.shooterMaxAngle);
-        }
-        else if (gamepad2.dpadDownWasPressed())
-        {
-            subSystemShooter.setShooterAngle(RobotConstants.shooterMinAngle);
-        }
-    }
-    public void doTest()
+    public void updateOperatorControls()
     {
 
-//        if(gamepad2.left_bumper)
-//        {
-//
-//        }
-//        else
-//        {
-//
-//        }
-
-//        if (gamepad2.dpad_right)
-//        {
-//            subSystemShooter.setTurretTargetVelocity(tempVelocity);
-//        }
-//        else
-//        {
-//            subSystemShooter.setTurretTargetVelocity(0);
-//        }
         if (gamepad2.y)
         {
             subSystemShooter.setLiftArm(true);
@@ -388,16 +370,6 @@ public class PedroTeleOp extends OpMode {
     }
     public void updateSlowMode()
     {
-//        //Optional way to change slow mode strength
-//        if (gamepad1.xWasPressed()) {
-//            slowModeMultiplier += 0.25;
-//        }
-//
-//        //Optional way to change slow mode strength
-//        if (gamepad2.yWasPressed()) {
-//            slowModeMultiplier -= 0.25;
-//        }
-
         //Slow Mode
         if (gamepad1.rightBumperWasPressed()) {
             slowMode = !slowMode;
@@ -414,21 +386,6 @@ public class PedroTeleOp extends OpMode {
             {
                 gamepad2.rumble(500);
             }
-        }
-    }
-    public void updateBoxBind()
-    {
-        if (gamepad1.dpadLeftWasPressed() && gamepad1.dpadRightWasPressed())
-        {
-            follower.setPose(waypoints.endgameParkBoxPose);
-//            if (alliance == RobotConstants.alliance.RED)
-//            {
-//                follower.setPose(waypoints.redEndgameBoxPose);
-//            }
-//            else if (alliance == RobotConstants.alliance.BLUE)
-//            {
-//                follower.setPose(waypoints.blueEndgameBoxPose);
-//            }
         }
     }
     public void updateTelemetryA()
@@ -492,8 +449,9 @@ public class PedroTeleOp extends OpMode {
 
         if (settingsChanged)
         {
-            follower.setPose(startingPose);
             waypoints.setWaypoints(alliance, location);
+            startingPose = waypoints.startingPose;
+            follower.setPose(startingPose);
         }
         changeAllianceMultiplier();
 
@@ -514,12 +472,15 @@ public class PedroTeleOp extends OpMode {
         {
             init_loopSelections();
         }
+
+        subSystemShooter.setGoalPose(goalPose);
 //        subSystemShooter.setAlliance(alliance);
     }
     @Override
     public void start()
     {
-        waypoints.setWaypoints(alliance, location);
+        subSystemShooter.setGoalPose(goalPose);
+        subSystemShooter.setAgitator(-1);
         follower.update();
         follower.startTeleopDrive();
         timer.reset();
@@ -534,15 +495,13 @@ public class PedroTeleOp extends OpMode {
         updatePedroDrive();
         updateAutomatedDrive();
 
-        updateBoxBind();
-
-//        updateTransfer();
         subSystemShooter.updateTurret(robotPose, DTG);
+        updateOperatorControls();
 
-        updateFeedback();
+//        updateFeedback();
 
         // do bs
-        doTest();
+        //doTest();
 
         updateTelemetryA();
     }
