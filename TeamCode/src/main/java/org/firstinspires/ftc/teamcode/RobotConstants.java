@@ -56,7 +56,7 @@ public class RobotConstants
     private double robotCFarShooterAngle = 50;
     public double farVelocity = 1670;
     private double robotAFarVelocity = 1710;
-    private double robotCFarVelocity = 1740;
+    private double robotCFarVelocity = 1680;
     public double farDistance = 165; //In inches
     private double robotAFarDistance = 165;
     private double robotCFarDistance = 165;

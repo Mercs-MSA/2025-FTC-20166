@@ -408,6 +408,9 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("position theta", Math.toDegrees(robotPose.getHeading()));
         telemetryA.addData("automatedDrive", automatedDrive);
         telemetryA.addLine();
+        telemetryA.addData("Goal Pose", goalPose);
+
+        telemetryA.addLine();
         telemetryA.addLine("Turret Data");
         telemetryA.addData("turretTargetAngle", subSystemShooter.getTurretDelta());
         telemetryA.addData("turretAngle", subSystemShooter.getTurretAngle());

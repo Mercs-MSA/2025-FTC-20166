@@ -124,6 +124,7 @@ public class AutonTwo extends OpMode {
     private void processBallLiftUp()
     {
         subSystemShooter.setLiftArm(true);
+        subSystemShooter.setIntakeSpeed(1200);
         restartTimeout(1000);
 
         currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
@@ -133,6 +134,7 @@ public class AutonTwo extends OpMode {
     private void processBallLiftDown()
     {
         subSystemShooter.setLiftArm(false);
+        subSystemShooter.setIntakeSpeed(0);
         ballCount--;
         if (ballCount > 0)
         {
@@ -151,7 +153,7 @@ public class AutonTwo extends OpMode {
     private void processShootBall()
     {
         currentAutonomousState = state.WAIT_TIMER_DONE_STATE;
-        restartTimeout(7000);
+        restartTimeout(3000);
         waitTimerDoneNextState = state.SHOOT_BALL_LIFT_UP_STATE;
     }
     private void processStateWaitPathDone() {
@@ -303,7 +305,8 @@ public class AutonTwo extends OpMode {
     public void loop() {
 
         // These loop the movements of the robot, these must be called continuously in order to work
-        follower.update();
+        updatePose();
+        //follower.update();
         autonomousPathUpdate();
         subSystemShooter.updateTurret(robotPose, DTG);
 
@@ -330,6 +333,12 @@ public class AutonTwo extends OpMode {
         telemetry.addData("Starting Pose x", startingPose.getX());
         telemetry.addData("Starting Pose y", startingPose.getY());
         telemetry.addData("Starting Pose Heading", Math.toDegrees(startingPose.getHeading()));
+        telemetry.addLine();
+
+        telemetryA.addData("turretTargetAngle", subSystemShooter.getTurretDelta());
+        telemetryA.addData("turretAngle", subSystemShooter.getTurretAngle());
+
+        telemetry.addData("Goal point", waypoints.goalPoint);
         telemetry.addLine();
         telemetry.addData("Goal Pose x", waypoints.goalPoint.getX());
         telemetry.addData("Goal Pose y", waypoints.goalPoint.getY());
