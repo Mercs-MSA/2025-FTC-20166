@@ -24,6 +24,7 @@ public class SubSystemShooter {
     private Servo shooterTiltRight;
     private Servo transferArm;
     private Servo gateServo;
+    private double turretOffset = 0;
     private DcMotorEx shooterFlyWheel;
     private DcMotorEx intakeMotor;
     private CRServo turretRotation;
@@ -182,7 +183,7 @@ public class SubSystemShooter {
         double currentTurretAngle;
         double goalHeading = GeneralUtils.getPointsHeading(goalPose.getX(), goalPose.getY(), robotPos.getX(), robotPos.getY()) - 180;
 
-        turretDelta = GeneralUtils.wrapRange(goalHeading - Math.toDegrees(robotPos.getHeading()), 180);
+        turretDelta = GeneralUtils.wrapRange((goalHeading - Math.toDegrees(robotPos.getHeading())) + turretOffset, 180);
 
         //this is for turret rotation.
         currentTurretAngle = getTurretAngle();
@@ -227,6 +228,14 @@ public class SubSystemShooter {
     {
         this.intakeShooterVelocity = velocity;
         intakeMotor.setVelocity(velocity);
+    }
+    public void incrementTurretOffset(double increment)
+    {
+        turretOffset += increment;
+    }
+    public void resetTurretOffset()
+    {
+        turretOffset = 0;
     }
     public double getTurretRotatePower()
     {

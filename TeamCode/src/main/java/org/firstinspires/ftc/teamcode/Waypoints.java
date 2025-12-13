@@ -21,23 +21,23 @@ public class Waypoints
     //PedroPoints for each pose and target location
     //CHECK ALL THESE !!!
     //BLUE
-    public static final Pose blueStartFrontPose = new Pose(53.6, 8.2, Math.toRadians(180));
+    public static final Pose blueStartFrontPose = new Pose(51.2, 8.2, Math.toRadians(180));
     public static final Pose blueShootFromFrontPose = new Pose(53.6, 8.2, Math.toRadians(180));
     public static final Pose blueAutoParkAtFrontPose = new Pose(53.6, 36, Math.toRadians(180));
-    public static final Pose blueStartBackPose = new Pose(27,128,Math.toRadians(180));
+    public static final Pose blueStartBackPose = new Pose(14.1, 113,Math.toRadians(270));
     public static final Pose blueShootFromBackPose = new Pose(27,128,Math.toRadians(180));
     public static final Pose blueAutoParkAtBackPose = new Pose(48,132,Math.toRadians(180));
     public static final Pose blueGoalPoint = new Pose(8, 136, 0);//Heading is not used for goal point
-    public static final Pose blueEndgameBoxPose = new Pose(104.4,31.5,Math.toRadians(180));
+    public static final Pose blueEndgameBoxPose = new Pose(99.8,32.6,Math.toRadians(0));
     //RED
-    public static final Pose redStartFrontPose = new Pose(72,72,Math.toRadians(90));//ToDO
-    public static final Pose redShootFromFrontPose = new Pose(72,72,Math.toRadians(90));//ToDO
-    public static final Pose redAutoParkAtFrontPose = new Pose(72,72,Math.toRadians(90));//ToDO
-    public static final Pose redStartBackPose = new Pose(72,72,Math.toRadians(90));//ToDO
-    public static final Pose redShootFromBackPose = new Pose(72,72,Math.toRadians(90));//ToDO
-    public static final Pose redAutoParkAtBackPose = new Pose(72,72,Math.toRadians(90));//ToDO
+    public static final Pose redStartFrontPose = new Pose(85.3,8.6,Math.toRadians(0));
+    public static final Pose redShootFromFrontPose = new Pose(85.3,8.6,Math.toRadians(0));//done
+    public static final Pose redAutoParkAtFrontPose = new Pose(90.4,36,Math.toRadians(90));//done
+    public static final Pose redStartBackPose = new Pose(123.6,112.3,Math.toRadians(270));
+    public static final Pose redShootFromBackPose = new Pose(117,128,Math.toRadians(90));//done
+    public static final Pose redAutoParkAtBackPose = new Pose(96,132,Math.toRadians(90));//done
     public static final Pose redGoalPoint = new Pose(136, 136, 0);//Heading is not used for goal point
-    public static final Pose redEndgameBoxPose = new Pose(36.7,31.5,Math.toRadians(0));
+    public static final Pose redEndgameBoxPose = new Pose(36.7,33.9,Math.toRadians(0));
     //Neutral test
     public static final Pose testStartPose = new Pose(8,8,Math.toRadians(0));
     public static final Pose testFieldCenter = new Pose(72,72,Math.toRadians(90));

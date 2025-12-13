@@ -330,7 +330,7 @@ public class PedroTeleOp extends OpMode {
     {
         //Automated PathFollowing
         if (gamepad1.aWasPressed()) {
-            follower.holdPoint(waypoints.endgameParkBoxPose);
+        follower.holdPoint(waypoints.endgameParkBoxPose);
             automatedDrive = true;
         }
 
@@ -366,6 +366,18 @@ public class PedroTeleOp extends OpMode {
         else
         {
             subSystemShooter.setIntakeSpeed(0);
+        }
+        if (gamepad2.dpadUpWasPressed())
+        {
+            subSystemShooter.resetTurretOffset();
+        }
+        else if (gamepad2.dpad_right)
+        {
+            subSystemShooter.incrementTurretOffset(-.5);
+        }
+        else if (gamepad2.dpad_left)
+        {
+            subSystemShooter.incrementTurretOffset(.5);
         }
     }
     public void updateSlowMode()
@@ -459,7 +471,6 @@ public class PedroTeleOp extends OpMode {
         telemetryA.addData("Starting Position", startPosVerbose);
         telemetryA.addData("Default Drive Mode", (defaultFieldCentric) ? "Field Centric" : "Robot Centric");
         telemetryA.addData("RobotID", subSystemRobotID.getRobotID());
-        updatePose();
 
         telemetryA.update();
 
@@ -472,7 +483,7 @@ public class PedroTeleOp extends OpMode {
         {
             init_loopSelections();
         }
-
+        updatePose();
         subSystemShooter.setGoalPose(goalPose);
 //        subSystemShooter.setAlliance(alliance);
     }
