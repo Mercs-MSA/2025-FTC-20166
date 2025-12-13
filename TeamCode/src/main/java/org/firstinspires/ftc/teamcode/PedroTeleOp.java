@@ -85,11 +85,13 @@ public class PedroTeleOp extends OpMode {
     boolean currentlyTurning = false;
     private Telemetry telemetryA;
     private RobotConstants.alliance alliance;
+    private Object centricity = true;
     private RobotConstants.location location;
 
     private Pose startingPose = null;
     private int joystickMultiplier;
     private Pose goalPose;
+    private Pose boxProxy;
     private Supplier<PathChain> pathChain;
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
@@ -161,6 +163,7 @@ public class PedroTeleOp extends OpMode {
         boolean allianceGoodFromAuto = false;
         startingPose = (Pose) blackboard.get("Position");
         alliance = (RobotConstants.alliance) blackboard.get("Alliance");
+        centricity = blackboard.get("Centricity");
         follower = Constants.createFollower(hardwareMap, robotConstants);
         if (startingPose != null)
         {
@@ -171,6 +174,11 @@ public class PedroTeleOp extends OpMode {
         {
             blackboard.remove("Alliance");
             allianceGoodFromAuto = true;
+        }
+        if (centricity != null)
+        {
+            defaultFieldCentric = (boolean) centricity;
+            blackboard.remove("Centricity");
         }
         if (allianceGoodFromAuto && positionGoodFromAuto)
         {
@@ -330,8 +338,29 @@ public class PedroTeleOp extends OpMode {
     {
         //Automated PathFollowing
         if (gamepad1.aWasPressed()) {
-        follower.holdPoint(waypoints.endgameParkBoxPose);
+            follower.holdPoint(boxProxy);
             automatedDrive = true;
+        }
+
+        if (automatedDrive && gamepad1.dpadLeftWasPressed())
+        {
+            boxProxy = new Pose(boxProxy.getX() - .5, boxProxy.getY(), boxProxy.getHeading());
+            follower.holdPoint(boxProxy);
+        }
+        else if (automatedDrive && gamepad1.dpadRightWasPressed())
+        {
+            boxProxy = new Pose(boxProxy.getX() + .5, boxProxy.getY(), boxProxy.getHeading());
+            follower.holdPoint(boxProxy);
+        }
+        else if (automatedDrive && gamepad1.dpadUpWasPressed())
+        {
+            boxProxy = new Pose(boxProxy.getX(), boxProxy.getY() + .5, boxProxy.getHeading());
+            follower.holdPoint(boxProxy);
+        }
+        else if (automatedDrive && gamepad1.dpadDownWasPressed())
+        {
+            boxProxy = new Pose(boxProxy.getX(), boxProxy.getY() - .5, boxProxy.getHeading());
+            follower.holdPoint(boxProxy);
         }
 
         //Stop automated following if the follower is done
@@ -486,6 +515,7 @@ public class PedroTeleOp extends OpMode {
         {
             init_loopSelections();
         }
+        boxProxy = waypoints.endgameParkBoxPose;
         updatePose();
         subSystemShooter.setGoalPose(goalPose);
 //        subSystemShooter.setAlliance(alliance);

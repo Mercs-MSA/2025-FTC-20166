@@ -326,6 +326,7 @@ public class AutonTwo extends OpMode {
 //        }
         blackboard.put("Alliance",alliance);
         blackboard.put("Position",follower.getPose());
+        blackboard.put("Centricity", defaultFieldCentric);
     }
 
     private void updateTelemetry()
