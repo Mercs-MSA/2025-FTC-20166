@@ -24,7 +24,7 @@ public class Waypoints
     public static final Pose blueStartFrontPose = new Pose(51.2, 8.2, Math.toRadians(180));
     public static final Pose blueShootFromFrontPose = new Pose(53.6, 8.2, Math.toRadians(180));
     public static final Pose blueAutoParkAtFrontPose = new Pose(53.6, 36, Math.toRadians(180));
-    public static final Pose blueStartBackPose = new Pose(14.1, 113,Math.toRadians(270));
+    public static final Pose blueStartBackPose = new Pose(14.1, 113,Math.toRadians(-90));
     public static final Pose blueShootFromBackPose = new Pose(27,128,Math.toRadians(-90));
     public static final Pose blueAutoParkAtBackPose = new Pose(48,132,Math.toRadians(180));
     public static final Pose blueGoalPoint = new Pose(8, 136, 0);//Heading is not used for goal point
@@ -34,7 +34,8 @@ public class Waypoints
     public static final Pose redShootFromFrontPose = new Pose(85.3,8.6,Math.toRadians(0));//done
     public static final Pose redAutoParkAtFrontPose = new Pose(90.4,36,Math.toRadians(0));//done
     public static final Pose redStartBackPose = new Pose(123.6,112.3,Math.toRadians(-90));
-    public static final Pose redShootFromBackPose = new Pose(86,118,Math.toRadians(-90));//done
+//    public static final Pose redShootFromBackPose = new Pose(86,118,Math.toRadians(-90));//done
+    public static final Pose redShootFromBackPose = new Pose(123.6,112.3,Math.toRadians(-90));
     public static final Pose redAutoParkAtBackPose = new Pose(86,118,Math.toRadians(-90));//done
     public static final Pose redGoalPoint = new Pose(136, 136, 0);//Heading is not used for goal point
     public static final Pose redEndgameBoxPose = new Pose(36.7,33.9,Math.toRadians(0));
